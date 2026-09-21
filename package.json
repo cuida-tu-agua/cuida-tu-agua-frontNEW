@@ -2,13 +2,24 @@
   "name": "save-your-water",
   "main": "expo-router/entry",
   "version": "1.0.0",
+
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  },
   "scripts": {
     "start": "expo start",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "test": "jest --coverage",
+    "audit": "npm audit --audit-level=moderate",
+    "audit:fix": "npm audit fix",
+    "audit:prod": "npm audit --production --audit-level=high",
+    "outdated": "npm outdated",
+    "ci": "npm ci --legacy-peer-deps"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
