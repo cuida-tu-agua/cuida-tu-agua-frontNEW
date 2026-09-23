@@ -19,7 +19,7 @@ interface InputProps {
   keyboardType?: 'default' | 'email-address' | 'numeric' | 'phone-pad';
   editable?: boolean;
   error?: string;
-  icon?: string;
+  icon?: React.ReactNode; // string (emoji) o componente, p. ej. <Ionicons />
   onIconPress?: () => void;
   style?: StyleProp<ViewStyle>;
 }
@@ -30,7 +30,7 @@ const containerBase: ViewStyle = {
 
 const labelBase: TextStyle = {
   ...theme.textStyles.label,
-  color: theme.colors.textMuted,
+  color: theme.colors.textPrimary,
   marginBottom: theme.spacing.sm,
 };
 
@@ -110,8 +110,9 @@ export const Input: React.FC<InputProps> = ({
               justifyContent: 'center',
             }}
             onPress={onIconPress}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
-            <Text style={{ fontSize: 20 }}>{icon}</Text>
+            {typeof icon === 'string' ? <Text style={{ fontSize: 20 }}>{icon}</Text> : icon}
           </TouchableOpacity>
         )}
       </View>

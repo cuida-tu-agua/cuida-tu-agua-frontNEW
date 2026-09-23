@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import {
+  Image,
   View,
   Text,
   ScrollView,
   ViewStyle,
   TextStyle,
-  StyleProp,
   Keyboard,
   TouchableWithoutFeedback,
 } from 'react-native';
@@ -13,6 +13,7 @@ import { theme } from '../../styles/theme';
 import { Input } from '../../components/common/Input';
 import { Button } from '../../components/common/Button';
 import { Logo } from '../../components/common/Logo';
+import { EyeIcon } from '../../components/common/EyeIcon';
 
 interface LoginScreenProps {
   onLoginPress: (email: string, password: string) => void;
@@ -37,11 +38,6 @@ const headerStyle: ViewStyle = {
   marginBottom: theme.spacing.xxxl,
 };
 
-const logoStyle: TextStyle = {
-  fontSize: 80,
-  marginBottom: theme.spacing.lg,
-};
-
 const titleStyle: TextStyle = {
   ...theme.textStyles.h2,
   color: theme.colors.textPrimary,
@@ -57,6 +53,17 @@ const subtitleStyle: TextStyle = {
 
 const formStyle: ViewStyle = {
   marginBottom: theme.spacing.xxxl,
+  backgroundColor: theme.colors.surface,
+  paddingVertical: theme.spacing.xl, 
+  paddingHorizontal: theme.spacing.lg, 
+  borderColor: theme.colors.border,
+  borderWidth: 0.3,
+  borderRadius: theme.spacing.xl,
+  shadowColor: theme.colors.primary,
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.3,
+  shadowRadius: 5,
+  elevation: 1,
 };
 
 const forgotPasswordLinkStyle: TextStyle = {
@@ -88,7 +95,6 @@ const footerStyle: ViewStyle = {
   flexDirection: 'row',
   justifyContent: 'center',
   alignItems: 'center',
-  marginTop: theme.spacing.xl,
 };
 
 const footerTextStyle: TextStyle = {
@@ -140,7 +146,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
   };
 
   return (
-    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()} >
       <View style={containerStyle}>
         <ScrollView
           contentContainerStyle={contentStyle}
@@ -149,7 +155,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
           {/* Header */}
           <View style={headerStyle}>
             <Logo type="isotipo" theme="light" size={120} />
-            <Text style={titleStyle}>Inicia Sesión</Text>
+            <Text style={titleStyle}>Bienvenido de vuelta</Text>
             <Text style={subtitleStyle}>Accede con tus credenciales</Text>
           </View>
 
@@ -162,7 +168,6 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
               onChangeText={setEmail}
               keyboardType="email-address"
               error={errors.email}
-              icon="✉️"
             />
 
             <Input
@@ -172,7 +177,14 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
               onChangeText={setPassword}
               secureTextEntry={!showPassword}
               error={errors.password}
-              icon={showPassword ? '👁️' : '👁️‍🗨️'}
+              icon={
+                <EyeIcon
+                  crossed={showPassword}
+                  size={22}
+                  color={theme.colors.textPrimary}
+                  accessibilityLabel={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                />
+              }
               onIconPress={() => setShowPassword(!showPassword)}
             />
 
@@ -191,22 +203,31 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
               loading={loading}
               disabled={loading}
             />
+
+             {/* Divider */}
+            <View style={dividerContainerStyle}>
+              <View style={dividerStyle} />
+              <Text style={dividerTextStyle}>O</Text>
+              <View style={dividerStyle} />
+            </View>
+
+            {/* Google Button */}
+            <Button
+              label="Continuar con Google"
+              onPress={() => console.log('Google login')}
+              variant="secondary"
+              icon={
+                <Image
+                  source={require('../../../../assets/images/g-logo.png')}
+                  style={{ width: 20, height: 20 }}
+                  resizeMode="contain"
+                  accessibilityIgnoresInvertColors
+                />
+              }
+            />
           </View>
 
-          {/* Divider */}
-          <View style={dividerContainerStyle}>
-            <View style={dividerStyle} />
-            <Text style={dividerTextStyle}>O</Text>
-            <View style={dividerStyle} />
-          </View>
-
-          {/* Google Button */}
-          <Button
-            label="Continuar con Google"
-            onPress={() => console.log('Google login')}
-            variant="secondary"
-            icon="🔵"
-          />
+         
 
           {/* Register Link */}
           <View style={footerStyle}>

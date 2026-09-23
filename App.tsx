@@ -10,20 +10,11 @@ export default function App() {
   const [screen, setScreen] = React.useState<ScreenName>('splash');
   const [showDevButtons, setShowDevButtons] = React.useState(false);
 
-  React.useEffect(() => {
-    if (screen === 'splash') {
-      const timer = setTimeout(() => {
-        setScreen('login');
-        setShowDevButtons(true);
-      }, 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [screen]);
 
   const renderScreen = () => {
     switch (screen) {
       case 'splash':
-        return <SplashScreen onFinish={() => setScreen('login')} />;
+        return <SplashScreen onFinish={() => {setScreen('login'); setShowDevButtons(true);}} />;
       case 'login':
         return (
           <LoginScreen
