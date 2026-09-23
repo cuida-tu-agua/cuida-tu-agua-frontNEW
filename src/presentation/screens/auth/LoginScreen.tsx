@@ -13,7 +13,8 @@ import { theme } from '../../styles/theme';
 import { Input } from '../../components/common/Input';
 import { Button } from '../../components/common/Button';
 import { Logo } from '../../components/common/Logo';
-import { EyeIcon } from '../../components/common/EyeIcon';
+import { EyeIcon } from '../../components/auth/EyeIcon';
+import { UIcon } from '../../components/auth';
 
 interface LoginScreenProps {
   onLoginPress: (email: string, password: string) => void;
@@ -167,6 +168,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
+              leftIcon={<UIcon name="envelope" size={20} color={theme.colors.textMuted} />}
               error={errors.email}
             />
 
@@ -177,6 +179,8 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
               onChangeText={setPassword}
               secureTextEntry={!showPassword}
               error={errors.password}
+              leftIcon={<UIcon name="lock" size={20} color={theme.colors.textMuted} />}
+              
               icon={
                 <EyeIcon
                   crossed={showPassword}

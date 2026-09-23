@@ -2,4 +2,4 @@ export { Button } from './Button';
 export { Input } from './Input';
 export { Card } from './Card';
 export { Logo } from './Logo';
-export { LoadingProgress } from './LoadingProgress';export { EyeIcon } from './EyeIcon';
+export { LoadingProgress } from './LoadingProgress';

@@ -26,7 +26,7 @@ export default function App() {
       case 'register':
         return (
           <RegisterScreen
-            onRegisterPress={(name, email, password) => console.log('Register:', name, email, password)}
+            onRegisterPress={(name, lastName, email, password) => console.log('Register:', name, lastName, email, password)}
             onLoginPress={() => setScreen('login')}
           />
         );
