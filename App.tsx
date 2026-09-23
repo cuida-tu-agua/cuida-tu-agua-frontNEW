@@ -3,8 +3,9 @@ import { AppRegistry, SafeAreaView, View, Button } from 'react-native';
 import { SplashScreen } from './src/presentation/screens/SplashScreen';
 import { LoginScreen } from './src/presentation/screens/auth/LoginScreen';
 import { RegisterScreen } from './src/presentation/screens/auth/RegisterScreen';
+import { DashboardScreen } from './src/presentation/screens/dashboard/DashboardScreen';
 
-type ScreenName = 'splash' | 'login' | 'register';
+type ScreenName = 'splash' | 'login' | 'register' | 'dashboard';
 
 export default function App() {
   const [screen, setScreen] = React.useState<ScreenName>('splash');
@@ -18,7 +19,10 @@ export default function App() {
       case 'login':
         return (
           <LoginScreen
-            onLoginPress={(email, password) => console.log('Login:', email, password)}
+            onLoginPress={(email, password) => {
+              console.log('Login:', email, password);
+              setScreen('dashboard'); // BETA: sin autenticación real todavía
+            }}
             onRegisterPress={() => setScreen('register')}
             onForgotPasswordPress={() => console.log('Forgot')}
           />
@@ -30,6 +34,8 @@ export default function App() {
             onLoginPress={() => setScreen('login')}
           />
         );
+      case 'dashboard':
+        return <DashboardScreen userName="Esteban" />;
       default:
         return null;
     }
@@ -43,6 +49,7 @@ export default function App() {
           <Button title="Splash" onPress={() => setScreen('splash')} color="#0096C7" />
           <Button title="Login" onPress={() => setScreen('login')} color="#0096C7" />
           <Button title="Register" onPress={() => setScreen('register')} color="#0096C7" />
+          <Button title="Dashboard" onPress={() => setScreen('dashboard')} color="#0096C7" />
         </View>
       )}
     </SafeAreaView>
