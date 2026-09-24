@@ -17,7 +17,7 @@ import { EyeIcon } from '../../components/auth/EyeIcon';
 import { UIcon } from '../../components/auth';
 
 interface LoginScreenProps {
-  onLoginPress: (email: string, password: string) => void;
+  onLoginPress: (email: string, password: string) => Promise<void>;
   onRegisterPress: () => void;
   onForgotPasswordPress: () => void;
   loading?: boolean;
@@ -144,6 +144,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
     if (validateForm()) {
       onLoginPress(email, password);
     }
+    
   };
 
   return (

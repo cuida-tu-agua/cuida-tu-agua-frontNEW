@@ -15,7 +15,7 @@ import { Logo } from '../../components/common/Logo';
 import { EyeIcon, PasswordStrengthMeter, UIcon } from '../../components/auth';
 
 interface RegisterScreenProps {
-  onRegisterPress: (name: string, lastName: string, email: string, password: string) => void;
+  onRegisterPress: (firstName: string, lastName: string, email: string, password: string) => Promise<void>;
   onLoginPress: () => void;
   loading?: boolean;
 }
@@ -124,7 +124,7 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
   onLoginPress,
   loading = false,
 }) => {
-  const [name, setName] = useState('');
+  const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -132,20 +132,18 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
   const [showPassword, setShowPassword] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [errors, setErrors] = useState<{
-    name?: string;
+    firstName?: string;
     lastName?: string;
     email?: string;
     password?: string;
     confirmPassword?: string;
   }>({});
 
-  const passwordsMatch = confirmPassword.length > 0 && confirmPassword === password;
-
   const validateForm = (): boolean => {
     const newErrors: typeof errors = {};
 
-    if (!name.trim()) {
-      newErrors.name = 'Nombre es requerido';
+    if (!firstName.trim()) {
+      newErrors.firstName = 'Nombre es requerido';
     }
 
     if (!lastName.trim()) {
@@ -177,8 +175,9 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
   const handleRegisterPress = () => {
     Keyboard.dismiss();
     if (validateForm()) {
-      onRegisterPress(name.trim(), lastName.trim(), email, password);
+      onRegisterPress(firstName.trim(), lastName.trim(), email, password);
     }
+    
   };
 
   return (
@@ -201,9 +200,9 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
                 <Input
                   label="Nombres"
                   placeholder="Juan Diego"
-                  value={name}
-                  onChangeText={setName}
-                  error={errors.name}
+                  value={firstName}
+                  onChangeText={setFirstName}
+                  error={errors.firstName}
                   style={{ flex: 1, marginRight: theme.spacing.sm }}
                 />
                 <Input

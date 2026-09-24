@@ -1,37 +1,30 @@
-import {ENV} from './env';
-import {CONSTANTS} from './constants';
+import axios from 'axios';
 
-export const API_CONFIG ={
-    baseURL: ENV.API_URL,
+const API_BASE_URL =
+  process.env.EXPO_PUBLIC_API_URL || 'http://192.168.20.180:8081';
 
-    timeout: CONSTANTS.API_TIMEOUT,
+console.log('API Base URL:', API_BASE_URL);
 
-    headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-    },
+export const API_CONFIG = {
+  baseURL: API_BASE_URL,
+  timeout: 10000,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+};
+
+export const api = axios.create(API_CONFIG);
+
+export const AUTH_ENDPOINTS = {
+  REGISTER: '/api/auth/register',
+  LOGIN: '/api/auth/login',
+  REFRESH: '/api/auth/refresh',
+  LOGOUT: '/api/auth/logout',
 };
 
 export const API_ENDPOINTS = {
-    AUTH_LOGIN: '/auth/login',
-    AUTH_REGISTER: '/auth/register',
-    AUTH_REFRESH: '/auth/refresh',
-    AUTH_LOGOUT: '/auth/logout',
-    AUTH_VERIFY_EMAIL: '/auth/verify-email',
-    AUTH_FORGOT_PASSWORD: '/auth/forgot-password',
-
-    USER_PROFILE: '/users/profile',
-    USER_UPDATE: '/users/profile',
-
-    PLACE_LIST: '/places',
-    PLACE_CREATE: '/places',
-    PLACE_UPDATE: '/places/:id',
-    PLACE_DELETE: '/places/:id',
-
-    CONSUMPTION_TODAY: '/consumption/today',
-    CONSUMPTION_RANGE: '/consumption/range', 
-
-    VALVE_STATUS: '/valve/status',
-    VALVE_CLOSE: '/valve/close',
-    VALVE_OPEN: '/valve/open',
-}
+  AUTH: AUTH_ENDPOINTS,
+  USERS: '/api/users',
+  DEVICES: '/api/devices',
+  CONSUMPTION: '/api/consumption',
+};
