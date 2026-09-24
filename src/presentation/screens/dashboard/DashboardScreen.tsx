@@ -7,6 +7,7 @@ import {
   ViewStyle,
   TextStyle,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { theme } from '../../styles/theme';
 import { Card, Logo } from '../../components/common';
@@ -94,6 +95,7 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
   userName = 'Usuario',
   onNotificationsPress,
 }) => {
+  const insets = useSafeAreaInsets();
   const [period, setPeriod] = useState<Period>('day'); // HU-016: "Día" preseleccionado
   const [selectedBar, setSelectedBar] = useState<number | null>(null);
   const [lastUpdate, setLastUpdate] = useState(MOCK_STATUS.lastUpdate);
@@ -116,7 +118,7 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
   };
 
   return (
-    <View style={containerStyle}>
+    <View style={[containerStyle, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
       <ScrollView contentContainerStyle={contentStyle} showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={headerStyle}>

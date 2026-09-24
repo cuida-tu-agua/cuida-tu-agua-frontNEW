@@ -9,6 +9,7 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { theme } from '../../styles/theme';
 import { Input } from '../../components/common/Input';
 import { Button } from '../../components/common/Button';
@@ -115,6 +116,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
   onForgotPasswordPress,
   loading = false,
 }) => {
+  const insets = useSafeAreaInsets();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -149,7 +151,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
 
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()} >
-      <View style={containerStyle}>
+      <View style={[containerStyle, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
         <ScrollView
           contentContainerStyle={contentStyle}
           showsVerticalScrollIndicator={false}

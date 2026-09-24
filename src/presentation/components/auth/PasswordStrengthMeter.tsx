@@ -7,21 +7,23 @@ interface PasswordStrengthMeterProps {
   password: string;
 }
 
-const SEGMENTS = 4;
+const SEGMENTS = 5;
 
 export const getPasswordRules = (password: string) => [
   { label: '8+ carac.', met: password.length >= 8 },
+  { label: 'Minúscula', met: /[a-z]/.test(password) },
   { label: 'Mayúscula', met: /[A-Z]/.test(password) },
   { label: 'Número', met: /[0-9]/.test(password) },
-  { label: 'Símbolo', met: /[^A-Za-z0-9\s]/.test(password) },
+  { label: 'Símbolo', met: /[@$!%*?&_.]/.test(password) },
 ];
 
-// Nivel según cuántas reglas se cumplen (0 a 4)
+// Nivel según cuántas reglas se cumplen (0 a 5)
 const LEVELS = [
   { label: '', color: theme.colors.grayMedium },
   { label: 'Débil', color: theme.colors.error },
   { label: 'Regular', color: theme.colors.warning },
   { label: 'Fuerte', color: theme.colors.primaryActive },
+  { label: 'Muy fuerte', color: theme.colors.success },
   { label: 'Muy fuerte', color: theme.colors.success },
 ];
 

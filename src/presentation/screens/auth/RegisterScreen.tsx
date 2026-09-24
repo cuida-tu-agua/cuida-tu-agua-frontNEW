@@ -8,6 +8,7 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { theme } from '../../styles/theme';
 import { Input } from '../../components/common/Input';
 import { Button } from '../../components/common/Button';
@@ -124,6 +125,7 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
   onLoginPress,
   loading = false,
 }) => {
+  const insets = useSafeAreaInsets();
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
@@ -177,12 +179,12 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
     if (validateForm()) {
       onRegisterPress(firstName.trim(), lastName.trim(), email, password);
     }
-    
-  };
+      
+ };
 
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-      <View style={containerStyle}>
+      <View style={[containerStyle, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
         <ScrollView
           contentContainerStyle={contentStyle}
           showsVerticalScrollIndicator={false}

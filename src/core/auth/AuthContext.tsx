@@ -37,6 +37,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       setIsLoading(true);
       console.log('Verificando sesión guardada...');
+      // Simular tiempo mínimo de carga (2 segundos) para que se vea la SplashScreen
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
 
       const isValid = await tokenManager.isTokenValid();
 
@@ -67,7 +70,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.log('Iniciando login para:', email);
 
       // 1. Llamar API
-      const response = await fetch('http://192.168.20.180:8081/api/auth/login', {
+      const response = await fetch('http://10.3.233.57:8081/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -108,7 +111,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.log('Registrando usuario:', email);
 
         // 1. Llamar API
-        const response = await fetch('http://192.168.20.180:8081/api/auth/register', {
+        const response = await fetch('http://10.3.233.57:8081/api/auth/register', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -127,7 +130,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const data = await response.json();
         console.log('Registro exitoso');
 
-        // 2. Auto-login después de registro (opcional)
         if (data.accessToken) {
           await tokenManager.setTokens(data.accessToken, data.refreshToken);
           const userData = await tokenManager.getUserData();
