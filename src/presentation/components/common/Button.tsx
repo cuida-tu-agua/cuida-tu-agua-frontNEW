@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  View,
   TouchableOpacity,
   Text,
   ViewStyle,
@@ -119,10 +120,15 @@ export const Button: React.FC<ButtonProps> = ({
           color={variant === 'primary' ? theme.colors.textOnPrimary : theme.colors.primary}
         />
       ) : (
-        <>
-          {icon && <Text style={styles.icon}>{icon}</Text>}
+        <View style={styles.content}>
+          {icon &&
+            (typeof icon === 'string' ? (
+              <Text style={styles.icon}>{icon}</Text>
+            ) : (
+              <View style={styles.iconWrapper}>{icon}</View>
+            ))}
           <Text style={getTextStyle()}>{label}</Text>
-        </>
+        </View>
       )}
     </TouchableOpacity>
   );
@@ -130,11 +136,21 @@ export const Button: React.FC<ButtonProps> = ({
 
 const styles: {
   disabled: ViewStyle;
+  content: ViewStyle;
+  iconWrapper: ViewStyle;
   text: TextStyle;
   icon: TextStyle;
 } = {
   disabled: {
     opacity: 0.6,
+  },
+  content: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  iconWrapper: {
+    marginRight: theme.spacing.sm,
   },
   text: {
     ...(theme.textStyles.button as TextStyle),

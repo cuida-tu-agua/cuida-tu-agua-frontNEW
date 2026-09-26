@@ -2,12 +2,11 @@ import React, { useEffect } from 'react';
 import {
   View,
   Text,
-  ActivityIndicator,
   ViewStyle,
   TextStyle,
 } from 'react-native';
 import { theme } from '../styles/theme';
-import { Logo } from '../components/common/Logo';
+import { LoadingProgress, Logo } from '../components/common';
 
 interface SplashScreenProps {
   onFinish: () => void;
@@ -33,15 +32,6 @@ const subtitleStyle: TextStyle = {
   marginBottom: theme.spacing.xxxl,
 };
 
-const spinnerContainerStyle: ViewStyle = {
-  marginTop: theme.spacing.xl,
-};
-
-const loadingTextStyle: TextStyle = {
-  ...theme.textStyles.caption,
-  color: theme.colors.textMuted,
-  marginTop: theme.spacing.md,
-};
 
 export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
   useEffect(() => {
@@ -62,13 +52,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
       <Text style={subtitleStyle}>Monitoreo Inteligente</Text>
 
       {/* Loading spinner */}
-      <View style={spinnerContainerStyle}>
-        <ActivityIndicator
-          size="large"
-          color={theme.colors.primary}
-        />
-        <Text style={loadingTextStyle}>Sincronizando...</Text>
-      </View>
+      <LoadingProgress onComplete={onFinish} style={{ marginTop: theme.spacing.xl }} />
     </View>
   );
 };

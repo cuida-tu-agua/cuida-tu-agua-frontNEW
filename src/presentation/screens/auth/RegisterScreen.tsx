@@ -8,12 +8,15 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { theme } from '../../styles/theme';
 import { Input } from '../../components/common/Input';
 import { Button } from '../../components/common/Button';
+import { Logo } from '../../components/common/Logo';
+import { EyeIcon, PasswordStrengthMeter, UIcon } from '../../components/auth';
 
 interface RegisterScreenProps {
-  onRegisterPress: (name: string, email: string, password: string) => void;
+  onRegisterPress: (firstName: string, lastName: string, email: string, password: string) => Promise<void>;
   onLoginPress: () => void;
   loading?: boolean;
 }
@@ -34,10 +37,6 @@ const headerStyle: ViewStyle = {
   marginBottom: theme.spacing.xxl,
 };
 
-const logoStyle: TextStyle = {
-  fontSize: 80,
-  marginBottom: theme.spacing.lg,
-};
 
 const titleStyle: TextStyle = {
   ...theme.textStyles.h2,
@@ -53,57 +52,25 @@ const subtitleStyle: TextStyle = {
 };
 
 const formStyle: ViewStyle = {
-  marginBottom: theme.spacing.xxl,
+  marginBottom: theme.spacing.xxxl,
+  backgroundColor: theme.colors.surface,
+  paddingVertical: theme.spacing.xl, 
+  paddingHorizontal: theme.spacing.lg, 
+  borderColor: theme.colors.border,
+  borderWidth: 0.3,
+  borderRadius: theme.spacing.xl,
+  shadowColor: theme.colors.primary,
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.3,
+  shadowRadius: 5,
+  elevation: 1,
 };
 
-const passwordStrengthContainerStyle: ViewStyle = {
-  marginTop: theme.spacing.md,
-  marginBottom: theme.spacing.lg,
-};
-
-const strengthBarStyle: ViewStyle = {
-  height: 4,
-  backgroundColor: theme.colors.grayLight,
-  borderRadius: theme.borderRadius.small,
-  marginBottom: theme.spacing.sm,
-  overflow: 'hidden',
-};
-
-const strengthBarFillStyle = (strength: PasswordStrength): ViewStyle => {
-  const baseStyle: ViewStyle = {
-    height: '100%',
-    borderRadius: theme.borderRadius.small,
-  };
-
-  const strengthMap: Record<PasswordStrength, ViewStyle> = {
-    weak: { width: '33%', backgroundColor: theme.colors.error },
-    medium: { width: '66%', backgroundColor: theme.colors.warning },
-    strong: { width: '100%', backgroundColor: theme.colors.success },
-  };
-
-  return { ...baseStyle, ...strengthMap[strength] };
-};
-
-const strengthTextStyle: TextStyle = {
-  ...theme.textStyles.caption,
-  color: theme.colors.textMuted,
-};
-
-const checklistStyle: ViewStyle = {
-  marginBottom: theme.spacing.lg,
-};
-
-const checklistItemStyle: ViewStyle = {
+const fullName: ViewStyle = {
   flexDirection: 'row',
-  alignItems: 'center',
-  marginBottom: theme.spacing.sm,
+  justifyContent: 'space-between',
 };
 
-const checklistTextStyle: TextStyle = {
-  ...theme.textStyles.caption,
-  color: theme.colors.textMuted,
-  marginLeft: theme.spacing.sm,
-};
 
 const acceptTermsStyle: ViewStyle = {
   flexDirection: 'row',
@@ -153,42 +120,36 @@ const loginLinkStyle: TextStyle = {
   fontWeight: '600',
 };
 
-type PasswordStrength = 'weak' | 'medium' | 'strong';
-
-const getPasswordStrength = (password: string): PasswordStrength => {
-  if (!password) return 'weak';
-  
-  const hasUpperCase = /[A-Z]/.test(password);
-  const hasNumber = /[0-9]/.test(password);
-  const hasSpecial = /[!@#$%^&*]/.test(password);
-  const isLong = password.length >= 8;
-
-  const strength = [hasUpperCase, hasNumber, hasSpecial, isLong].filter(Boolean).length;
-
-  if (strength >= 3) return 'strong';
-  if (strength >= 2) return 'medium';
-  return 'weak';
-};
-
 export const RegisterScreen: React.FC<RegisterScreenProps> = ({
   onRegisterPress,
   onLoginPress,
   loading = false,
 }) => {
-  const [name, setName] = useState('');
+  const insets = useSafeAreaInsets();
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(false);
-  const [errors, setErrors] = useState<{ name?: string; email?: string; password?: string }>({});
-
-  const passwordStrength = getPasswordStrength(password);
+  const [errors, setErrors] = useState<{
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    password?: string;
+    confirmPassword?: string;
+  }>({});
 
   const validateForm = (): boolean => {
     const newErrors: typeof errors = {};
 
-    if (!name.trim()) {
-      newErrors.name = 'Nombre es requerido';
+    if (!firstName.trim()) {
+      newErrors.firstName = 'Nombre es requerido';
+    }
+
+    if (!lastName.trim()) {
+      newErrors.lastName = 'Apellido es requerido';
     }
 
     if (!email) {
@@ -203,6 +164,12 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
       newErrors.password = 'Contraseña debe tener mínimo 8 caracteres';
     }
 
+    if (!confirmPassword) {
+      newErrors.confirmPassword = 'Confirma tu contraseña';
+    } else if (confirmPassword !== password) {
+      newErrors.confirmPassword = 'Las contraseñas no coinciden';
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0 && acceptTerms;
   };
@@ -210,40 +177,46 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
   const handleRegisterPress = () => {
     Keyboard.dismiss();
     if (validateForm()) {
-      onRegisterPress(name, email, password);
+      onRegisterPress(firstName.trim(), lastName.trim(), email, password);
     }
-  };
-
-  const checklistItems = [
-    { label: '8 caracteres mínimo', met: password.length >= 8 },
-    { label: 'Una mayúscula', met: /[A-Z]/.test(password) },
-    { label: 'Un número', met: /[0-9]/.test(password) },
-    { label: 'Un carácter especial', met: /[!@#$%^&*]/.test(password) },
-  ];
+      
+ };
 
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-      <View style={containerStyle}>
+      <View style={[containerStyle, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
         <ScrollView
           contentContainerStyle={contentStyle}
           showsVerticalScrollIndicator={false}
         >
           {/* Header */}
           <View style={headerStyle}>
-            <Text style={logoStyle}>💧</Text>
+            <Logo type="isotipo" theme="light" size={120} />
             <Text style={titleStyle}>Crear Cuenta</Text>
             <Text style={subtitleStyle}>Únete a nuestros usuarios</Text>
           </View>
 
           {/* Form */}
           <View style={formStyle}>
-            <Input
-              label="Nombre Completo"
-              placeholder="Juan Esteban Ome"
-              value={name}
-              onChangeText={setName}
-              error={errors.name}
-            />
+            <View style={fullName}>
+                <Input
+                  label="Nombres"
+                  placeholder="Juan Diego"
+                  value={firstName}
+                  onChangeText={setFirstName}
+                  error={errors.firstName}
+                  style={{ flex: 1, marginRight: theme.spacing.sm }}
+                />
+                <Input
+                  label="Apellidos"
+                  placeholder="Ome Figueroa"
+                  value={lastName}
+                  onChangeText={setLastName}
+                  error={errors.lastName}
+                  style={{ flex: 1, marginLeft: theme.spacing.sm }}
+                />
+            </View>
+            
 
             <Input
               label="Email"
@@ -252,6 +225,7 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
               onChangeText={setEmail}
               keyboardType="email-address"
               error={errors.email}
+              leftIcon={<UIcon name="envelope" size={20} color={theme.colors.textMuted} />}
             />
 
             <Input
@@ -261,39 +235,30 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
               onChangeText={setPassword}
               secureTextEntry={!showPassword}
               error={errors.password}
-              icon={showPassword ? '👁️' : '👁️‍🗨️'}
+              leftIcon={<UIcon name="lock" size={20} color={theme.colors.textMuted} />}
+              icon={
+                <EyeIcon
+                  crossed={showPassword}
+                  size={22}
+                  color={theme.colors.textPrimary}
+                  accessibilityLabel={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                />
+              }
               onIconPress={() => setShowPassword(!showPassword)}
             />
 
-            {/* Password Strength Indicator */}
-            {password && (
-              <View style={passwordStrengthContainerStyle}>
-                <View style={strengthBarStyle}>
-                  <View style={strengthBarFillStyle(passwordStrength)} />
-                </View>
-                <Text style={strengthTextStyle}>
-                  Fuerza: {passwordStrength === 'weak' ? 'Débil' : passwordStrength === 'medium' ? 'Regular' : 'Fuerte'}
-                </Text>
-              </View>
-            )}
+            {/* Password Strength */}
+            <PasswordStrengthMeter password={password} />
 
-            {/* Checklist */}
-            <View style={checklistStyle}>
-              {checklistItems.map((item, index) => (
-                <View key={index} style={checklistItemStyle}>
-                  <View
-                    style={{
-                      ...checkboxStyle,
-                      backgroundColor: item.met ? theme.colors.success : 'transparent',
-                      borderColor: item.met ? theme.colors.success : theme.colors.border,
-                    }}
-                  >
-                    {item.met && <Text style={{ color: theme.colors.textOnPrimary }}>✓</Text>}
-                  </View>
-                  <Text style={checklistTextStyle}>{item.label}</Text>
-                </View>
-              ))}
-            </View>
+            <Input
+              label="Confirmar contraseña"
+              placeholder="Repite tu contraseña"
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              secureTextEntry={!showPassword}
+              error={errors.confirmPassword}
+              leftIcon={<UIcon name="lock" size={20} color={theme.colors.textMuted} />}
+            />
 
             {/* Accept Terms */}
             <View style={acceptTermsStyle}>
