@@ -70,7 +70,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.log('Iniciando login para:', email);
 
       // 1. Llamar API
-      const response = await fetch('http://10.3.233.57:8081/api/auth/login', {
+      const response = await fetch('http://192.168.20.180:8081/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -111,7 +111,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.log('Registrando usuario:', email);
 
         // 1. Llamar API
-        const response = await fetch('http://10.3.233.57:8081/api/auth/register', {
+        const response = await fetch('http://192.168.20.180:8081/api/auth/register', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
