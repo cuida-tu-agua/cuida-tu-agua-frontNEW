@@ -1,16 +1,8 @@
-import React, { useEffect } from 'react';
-import {
-  View,
-  Text,
-  ViewStyle,
-  TextStyle,
-} from 'react-native';
+import React from 'react';
+import { ActivityIndicator, Text, TextStyle, View, ViewStyle } from 'react-native';
 import { theme } from '../styles/theme';
-import { LoadingProgress, Logo } from '../components/common';
+import { Logo } from '../components/common/Logo';
 
-interface SplashScreenProps {
-  onFinish: () => void;
-}
 
 const containerStyle: ViewStyle = {
   flex: 1,
@@ -33,26 +25,11 @@ const subtitleStyle: TextStyle = {
 };
 
 
-export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
-  useEffect(() => {
-    // Simular verificación de token (2-3 segundos)
-    const timer = setTimeout(() => {
-      onFinish();
-    }, 2500);
-
-    return () => clearTimeout(timer);
-  }, [onFinish]);
-
-  return (
-    <View style={containerStyle}>
-      <Logo type="isotipo" theme="light" size={120} />
-
-      {/* App name */}
-      <Text style={titleStyle}>Cuida Tu Agua</Text>
-      <Text style={subtitleStyle}>Monitoreo Inteligente</Text>
-
-      {/* Loading spinner */}
-      <LoadingProgress onComplete={onFinish} style={{ marginTop: theme.spacing.xl }} />
-    </View>
-  );
-};
+export const SplashScreen: React.FC = () => (
+  <View style={containerStyle}>
+    <Logo type="isotipo" theme="light" size={120} />
+    <Text style={titleStyle}>Cuida Tu Agua</Text>
+    <Text style={subtitleStyle}>Monitoreo Inteligente</Text>
+    <ActivityIndicator size="large" color={theme.colors.primary} />
+  </View>
+);
