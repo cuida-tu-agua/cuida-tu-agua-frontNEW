@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { tokenManager } from './TokenManager';
+import { setUnauthorizedHandler } from '../http/ApiClient';
 
 export interface User {
   userId: string;
@@ -29,9 +30,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   /**
    * Verifica si hay sesión guardada al iniciar la app
    */
-  useEffect(() => {
-    checkAuthStatus();
-  }, []);
 
   const checkAuthStatus = useCallback(async () => {
     try {
@@ -63,6 +61,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setIsLoading(false);
     }
   }, []);
+  
+
+  useEffect(() => {
+    checkAuthStatus();
+  }, [checkAuthStatus]);
+
+  
 
   const login = useCallback(async (email: string, password: string) => {
     try {
@@ -160,6 +165,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       throw error;
     }
   }, []);
+
+  useEffect(() => {
+    setUnauthorizedHandler(logout);
+    return () => setUnauthorizedHandler(null);
+  }, [logout]);
 
   const value: AuthContextType = {
     isAuthenticated,
