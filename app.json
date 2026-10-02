@@ -21,7 +21,13 @@
     "plugins": [
       "expo-font",
       "expo-image",
-      "expo-status-bar"
+      "expo-status-bar",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Cuida Tu Agua usa tus fotos solo para tu foto de perfil."
+        }
+      ]
     ]
   }
 }
