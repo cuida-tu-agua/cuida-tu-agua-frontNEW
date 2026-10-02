@@ -7,6 +7,7 @@ import {
   TextStyle,
   StyleProp,
   TouchableOpacity,
+  TextInputProps,
 } from 'react-native';
 import { theme } from '../../styles/theme';
 
@@ -23,6 +24,16 @@ interface InputProps {
   leftIcon?: React.ReactNode; // ícono decorativo a la izquierda del texto
   onIconPress?: () => void;
   style?: StyleProp<ViewStyle>;
+  /** Grey help text under the field (hidden while there is an error). */
+  hint?: string;
+  onBlur?: () => void;
+  maxLength?: number;
+  autoFocus?: boolean;
+  autoCapitalize?: TextInputProps['autoCapitalize'];
+  autoComplete?: TextInputProps['autoComplete'];
+  textContentType?: TextInputProps['textContentType'];
+  returnKeyType?: TextInputProps['returnKeyType'];
+  onSubmitEditing?: () => void;
 }
 
 const containerBase: ViewStyle = {
@@ -85,6 +96,12 @@ const placeholderTextStyle: TextStyle = {
   includeFontPadding: false,
 };
 
+const hintTextStyle: TextStyle = {
+  ...theme.textStyles.caption,
+  color: theme.colors.textMuted,
+  marginTop: theme.spacing.sm,
+};
+
 const errorTextStyle: TextStyle = {
   ...theme.textStyles.caption,
   color: theme.colors.error,
@@ -104,6 +121,15 @@ export const Input: React.FC<InputProps> = ({
   leftIcon,
   onIconPress,
   style,
+  hint,
+  onBlur,
+  maxLength,
+  autoFocus,
+  autoCapitalize,
+  autoComplete,
+  textContentType,
+  returnKeyType,
+  onSubmitEditing,
 }) => {
   const [isFocused, setIsFocused] = useState(false);
 
@@ -112,7 +138,6 @@ export const Input: React.FC<InputProps> = ({
     isFocused && {
       borderColor: theme.colors.primary,
       borderWidth: BORDER_FOCUSED,
-      // compensa el borde más grueso para que el contenido no se mueva
       paddingHorizontal: theme.spacing.lg - (BORDER_FOCUSED - BORDER),
     },
     !!error && { borderColor: theme.colors.error },
@@ -144,10 +169,20 @@ export const Input: React.FC<InputProps> = ({
             secureTextEntry={secureTextEntry}
             keyboardType={keyboardType}
             editable={editable}
-            autoCapitalize={keyboardType === 'email-address' ? 'none' : undefined}
+            autoCapitalize={autoCapitalize ?? (keyboardType === 'email-address' ? 'none' : undefined)}
+            autoCorrect={keyboardType === 'email-address' || secureTextEntry ? false : undefined}
+            autoComplete={autoComplete}
+            textContentType={textContentType}
+            maxLength={maxLength}
+            autoFocus={autoFocus}
+            returnKeyType={returnKeyType}
+            onSubmitEditing={onSubmitEditing}
             underlineColorAndroid="transparent"
             onFocus={() => setIsFocused(true)}
-            onBlur={() => setIsFocused(false)}
+            onBlur={() => {
+              setIsFocused(false);
+              onBlur?.();
+            }}
           />
         </View>
 
@@ -158,7 +193,13 @@ export const Input: React.FC<InputProps> = ({
         )}
       </View>
 
-      {error && <Text style={errorTextStyle}>{error}</Text>}
+      {error ? (
+        <Text style={errorTextStyle} accessibilityLiveRegion="polite">
+          {error}
+        </Text>
+      ) : (
+        !!hint && <Text style={hintTextStyle}>{hint}</Text>
+      )}
     </View>
   );
 };
