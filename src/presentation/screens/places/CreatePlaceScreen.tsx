@@ -34,7 +34,6 @@ const introStyle: TextStyle = {
   marginBottom: theme.spacing.xl,
 };
 
-/** HU-008: register a place. */
 export const CreatePlaceScreen: React.FC<Props> = ({ navigation }) => {
   const form = usePlaceForm();
   const [submitting, setSubmitting] = useState(false);
@@ -60,7 +59,7 @@ export const CreatePlaceScreen: React.FC<Props> = ({ navigation }) => {
 
   const handleSuccessDismiss = useCallback(() => {
     if (!created) return;
-    navigation.replace('EditPlace', { placeId: created.id, justCreated: true });
+    navigation.goBack();
   }, [created, navigation]);
 
   return (
@@ -86,7 +85,7 @@ export const CreatePlaceScreen: React.FC<Props> = ({ navigation }) => {
         visible={!!created}
         message={
           created?.isDefault
-            ? `"${created.name}" quedó registrado y es tu lugar principal.`
+            ? `"${created.name}" quedó registrado y ya está seleccionado.`
             : `"${created?.name ?? ''}" quedó registrado.`
         }
         onDismiss={handleSuccessDismiss}
