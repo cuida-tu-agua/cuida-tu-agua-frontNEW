@@ -1,12 +1,30 @@
+export type LoginNotice = 'verified' | 'password_reset';
+
+export type AuthStackParamList = {
+  Login: { email?: string; notice?: LoginNotice } | undefined;
+  Register: undefined;
+  VerifyEmail: {
+    email: string;
+    maskedEmail?: string;
+    expiresAt?: string;
+    justRegistered?: boolean;
+    cooldownSeconds?: number;
+  };
+  ForgotPassword: { identifier?: string } | undefined;
+  ResetPassword: { identifier: string; maskedEmail?: string; expiresAt?: string; cooldownSeconds?: number };
+};
+
 export type MainStackParamList = {
-  Home: undefined;
+  Places: { notice?: string } | undefined;
   CreatePlace: undefined;
-  EditPlace: { placeId: string; justCreated?: boolean };
+  EditPlace: { placeId: string };
+  Profile: undefined;
+  ChangePassword: undefined;
+  DeleteAccount: undefined;
 };
 
 declare global {
   namespace ReactNavigation {
-    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-    interface RootParamList extends MainStackParamList {}
+    interface RootParamList extends MainStackParamList, AuthStackParamList {}
   }
 }
