@@ -14,7 +14,9 @@ import { placeRepository } from '../../../core/di/container';
 import { AppError } from '../../../domain/common/AppError';
 import { Place } from '../../../domain/places/Place';
 import { toUpdatePlaceInput } from '../../../domain/places/placeForm';
+import { Banner } from '../../components/common/Banner';
 import { Button } from '../../components/common/Button';
+import { ConfirmDialog } from '../../components/common/ConfirmDialog';
 import { SuccessModal } from '../../components/common/SuccessModal';
 import { PlaceForm } from '../../components/places/placeForm';
 import { usePlaceForm } from '../../hooks/usePlaceForm';
@@ -46,16 +48,24 @@ const messageStyle: TextStyle = {
   marginVertical: theme.spacing.lg,
 };
 
-const infoBannerStyle: ViewStyle = {
-  backgroundColor: theme.colors.successBg,
-  borderRadius: theme.borderRadius.small,
-  padding: theme.spacing.md,
-  marginBottom: theme.spacing.lg,
+const dangerZoneStyle: ViewStyle = {
+  marginTop: theme.spacing.xxl,
+  paddingTop: theme.spacing.xl,
+  borderTopWidth: 1,
+  borderTopColor: theme.colors.border,
 };
 
-const infoBannerTextStyle: TextStyle = {
+const dangerTitleStyle: TextStyle = {
+  ...theme.textStyles.label,
+  color: theme.colors.error,
+  textTransform: 'uppercase',
+  marginBottom: theme.spacing.sm,
+};
+
+const dangerTextStyle: TextStyle = {
   ...theme.textStyles.caption,
-  color: theme.colors.success,
+  color: theme.colors.textSecondary,
+  marginBottom: theme.spacing.lg,
 };
 
 const metaStyle: TextStyle = {
@@ -68,7 +78,7 @@ const formatDate = (iso: string) =>
   new Date(iso).toLocaleString('es-CO', { dateStyle: 'medium', timeStyle: 'short' });
 
 export const EditPlaceScreen: React.FC<Props> = ({ navigation, route }) => {
-  const { placeId, justCreated } = route.params;
+  const { placeId } = route.params;
   const form = usePlaceForm();
   const { hydrate } = form;
 
@@ -77,6 +87,9 @@ export const EditPlaceScreen: React.FC<Props> = ({ navigation, route }) => {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const [attempt, setAttempt] = useState(0);
 
@@ -128,6 +141,22 @@ export const EditPlaceScreen: React.FC<Props> = ({ navigation, route }) => {
     navigation.goBack();
   }, [navigation]);
 
+  const handleDelete = async () => {
+    if (!place) return;
+    setDeleting(true);
+    try {
+      await placeRepository.remove(place.id);
+      setConfirmingDelete(false);
+      navigation.popTo('Places', { notice: `Eliminaste "${place.name}".` });
+    } catch (error) {
+      const appError = error instanceof AppError ? error : new AppError('server', 'No se pudo eliminar el lugar.');
+      setConfirmingDelete(false);
+      setDeleteError(appError.message);
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   if (loadError) {
     return (
       <View style={centeredStyle}>
@@ -153,12 +182,6 @@ export const EditPlaceScreen: React.FC<Props> = ({ navigation, route }) => {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <ScrollView contentContainerStyle={contentStyle} keyboardShouldPersistTaps="handled">
-        {justCreated && (
-          <View style={infoBannerStyle}>
-            <Text style={infoBannerTextStyle}>Lugar registrado. Revisa los datos o ajústalos aquí.</Text>
-          </View>
-        )}
-
         <Text style={metaStyle}>Última modificación: {formatDate(place.updatedAt)}</Text>
 
         <PlaceForm
@@ -169,7 +192,31 @@ export const EditPlaceScreen: React.FC<Props> = ({ navigation, route }) => {
           submitError={submitError}
           submitDisabled={!form.isDirty}
         />
+
+        <View style={dangerZoneStyle}>
+          <Text style={dangerTitleStyle}>Zona de peligro</Text>
+          <Text style={dangerTextStyle}>
+            Si ya no usas este lugar puedes eliminarlo. Primero desvincula su medidor, si tiene uno.
+          </Text>
+          {!!deleteError && <Banner tone="error" message={deleteError} onClose={() => setDeleteError(null)} />}
+          <Button label="Eliminar lugar" variant="danger" onPress={() => setConfirmingDelete(true)} />
+        </View>
       </ScrollView>
+
+      <ConfirmDialog
+        visible={confirmingDelete}
+        tone="danger"
+        title={`¿Eliminar "${place.name}"?`}
+        message={
+          'El lugar desaparecerá de tu lista y ya no podrás ver su historial de consumo en la app. ' +
+          (place.isDefault ? 'Como es tu lugar seleccionado, seleccionaremos otro de tus lugares.' : '')
+        }
+        confirmLabel="Sí, eliminar lugar"
+        cancelLabel="No, conservarlo"
+        loading={deleting}
+        onConfirm={handleDelete}
+        onCancel={() => setConfirmingDelete(false)}
+      />
 
       <SuccessModal
         visible={saved}
