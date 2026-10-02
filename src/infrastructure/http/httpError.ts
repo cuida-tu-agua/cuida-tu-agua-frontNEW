@@ -1,29 +1,121 @@
 import { isAxiosError } from 'axios';
-import { AppError } from '../../domain/common/AppError';
+import { AppError, AppErrorDetails, AppErrorKind } from '../../domain/common/AppError';
+import { describeRules } from '../../domain/auth/passwordPolicy';
 
 const DOMAIN_MESSAGES: Record<string, string> = {
+  // ms-places
   'place.not_found': 'El lugar no existe o no te pertenece.',
   'place.invalid': 'Los datos del lugar no son válidos.',
   'city.not_found': 'La ciudad seleccionada no existe. Vuelve a elegirla.',
+  'place.has_active_device': 'Este lugar tiene un dispositivo vinculado. Desvincúlalo antes de eliminar el lugar.',
+  'service.unavailable': 'Un servicio necesario no está respondiendo. Inténtalo en unos minutos.',
+  // ms-iam: login and session
+  'auth.email_not_found': 'No encontramos una cuenta con este correo.',
+  'auth.wrong_password': 'Contraseña incorrecta.',
+  'auth.account_not_verified': 'Tu cuenta aún no está verificada. Confirma tu correo para entrar.',
+  'auth.account_locked': 'Bloqueamos tu cuenta por seguridad después de varios intentos fallidos.',
+  'auth.account_blocked': 'Tu cuenta fue bloqueada. Comunícate con soporte.',
+  'auth.invalid_refresh_token': 'Tu sesión expiró. Inicia sesión de nuevo.',
+  'auth.invalid_token': 'Tu sesión expiró. Inicia sesión de nuevo.',
+  // ms-iam: registration and codes
+  'auth.email_already_registered': 'Este correo ya está registrado.',
+  'auth.phone_already_registered': 'Este teléfono ya está registrado en otra cuenta.',
+  'auth.already_verified': 'Tu correo ya estaba verificado. Ya puedes iniciar sesión.',
+  'auth.invalid_code': 'El código no es correcto.',
+  'auth.code_expired': 'El código venció o ya se usó. Pide uno nuevo.',
+  'auth.code_recently_sent': 'Acabamos de enviarte un código. Espera un momento antes de pedir otro.',
+  'auth.account_not_found': 'No encontramos una cuenta con ese correo o teléfono.',
+  // ms-iam: profile
+  'user.weak_password': 'La contraseña no cumple los requisitos.',
+  'user.invalid_email': 'El correo no es válido.',
+  'user.invalid': 'Revisa los datos: hay un valor que no es válido.',
+  'user.current_password_incorrect': 'La contraseña actual no es correcta.',
+  'user.invalid_avatar': 'La foto debe ser JPG o PNG y pesar máximo 2 MB.',
+  'user.not_found': 'Tu cuenta ya no existe.',
+  // generic
+  'validation.failed': 'Revisa los campos marcados.',
+  'validation.malformed_body': 'Los datos enviados no son válidos.',
 };
 
+/** Which form field shows the error, for errors that belong to ONE field. */
+const FIELD_OF_CODE: Record<string, string> = {
+  'city.not_found': 'cityId',
+  'auth.email_not_found': 'email',
+  'auth.wrong_password': 'password',
+  'auth.email_already_registered': 'email',
+  'auth.phone_already_registered': 'phone',
+  'auth.invalid_code': 'code',
+  'auth.code_expired': 'code',
+  'auth.account_not_found': 'identifier',
+  'user.weak_password': 'password',
+  'user.invalid_email': 'email',
+  'user.current_password_incorrect': 'currentPassword',
+};
+
+/** Messages for the 400 "errors" map (ASP.NET ValidationProblemDetails and ms-iam @Valid). */
 const FIELD_MESSAGES: Record<string, string> = {
   name: 'Revisa el nombre.',
   type: 'Elige un tipo válido.',
   address: 'Revisa la dirección.',
   cityId: 'Elige la ciudad.',
   measurementUnit: 'Elige una unidad válida.',
+  firstName: 'Revisa tu nombre.',
+  lastName: 'Revisa tu apellido.',
+  email: 'Revisa el correo.',
+  phone: 'Revisa el teléfono.',
+  password: 'Revisa la contraseña.',
+  newPassword: 'Revisa la contraseña nueva.',
+  currentPassword: 'Escribe tu contraseña actual.',
+  code: 'Revisa el código.',
+  identifier: 'Revisa el correo o teléfono.',
 };
 
-interface ProblemDetailsBody {
+const KIND_BY_STATUS: Record<number, AppErrorKind> = {
+  400: 'validation',
+  401: 'unauthorized',
+  403: 'forbidden',
+  404: 'not_found',
+  409: 'conflict',
+  423: 'locked',
+  429: 'rate_limited',
+  503: 'unavailable',
+};
+
+interface ProblemDetailsBody extends AppErrorDetails {
   title?: string;
   detail?: string;
-  errors?: Record<string, string[]>;
+  errors?: Record<string, string[] | string>;
 }
 
 const toFieldName = (key: string): string => {
   const clean = key.replace(/^\$\.?/, '');
   return clean.charAt(0).toLowerCase() + clean.slice(1);
+};
+
+const attempts = (n: number) => (n === 1 ? 'Te queda 1 intento.' : `Te quedan ${n} intentos.`);
+
+/** Adds the useful numbers to the base message (attempts left, missing password rules...). */
+const withDetails = (code: string | undefined, base: string, body: ProblemDetailsBody): string => {
+  if ((code === 'auth.wrong_password' || code === 'auth.invalid_code') && typeof body.remainingAttempts === 'number') {
+    return `${base} ${attempts(body.remainingAttempts)}`;
+  }
+  if (code === 'user.weak_password' && body.unmetRules?.length) {
+    return `A la contraseña le falta ${describeRules(body.unmetRules)}.`;
+  }
+  return base;
+};
+
+const FALLBACK_BY_KIND: Record<AppErrorKind, string> = {
+  network: 'No se pudo conectar con el servidor. Revisa tu conexión e inténtalo de nuevo.',
+  unauthorized: 'Tu sesión expiró. Inicia sesión de nuevo.',
+  forbidden: 'No tienes permiso para hacer esto.',
+  not_found: 'No se encontró el recurso.',
+  conflict: 'Ese dato ya existe.',
+  locked: 'La cuenta está bloqueada temporalmente.',
+  rate_limited: 'Demasiados intentos. Espera un momento e inténtalo de nuevo.',
+  validation: 'Revisa los campos marcados.',
+  unavailable: 'El servicio no está disponible. Inténtalo en unos minutos.',
+  server: 'Ocurrió un error en el servidor. Inténtalo más tarde.',
 };
 
 export const toAppError = (error: unknown): AppError => {
@@ -34,34 +126,37 @@ export const toAppError = (error: unknown): AppError => {
   }
 
   if (!error.response) {
-    return new AppError(
-      'network',
-      'No se pudo conectar con el servidor. Revisa tu conexión e inténtalo de nuevo.',
-    );
+    return new AppError('network', FALLBACK_BY_KIND.network);
   }
 
   const { status } = error.response;
-  const body = (error.response.data ?? {}) as ProblemDetailsBody;
-  const domainMessage = body.title ? DOMAIN_MESSAGES[body.title] : undefined;
+  const body = (error.response.data && typeof error.response.data === 'object'
+    ? error.response.data
+    : {}) as ProblemDetailsBody;
+  const kind = KIND_BY_STATUS[status] ?? 'server';
+  const code = body.title && DOMAIN_MESSAGES[body.title] ? body.title : undefined;
+  const message = withDetails(code, code ? DOMAIN_MESSAGES[code] : FALLBACK_BY_KIND[kind], body);
 
-  if (status === 401) {
-    return new AppError('unauthorized', 'Tu sesión expiró. Inicia sesión de nuevo.');
-  }
-
-  if (status === 404) {
-    return new AppError('not_found', domainMessage ?? 'No se encontró el recurso.');
-  }
-
-  if (status === 400) {
-    const fieldErrors: Record<string, string> = {};
+  const fieldErrors: Record<string, string> = {};
+  if (kind === 'validation') {
     for (const key of Object.keys(body.errors ?? {})) {
       const field = toFieldName(key);
       fieldErrors[field] = FIELD_MESSAGES[field] ?? 'Valor no válido.';
     }
-    if (body.title === 'city.not_found') fieldErrors.cityId = DOMAIN_MESSAGES['city.not_found'];
-
-    return new AppError('validation', domainMessage ?? 'Revisa los campos marcados.', fieldErrors);
   }
+  if (code && FIELD_OF_CODE[code]) fieldErrors[FIELD_OF_CODE[code]] = message;
 
-  return new AppError('server', 'Ocurrió un error en el servidor. Inténtalo más tarde.');
+  const details: AppErrorDetails = {
+    remainingAttempts: body.remainingAttempts,
+    lockedUntil: body.lockedUntil,
+    unmetRules: body.unmetRules,
+    retryAfterSeconds: body.retryAfterSeconds ?? parseRetryAfter(error.response.headers?.['retry-after']),
+  };
+
+  return new AppError(kind, message, fieldErrors, { code: body.title, details });
+};
+
+const parseRetryAfter = (value: unknown): number | undefined => {
+  const seconds = Number(value);
+  return Number.isFinite(seconds) && seconds > 0 ? seconds : undefined;
 };
