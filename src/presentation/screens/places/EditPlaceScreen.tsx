@@ -9,6 +9,7 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { placeRepository } from '../../../core/di/container';
 import { AppError } from '../../../domain/common/AppError';
@@ -46,6 +47,20 @@ const messageStyle: TextStyle = {
   color: theme.colors.textSecondary,
   textAlign: 'center',
   marginVertical: theme.spacing.lg,
+};
+
+const sectionStyle: ViewStyle = {
+  marginTop: theme.spacing.xxl,
+  paddingTop: theme.spacing.xl,
+  borderTopWidth: 1,
+  borderTopColor: theme.colors.border,
+};
+
+const sectionTitleStyle: TextStyle = {
+  ...theme.textStyles.label,
+  color: theme.colors.textPrimary,
+  textTransform: 'uppercase',
+  marginBottom: theme.spacing.sm,
 };
 
 const dangerZoneStyle: ViewStyle = {
@@ -89,7 +104,7 @@ export const EditPlaceScreen: React.FC<Props> = ({ navigation, route }) => {
   const [saved, setSaved] = useState(false);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<AppError | null>(null);
 
   const [attempt, setAttempt] = useState(0);
 
@@ -151,10 +166,16 @@ export const EditPlaceScreen: React.FC<Props> = ({ navigation, route }) => {
     } catch (error) {
       const appError = error instanceof AppError ? error : new AppError('server', 'No se pudo eliminar el lugar.');
       setConfirmingDelete(false);
-      setDeleteError(appError.message);
+      setDeleteError(appError);
     } finally {
       setDeleting(false);
     }
+  };
+
+  const goToDevice = () => {
+    if (!place) return;
+    setDeleteError(null);
+    navigation.navigate('PlaceDevice', { placeId, placeName: place.name });
   };
 
   if (loadError) {
@@ -193,12 +214,31 @@ export const EditPlaceScreen: React.FC<Props> = ({ navigation, route }) => {
           submitDisabled={!form.isDirty}
         />
 
+        <View style={sectionStyle}>
+          <Text style={sectionTitleStyle}>Medidor</Text>
+          <Text style={dangerTextStyle}>Vincula el medidor de este lugar o revisa si está conectado.</Text>
+          <Button
+            label="Ver medidor"
+            variant="secondary"
+            icon={<Ionicons name="speedometer-outline" size={20} color={theme.colors.textPrimary} />}
+            onPress={goToDevice}
+          />
+        </View>
+
         <View style={dangerZoneStyle}>
           <Text style={dangerTitleStyle}>Zona de peligro</Text>
           <Text style={dangerTextStyle}>
             Si ya no usas este lugar puedes eliminarlo. Primero desvincula su medidor, si tiene uno.
           </Text>
-          {!!deleteError && <Banner tone="error" message={deleteError} onClose={() => setDeleteError(null)} />}
+          {!!deleteError && (
+            <Banner
+              tone="error"
+              message={deleteError.message}
+              // HU-011: the place still has a meter → take the user straight to where it is unlinked
+              action={deleteError.code === 'place.has_active_device' ? { label: 'Ir al medidor', onPress: goToDevice } : undefined}
+              onClose={() => setDeleteError(null)}
+            />
+          )}
           <Button label="Eliminar lugar" variant="danger" onPress={() => setConfirmingDelete(true)} />
         </View>
       </ScrollView>

@@ -1,6 +1,7 @@
 // On a physical phone use your PC's LAN IP, never "localhost". Values come from .env.
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://192.168.20.180:3001'; // ms-iam
 const PLACES_API_BASE_URL = process.env.EXPO_PUBLIC_PLACES_API_URL || 'http://192.168.20.180:3002'; // ms-places
+const DEVICES_API_BASE_URL = process.env.EXPO_PUBLIC_DEVICES_API_URL || 'http://192.168.20.180:3003'; // ms-devices
 
 export const API_CONFIG = {
   baseURL: API_BASE_URL,
@@ -13,6 +14,11 @@ export const API_CONFIG = {
 export const PLACES_API_CONFIG = {
   ...API_CONFIG,
   baseURL: PLACES_API_BASE_URL,
+};
+
+export const DEVICES_API_CONFIG = {
+  ...API_CONFIG,
+  baseURL: DEVICES_API_BASE_URL,
 };
 
 export const AUTH_ENDPOINTS = {
@@ -49,6 +55,11 @@ export const PLACES_ENDPOINTS = {
   COUNTRIES: '/api/geography/countries',
   SUBDIVISIONS: (countryCode: string) => `/api/geography/countries/${countryCode}/subdivisions`,
   CITIES: (subdivisionId: string) => `/api/geography/subdivisions/${subdivisionId}/cities`,
+};
+
+/** ms-devices: a place has at most ONE device, so the resource is singular. */
+export const DEVICES_ENDPOINTS = {
+  PLACE_DEVICE: (placeId: string) => `/api/places/${placeId}/device`,
 };
 
 /** Photos are served by ms-iam: "/api/avatars/x.jpg" → full URL for <Image>. */
