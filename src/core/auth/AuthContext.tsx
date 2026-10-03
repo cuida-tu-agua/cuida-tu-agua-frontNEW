@@ -1,197 +1,117 @@
-import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { authService } from '../di/container';
+import { refreshAccessToken, setSessionExpiredHandler } from '../http/ApiClient';
 import { tokenManager } from './TokenManager';
-import { setUnauthorizedHandler } from '../http/ApiClient';
+import { AppError } from '../../domain/common/AppError';
+import { User } from '../../domain/entities/User';
+import { normalizeEmail } from '../../presentation/utils/validation';
 
-export interface User {
-  userId: string;
-  email: string;
-  roles: string[];
-}
+export type AuthStatus = 'loading' | 'signedOut' | 'signedIn';
 
-interface AuthContextType {
-  isAuthenticated: boolean;
+export type SignedOutReason = 'expired' | 'deleted' | null;
+
+interface AuthContextValue {
+  status: AuthStatus;
   user: User | null;
-  isLoading: boolean;
+  signedOutReason: SignedOutReason;
   login: (email: string, password: string) => Promise<void>;
-  register: (firstName: string, lastName: string, email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
-  checkAuthStatus: () => Promise<void>;
+  endSession: (reason: SignedOutReason) => Promise<void>;
+  updateUser: (user: User) => Promise<void>;
+  clearSignedOutReason: () => void;
 }
 
-// Crear contexto
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
-// Proveedor
+const MIN_SPLASH_MS = 800; // enough to see the logo, short enough not to annoy
+
+const restoreSession = async (): Promise<User | null> => {
+  const [user, refreshToken, accessToken] = await Promise.all([
+    tokenManager.getUser(),
+    tokenManager.getRefreshToken(),
+    tokenManager.getAccessToken(),
+  ]);
+  if (!user || !refreshToken) return null;
+  if (!tokenManager.isExpiring(accessToken)) return user;
+
+  try {
+    await refreshAccessToken();
+    return (await tokenManager.getUser()) ?? user;
+  } catch (error) {
+    return error instanceof AppError && error.kind === 'network' ? user : null;
+  }
+};
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [status, setStatus] = useState<AuthStatus>('loading');
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  /**
-   * Verifica si hay sesión guardada al iniciar la app
-   */
-
-  const checkAuthStatus = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      console.log('Verificando sesión guardada...');
-      // Simular tiempo mínimo de carga (2 segundos) para que se vea la SplashScreen
-      await new Promise(resolve => setTimeout(resolve, 2000));
-
-
-      const isValid = await tokenManager.isTokenValid();
-
-      if (isValid) {
-        const userData = await tokenManager.getUserData();
-        if (userData) {
-          setUser(userData);
-          setIsAuthenticated(true);
-          console.log('Sesión válida, usuario:', userData.email);
-        }
-      } else {
-        console.log('Sesión inválida o expirada');
-        setIsAuthenticated(false);
-        setUser(null);
-      }
-    } catch (error) {
-      console.error(' Error verificando sesión:', error);
-      setIsAuthenticated(false);
-      setUser(null);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-  
+  const [signedOutReason, setSignedOutReason] = useState<SignedOutReason>(null);
 
   useEffect(() => {
-    checkAuthStatus();
-  }, [checkAuthStatus]);
+    let active = true;
+    const minimumSplash = new Promise((resolve) => setTimeout(resolve, MIN_SPLASH_MS));
 
-  
+    Promise.all([restoreSession().catch(() => null), minimumSplash]).then(([restored]) => {
+      if (!active) return;
+      setUser(restored);
+      setStatus(restored ? 'signedIn' : 'signedOut');
+    });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    setSessionExpiredHandler(() => {
+      setUser(null);
+      setStatus('signedOut');
+      setSignedOutReason('expired');
+    });
+    return () => setSessionExpiredHandler(null);
+  }, []);
 
   const login = useCallback(async (email: string, password: string) => {
-    try {
-      setIsLoading(true);
-      console.log('Iniciando login para:', email);
-
-      // 1. Llamar API
-      const response = await fetch('http://192.168.20.180:8081/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Login fallido');
-      }
-
-      const data = await response.json();
-      console.log('Login exitoso, token recibido');
-
-      // 2. Guardar token
-      await tokenManager.setTokens(data.accessToken, data.refreshToken);
-
-      // 3. Obtener datos del usuario
-      const userData = await tokenManager.getUserData();
-      if (userData) {
-        setUser(userData);
-        setIsAuthenticated(true);
-        console.log('Usuario autenticado:', userData.email);
-      }
-    } catch (error) {
-      console.error('Error en login:', error);
-      setIsAuthenticated(false);
-      setUser(null);
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
+    const session = await authService.login(normalizeEmail(email), password);
+    await tokenManager.saveSession(session);
+    setSignedOutReason(null);
+    setUser(session.user);
+    setStatus('signedIn');
   }, []);
 
-  const register = useCallback(
-    async (firstName: string, lastName: string, email: string, password: string) => {
-      try {
-        setIsLoading(true);
-        console.log('Registrando usuario:', email);
-
-        // 1. Llamar API
-        const response = await fetch('http://192.168.20.180:8081/api/auth/register', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            firstName,
-            lastName,
-            email,
-            password,
-          }),
-        });
-
-        if (!response.ok) {
-          const error = await response.json();
-          throw new Error(error.message || 'Registro fallido');
-        }
-
-        const data = await response.json();
-        console.log('Registro exitoso');
-
-        if (data.accessToken) {
-          await tokenManager.setTokens(data.accessToken, data.refreshToken);
-          const userData = await tokenManager.getUserData();
-          if (userData) {
-            setUser(userData);
-            setIsAuthenticated(true);
-          }
-        }
-      } catch (error) {
-        console.error('Error en registro:', error);
-        throw error;
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    []
-  );
+  const endSession = useCallback(async (reason: SignedOutReason) => {
+    await tokenManager.clear();
+    setUser(null);
+    setStatus('signedOut');
+    setSignedOutReason(reason);
+  }, []);
 
   const logout = useCallback(async () => {
-    try {
-      console.log('Haciendo logout...');
-      await tokenManager.clearTokens();
-      setIsAuthenticated(false);
-      setUser(null);
-      console.log('Logout exitoso');
-    } catch (error) {
-      console.error('Error en logout:', error);
-      throw error;
+    if (tokenManager.isExpiring(await tokenManager.getAccessToken())) {
+      await refreshAccessToken().catch(() => undefined);
     }
+    const refreshToken = await tokenManager.getRefreshToken();
+    await authService.logout(refreshToken).catch(() => undefined);
+    await endSession(null);
+  }, [endSession]);
+
+  const updateUser = useCallback(async (updated: User) => {
+    await tokenManager.saveUser(updated);
+    setUser(updated);
   }, []);
 
-  useEffect(() => {
-    setUnauthorizedHandler(logout);
-    return () => setUnauthorizedHandler(null);
-  }, [logout]);
+  const clearSignedOutReason = useCallback(() => setSignedOutReason(null), []);
 
-  const value: AuthContextType = {
-    isAuthenticated,
-    user,
-    isLoading,
-    login,
-    register,
-    logout,
-    checkAuthStatus,
-  };
+  const value = useMemo<AuthContextValue>(
+    () => ({ status, user, signedOutReason, login, logout, endSession, updateUser, clearSignedOutReason }),
+    [status, user, signedOutReason, login, logout, endSession, updateUser, clearSignedOutReason],
+  );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-/**
- * Hook para acceder al contexto de auth desde cualquier pantalla
- * Uso: const { user, login, logout } = useAuth();
- */
-export const useAuth = (): AuthContextType => {
+export const useAuth = (): AuthContextValue => {
   const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth debe ser usado dentro de AuthProvider');
-  }
+  if (!context) throw new Error('useAuth must be used inside AuthProvider');
   return context;
 };

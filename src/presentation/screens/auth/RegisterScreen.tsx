@@ -1,303 +1,209 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  ViewStyle,
-  TextStyle,
-  Keyboard,
-  TouchableWithoutFeedback,
-} from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { theme } from '../../styles/theme';
-import { Input } from '../../components/common/Input';
+import { Text, TextStyle, View, ViewStyle } from 'react-native';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { authService } from '../../../core/di/container';
+import { toAppError } from '../../../infrastructure/http/httpError';
+import { AuthFooterLink, AuthLayout, PasswordField, PasswordStrengthMeter, UIcon } from '../../components/auth';
+import { Banner, BannerTone } from '../../components/common/Banner';
 import { Button } from '../../components/common/Button';
-import { Logo } from '../../components/common/Logo';
-import { EyeIcon, PasswordStrengthMeter, UIcon } from '../../components/auth';
+import { Checkbox } from '../../components/common/Checkbox';
+import { Input } from '../../components/common/Input';
+import { useForm } from '../../hooks/useForm';
+import { AuthStackParamList } from '../../navigation/types';
+import { theme } from '../../styles/theme';
+import {
+  normalizeEmail,
+  normalizePhone,
+  validateEmail,
+  validateName,
+  validatePassword,
+  validatePasswordConfirmation,
+  validatePhone,
+} from '../../utils/validation';
 
-interface RegisterScreenProps {
-  onRegisterPress: (firstName: string, lastName: string, email: string, password: string) => Promise<void>;
-  onLoginPress: () => void;
-  loading?: boolean;
-}
+type Props = NativeStackScreenProps<AuthStackParamList, 'Register'>;
 
-const containerStyle: ViewStyle = {
-  flex: 1,
-  backgroundColor: theme.colors.background,
+const INITIAL = {
+  firstName: '',
+  lastName: '',
+  email: '',
+  phone: '',
+  password: '',
+  confirmPassword: '',
+  acceptTerms: false,
 };
 
-const contentStyle: ViewStyle = {
-  paddingHorizontal: theme.spacing.lg,
-  paddingTop: theme.spacing.xxl,
-  paddingBottom: theme.spacing.xxxl,
-};
+export const RegisterScreen: React.FC<Props> = ({ navigation }) => {
+  const form = useForm(INITIAL, {
+    firstName: (v) => validateName(v, 'nombre'),
+    lastName: (v) => validateName(v, 'apellido'),
+    email: validateEmail,
+    phone: validatePhone,
+    password: validatePassword,
+    confirmPassword: (v, all) => validatePasswordConfirmation(all.password, v),
+    acceptTerms: (v) => (v ? undefined : 'Debes aceptar los términos para crear la cuenta.'),
+  });
+  const { values, errors, setValue, blur } = form;
 
-const headerStyle: ViewStyle = {
-  alignItems: 'center',
-  marginBottom: theme.spacing.xxl,
-};
+  const [submitting, setSubmitting] = useState(false);
+  const [banner, setBanner] = useState<{
+    tone: BannerTone;
+    message: string;
+    action?: { label: string; onPress: () => void };
+  } | null>(null);
 
-
-const titleStyle: TextStyle = {
-  ...theme.textStyles.h2,
-  color: theme.colors.textPrimary,
-  marginBottom: theme.spacing.sm,
-  textAlign: 'center',
-};
-
-const subtitleStyle: TextStyle = {
-  ...theme.textStyles.body,
-  color: theme.colors.textSecondary,
-  textAlign: 'center',
-};
-
-const formStyle: ViewStyle = {
-  marginBottom: theme.spacing.xxxl,
-  backgroundColor: theme.colors.surface,
-  paddingVertical: theme.spacing.xl, 
-  paddingHorizontal: theme.spacing.lg, 
-  borderColor: theme.colors.border,
-  borderWidth: 0.3,
-  borderRadius: theme.spacing.xl,
-  shadowColor: theme.colors.primary,
-  shadowOffset: { width: 0, height: 2 },
-  shadowOpacity: 0.3,
-  shadowRadius: 5,
-  elevation: 1,
-};
-
-const fullName: ViewStyle = {
-  flexDirection: 'row',
-  justifyContent: 'space-between',
-};
-
-
-const acceptTermsStyle: ViewStyle = {
-  flexDirection: 'row',
-  alignItems: 'flex-start',
-  marginBottom: theme.spacing.xl,
-};
-
-const checkboxStyle: ViewStyle = {
-  width: 20,
-  height: 20,
-  borderRadius: 4,
-  borderWidth: 1,
-  borderColor: theme.colors.border,
-  justifyContent: 'center',
-  alignItems: 'center',
-  marginRight: theme.spacing.md,
-  marginTop: theme.spacing.sm,
-};
-
-const termsTextStyle: TextStyle = {
-  ...theme.textStyles.caption,
-  color: theme.colors.textSecondary,
-  flex: 1,
-};
-
-const termsLinkStyle: TextStyle = {
-  ...theme.textStyles.caption,
-  color: theme.colors.primary,
-  textDecorationLine: 'underline',
-};
-
-const footerStyle: ViewStyle = {
-  flexDirection: 'row',
-  justifyContent: 'center',
-  alignItems: 'center',
-  marginTop: theme.spacing.xl,
-};
-
-const footerTextStyle: TextStyle = {
-  ...theme.textStyles.caption,
-  color: theme.colors.textSecondary,
-};
-
-const loginLinkStyle: TextStyle = {
-  ...theme.textStyles.caption,
-  color: theme.colors.primary,
-  fontWeight: '600',
-};
-
-export const RegisterScreen: React.FC<RegisterScreenProps> = ({
-  onRegisterPress,
-  onLoginPress,
-  loading = false,
-}) => {
-  const insets = useSafeAreaInsets();
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [acceptTerms, setAcceptTerms] = useState(false);
-  const [errors, setErrors] = useState<{
-    firstName?: string;
-    lastName?: string;
-    email?: string;
-    password?: string;
-    confirmPassword?: string;
-  }>({});
-
-  const validateForm = (): boolean => {
-    const newErrors: typeof errors = {};
-
-    if (!firstName.trim()) {
-      newErrors.firstName = 'Nombre es requerido';
+  const handleSubmit = async () => {
+    if (submitting) return;
+    setBanner(null);
+    if (!form.validateAll()) {
+      setBanner({ tone: 'error', message: 'Revisa los campos marcados en rojo.' });
+      return;
     }
 
-    if (!lastName.trim()) {
-      newErrors.lastName = 'Apellido es requerido';
+    const email = normalizeEmail(values.email);
+    setSubmitting(true);
+    try {
+      const sent = await authService.register({
+        firstName: values.firstName.trim(),
+        lastName: values.lastName.trim(),
+        email,
+        phone: normalizePhone(values.phone) || null,
+        password: values.password,
+      });
+      navigation.replace('VerifyEmail', {
+        email,
+        maskedEmail: sent.maskedEmail,
+        expiresAt: sent.expiresAt,
+        justRegistered: true,
+        cooldownSeconds: 60,
+      });
+    } catch (error) {
+      const appError = toAppError(error);
+      form.setServerErrors(appError.fieldErrors);
+      if (appError.code === 'auth.email_already_registered') {
+        setBanner({
+          tone: 'info',
+          message: 'Ya existe una cuenta con este correo. Inicia sesión o recupera tu contraseña.',
+          action: {
+            label: 'Ir a iniciar sesión',
+            onPress: () => navigation.reset({ index: 0, routes: [{ name: 'Login', params: { email } }] }),
+          },
+        });
+      } else {
+        setBanner({ tone: 'error', message: appError.message });
+      }
+      setSubmitting(false);
     }
-
-    if (!email) {
-      newErrors.email = 'Email es requerido';
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = 'Email inválido';
-    }
-
-    if (!password) {
-      newErrors.password = 'Contraseña es requerida';
-    } else if (password.length < 8) {
-      newErrors.password = 'Contraseña debe tener mínimo 8 caracteres';
-    }
-
-    if (!confirmPassword) {
-      newErrors.confirmPassword = 'Confirma tu contraseña';
-    } else if (confirmPassword !== password) {
-      newErrors.confirmPassword = 'Las contraseñas no coinciden';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0 && acceptTerms;
   };
 
-  const handleRegisterPress = () => {
-    Keyboard.dismiss();
-    if (validateForm()) {
-      onRegisterPress(firstName.trim(), lastName.trim(), email, password);
-    }
-      
- };
-
   return (
-    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-      <View style={[containerStyle, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
-        <ScrollView
-          contentContainerStyle={contentStyle}
-          showsVerticalScrollIndicator={false}
-        >
-          {/* Header */}
-          <View style={headerStyle}>
-            <Logo type="isotipo" theme="light" size={120} />
-            <Text style={titleStyle}>Crear Cuenta</Text>
-            <Text style={subtitleStyle}>Únete a nuestros usuarios</Text>
-          </View>
+    <AuthLayout
+      title="Crea tu cuenta"
+      subtitle="Mide y cuida el agua de tu casa o negocio"
+      onBack={() => navigation.goBack()}
+      footer={<AuthFooterLink text="¿Ya tienes cuenta?" link="Inicia sesión" onPress={() => navigation.popTo('Login')} />}
+    >
+      {banner && <Banner {...banner} onClose={() => setBanner(null)} />}
 
-          {/* Form */}
-          <View style={formStyle}>
-            <View style={fullName}>
-                <Input
-                  label="Nombres"
-                  placeholder="Juan Diego"
-                  value={firstName}
-                  onChangeText={setFirstName}
-                  error={errors.firstName}
-                  style={{ flex: 1, marginRight: theme.spacing.sm }}
-                />
-                <Input
-                  label="Apellidos"
-                  placeholder="Ome Figueroa"
-                  value={lastName}
-                  onChangeText={setLastName}
-                  error={errors.lastName}
-                  style={{ flex: 1, marginLeft: theme.spacing.sm }}
-                />
-            </View>
-            
-
-            <Input
-              label="Email"
-              placeholder="tu@email.com"
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              error={errors.email}
-              leftIcon={<UIcon name="envelope" size={20} color={theme.colors.textMuted} />}
-            />
-
-            <Input
-              label="Contraseña"
-              placeholder="Mínimo 8 caracteres"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry={!showPassword}
-              error={errors.password}
-              leftIcon={<UIcon name="lock" size={20} color={theme.colors.textMuted} />}
-              icon={
-                <EyeIcon
-                  crossed={showPassword}
-                  size={22}
-                  color={theme.colors.textPrimary}
-                  accessibilityLabel={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
-                />
-              }
-              onIconPress={() => setShowPassword(!showPassword)}
-            />
-
-            {/* Password Strength */}
-            <PasswordStrengthMeter password={password} />
-
-            <Input
-              label="Confirmar contraseña"
-              placeholder="Repite tu contraseña"
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
-              secureTextEntry={!showPassword}
-              error={errors.confirmPassword}
-              leftIcon={<UIcon name="lock" size={20} color={theme.colors.textMuted} />}
-            />
-
-            {/* Accept Terms */}
-            <View style={acceptTermsStyle}>
-              <View
-                style={{
-                  ...checkboxStyle,
-                  backgroundColor: acceptTerms ? theme.colors.primary : 'transparent',
-                  borderColor: acceptTerms ? theme.colors.primary : theme.colors.border,
-                }}
-                onTouchEnd={() => setAcceptTerms(!acceptTerms)}
-              >
-                {acceptTerms && <Text style={{ color: theme.colors.textOnPrimary }}>✓</Text>}
-              </View>
-              <Text style={termsTextStyle}>
-                Acepto los{' '}
-                <Text style={termsLinkStyle} onPress={() => console.log('Terms')}>
-                  términos y condiciones
-                </Text>
-              </Text>
-            </View>
-
-            {/* Register Button */}
-            <Button
-              label="Crear Cuenta"
-              onPress={handleRegisterPress}
-              loading={loading}
-              disabled={loading || !acceptTerms}
-            />
-          </View>
-
-          {/* Login Link */}
-          <View style={footerStyle}>
-            <Text style={footerTextStyle}>¿Ya tienes cuenta? </Text>
-            <Text style={loginLinkStyle} onPress={onLoginPress}>
-              Inicia Sesión
-            </Text>
-          </View>
-        </ScrollView>
+      <View style={rowStyle}>
+        <Input
+          label="Nombres"
+          placeholder="Juan Diego"
+          value={values.firstName}
+          onChangeText={(t) => setValue('firstName', t)}
+          onBlur={() => blur('firstName')}
+          error={errors.firstName}
+          autoCapitalize="words"
+          autoComplete="given-name"
+          textContentType="givenName"
+          maxLength={100}
+          style={halfStyle}
+        />
+        <Input
+          label="Apellidos"
+          placeholder="Ome Figueroa"
+          value={values.lastName}
+          onChangeText={(t) => setValue('lastName', t)}
+          onBlur={() => blur('lastName')}
+          error={errors.lastName}
+          autoCapitalize="words"
+          autoComplete="family-name"
+          textContentType="familyName"
+          maxLength={100}
+          style={halfStyle}
+        />
       </View>
-    </TouchableWithoutFeedback>
+
+      <Input
+        label="Correo"
+        placeholder="tu@correo.com"
+        value={values.email}
+        onChangeText={(t) => setValue('email', t)}
+        onBlur={() => blur('email')}
+        error={errors.email}
+        hint="Te enviaremos un código para verificarlo."
+        keyboardType="email-address"
+        autoComplete="email"
+        textContentType="emailAddress"
+        maxLength={320}
+        leftIcon={<UIcon name="envelope" size={20} color={theme.colors.textMuted} />}
+      />
+
+      <Input
+        label="Teléfono (opcional)"
+        placeholder="300 123 4567"
+        value={values.phone}
+        onChangeText={(t) => setValue('phone', t)}
+        onBlur={() => blur('phone')}
+        error={errors.phone}
+        hint="Sirve para recuperar tu cuenta si olvidas la contraseña."
+        keyboardType="phone-pad"
+        autoComplete="tel"
+        textContentType="telephoneNumber"
+        maxLength={20}
+      />
+
+      <PasswordField
+        label="Contraseña"
+        purpose="new"
+        placeholder="Crea una contraseña segura"
+        value={values.password}
+        onChangeText={(t) => setValue('password', t)}
+        onBlur={() => blur('password')}
+        error={errors.password}
+      />
+      <PasswordStrengthMeter password={values.password} />
+
+      <PasswordField
+        label="Confirmar contraseña"
+        purpose="new"
+        placeholder="Repite la contraseña"
+        value={values.confirmPassword}
+        onChangeText={(t) => setValue('confirmPassword', t)}
+        onBlur={() => blur('confirmPassword')}
+        error={errors.confirmPassword}
+      />
+
+      <Checkbox
+        checked={values.acceptTerms}
+        onChange={(checked) => setValue('acceptTerms', checked)}
+        error={errors.acceptTerms}
+      >
+        <Text style={termsTextStyle}>
+          Acepto los <Text style={termsLinkStyle}>términos y condiciones</Text> y la{' '}
+          <Text style={termsLinkStyle}>política de tratamiento de datos</Text>.
+        </Text>
+      </Checkbox>
+
+      <Button label="Crear cuenta" onPress={handleSubmit} loading={submitting} />
+    </AuthLayout>
   );
 };
+
+const rowStyle: ViewStyle = { flexDirection: 'row', gap: theme.spacing.md };
+
+const halfStyle: ViewStyle = { flex: 1 };
+
+const termsTextStyle: TextStyle = { ...theme.textStyles.caption, color: theme.colors.textSecondary };
+
+const termsLinkStyle: TextStyle = { color: theme.colors.primary, textDecorationLine: 'underline' };

@@ -2,19 +2,13 @@ import React from 'react';
 import { View, Text, ViewStyle, TextStyle } from 'react-native';
 import { theme } from '../../styles/theme';
 import { UIcon } from './UIcon';
+import { passwordRules } from '../../../domain/auth/passwordPolicy';
 
 interface PasswordStrengthMeterProps {
   password: string;
 }
 
 const SEGMENTS = 4;
-
-export const getPasswordRules = (password: string) => [
-  { label: '8+ carac.', met: password.length >= 8 },
-  { label: 'Mayúscula', met: /[A-Z]/.test(password) },
-  { label: 'Número', met: /[0-9]/.test(password) },
-  { label: 'Símbolo', met: /[@$!%*?&_.]/.test(password) },
-];
 
 const LEVELS = [
   { label: '', color: theme.colors.grayMedium },
@@ -25,7 +19,7 @@ const LEVELS = [
 ];
 
 export const PasswordStrengthMeter: React.FC<PasswordStrengthMeterProps> = ({ password }) => {
-  const rules = getPasswordRules(password);
+  const rules = passwordRules(password);
   const score = password ? rules.filter((r) => r.met).length : 0;
   const level = LEVELS[score];
 
@@ -35,7 +29,6 @@ export const PasswordStrengthMeter: React.FC<PasswordStrengthMeterProps> = ({ pa
       accessible
       accessibilityLabel={`Seguridad de la contraseña: ${level.label || 'sin evaluar'}`}
     >
-      {/* Barra segmentada + nivel */}
       <View style={headerRowStyle}>
         <View style={segmentsRowStyle}>
           {Array.from({ length: SEGMENTS }).map((_, i) => (
@@ -51,15 +44,16 @@ export const PasswordStrengthMeter: React.FC<PasswordStrengthMeterProps> = ({ pa
 
         <View style={levelLabelRowStyle}>
           {!!level.label && <Text style={[levelTextStyle, { color: level.color }]}>{level.label}</Text>}
-          {score >= 3 && <UIcon name="check" size={1} color={level.color} />}
+          {score >= 3 && <UIcon name="check" size={14} color={level.color} />}
         </View>
       </View>
 
-      {/* Reglas en forma de chips */}
       <View style={chipsRowStyle}>
         {rules.map((rule) => (
           <View
-            key={rule.label}
+            key={rule.id}
+            accessible
+            accessibilityLabel={`${rule.label}: ${rule.met ? 'cumple' : 'falta'}`}
             style={[chipStyle, { backgroundColor: rule.met ? theme.colors.infoBg : theme.colors.grayLight }]}
           >
             <UIcon
@@ -68,7 +62,7 @@ export const PasswordStrengthMeter: React.FC<PasswordStrengthMeterProps> = ({ pa
               color={rule.met ? theme.colors.primaryActive : theme.colors.textMuted}
             />
             <Text style={[chipTextStyle, { color: rule.met ? theme.colors.textPrimary : theme.colors.textMuted }]}>
-              {rule.label}
+              {rule.shortLabel}
             </Text>
           </View>
         ))}
@@ -78,7 +72,7 @@ export const PasswordStrengthMeter: React.FC<PasswordStrengthMeterProps> = ({ pa
 };
 
 const containerStyle: ViewStyle = {
-  marginTop: -theme.spacing.sm, // pega el medidor al input de contraseña
+  marginTop: -theme.spacing.sm, 
   marginBottom: theme.spacing.lg,
 };
 

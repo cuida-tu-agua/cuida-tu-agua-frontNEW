@@ -1,32 +1,19 @@
 import React from 'react';
-import { View, Button as NativeButton, StyleSheet } from 'react-native';
-import { createNativeStackNavigator, NativeStackScreenProps } from '@react-navigation/native-stack';
-import { DashboardScreen } from '../screens/dashboard/DashboardScreen';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { CreatePlaceScreen } from '../screens/places/CreatePlaceScreen';
 import { EditPlaceScreen } from '../screens/places/EditPlaceScreen';
-import { Button } from '../components/common/Button';
-import { useAuth } from '../../core/auth/AuthContext';
+import { PlacesScreen } from '../screens/places/PlacesScreen';
+import { ChangePasswordScreen } from '../screens/profile/ChangePasswordScreen';
+import { DeleteAccountScreen } from '../screens/profile/DeleteAccountScreen';
+import { ProfileScreen } from '../screens/profile/ProfileScreen';
 import { theme } from '../styles/theme';
 import { MainStackParamList } from './types';
 
 const Stack = createNativeStackNavigator<MainStackParamList>();
 
-const HomeScreen: React.FC<NativeStackScreenProps<MainStackParamList, 'Home'>> = ({ navigation }) => {
-  const { user, logout } = useAuth();
-
-  return (
-    <View style={styles.container}>
-      <DashboardScreen userName={user?.email || 'Usuario'} />
-      <View style={styles.footer}>
-        <Button label="+ Registrar lugar" size="medium" onPress={() => navigation.navigate('CreatePlace')} />
-        <NativeButton title="Logout" onPress={logout} color="#0096C7" />
-      </View>
-    </View>
-  );
-};
-
 export const MainNavigator: React.FC = () => (
   <Stack.Navigator
+    initialRouteName="Places"
     screenOptions={{
       headerTintColor: theme.colors.primary,
       headerTitleStyle: { color: theme.colors.textPrimary },
@@ -36,21 +23,11 @@ export const MainNavigator: React.FC = () => (
       headerBackTitle: 'Atrás',
     }}
   >
-    <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
+    <Stack.Screen name="Places" component={PlacesScreen} options={{ headerShown: false }} />
     <Stack.Screen name="CreatePlace" component={CreatePlaceScreen} options={{ title: 'Registrar lugar' }} />
     <Stack.Screen name="EditPlace" component={EditPlaceScreen} options={{ title: 'Editar lugar' }} />
+    <Stack.Screen name="Profile" component={ProfileScreen} options={{ title: 'Mi perfil' }} />
+    <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} options={{ title: 'Cambiar contraseña' }} />
+    <Stack.Screen name="DeleteAccount" component={DeleteAccountScreen} options={{ title: 'Eliminar cuenta' }} />
   </Stack.Navigator>
 );
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  footer: {
-    padding: 20,
-    gap: 12,
-    backgroundColor: '#f5f5f5',
-    borderTopWidth: 1,
-    borderTopColor: '#e0e0e0',
-  },
-});

@@ -11,6 +11,15 @@ export class HttpPlaceRepository implements PlaceRepository {
     this.http = http;
   }
 
+  async list(): Promise<Place[]> {
+    try {
+      const { data } = await this.http.get<Place[]>(PLACES_ENDPOINTS.PLACES);
+      return data;
+    } catch (error) {
+      throw toAppError(error);
+    }
+  }
+
   async create(input: CreatePlaceInput): Promise<Place> {
     try {
       const { data } = await this.http.post<Place>(PLACES_ENDPOINTS.PLACES, input);
@@ -33,6 +42,23 @@ export class HttpPlaceRepository implements PlaceRepository {
     try {
       const { data } = await this.http.put<Place>(PLACES_ENDPOINTS.PLACE(placeId), input);
       return data;
+    } catch (error) {
+      throw toAppError(error);
+    }
+  }
+
+  async select(placeId: string): Promise<Place> {
+    try {
+      const { data } = await this.http.put<Place>(PLACES_ENDPOINTS.DEFAULT(placeId));
+      return data;
+    } catch (error) {
+      throw toAppError(error);
+    }
+  }
+
+  async remove(placeId: string): Promise<void> {
+    try {
+      await this.http.delete(PLACES_ENDPOINTS.PLACE(placeId));
     } catch (error) {
       throw toAppError(error);
     }

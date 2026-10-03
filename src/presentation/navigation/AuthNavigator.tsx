@@ -1,53 +1,28 @@
-import React, { useState } from 'react';
-import { View } from 'react-native';
+import React from 'react';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { ForgotPasswordScreen } from '../screens/auth/ForgotPasswordScreen';
 import { LoginScreen } from '../screens/auth/LoginScreen';
 import { RegisterScreen } from '../screens/auth/RegisterScreen';
-import { SuccessModal } from '../components/common/SuccessModal';
-import { useAuth } from '../../core/auth/AuthContext';
+import { ResetPasswordScreen } from '../screens/auth/ResetPasswordScreen';
+import { VerifyEmailScreen } from '../screens/auth/VerifyEmailScreen';
+import { theme } from '../styles/theme';
+import { AuthStackParamList } from './types';
 
-type AuthScreenName = 'login' | 'register';
+const Stack = createNativeStackNavigator<AuthStackParamList>();
 
-export const AuthNavigator: React.FC = () => {
-  const [screen, setScreen] = useState<AuthScreenName>('login');
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const { login, register } = useAuth();
-
-  const handleRegister = async (firstName: string, lastName: string, email: string, password: string) => {
-    try {
-      //  Registrar el usuario en la API
-      await register(firstName, lastName, email, password);
-
-      setShowSuccessModal(true);
-
-      await new Promise(resolve => setTimeout(resolve, 3000));
-
-      await login(email, password);
-    } catch (error) {
-      setShowSuccessModal(false);
-      throw error;
-    }
-  };
-
-  return (
-    <View style={{ flex: 1 }}>
-      <SuccessModal
-        visible={showSuccessModal}
-        message="Se ha registrado correctamente"
-        onDismiss={() => setShowSuccessModal(false)}
-        autoCloseDuration={3000}
-      />
-      {screen === 'login' ? (
-        <LoginScreen
-          onLoginPress={login}
-          onRegisterPress={() => setScreen('register')}
-          onForgotPasswordPress={() => console.log('TODO: Password reset')}
-        />
-      ) : (
-        <RegisterScreen
-          onRegisterPress={handleRegister}
-          onLoginPress={() => setScreen('login')}
-        />
-      )}
-    </View>
-  );
-};
+export const AuthNavigator: React.FC = () => (
+  <Stack.Navigator
+    initialRouteName="Login"
+    screenOptions={{
+      headerShown: false,
+      animation: 'slide_from_right',
+      contentStyle: { backgroundColor: theme.colors.background },
+    }}
+  >
+    <Stack.Screen name="Login" component={LoginScreen} />
+    <Stack.Screen name="Register" component={RegisterScreen} />
+    <Stack.Screen name="VerifyEmail" component={VerifyEmailScreen} />
+    <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+    <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
+  </Stack.Navigator>
+);

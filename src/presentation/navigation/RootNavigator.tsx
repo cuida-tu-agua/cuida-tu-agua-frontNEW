@@ -5,11 +5,8 @@ import { AuthNavigator } from './AuthNavigator';
 import { MainNavigator } from './MainNavigator';
 
 export const RootNavigator: React.FC = () => {
-  const { isAuthenticated } = useAuth();
+  const { status } = useAuth();
 
-  if (!isAuthenticated) {
-    return <AuthNavigator />;
-  }
-
-  return <MainNavigator />;
+  if (status === 'loading') return <SplashScreen />;
+  return status === 'signedIn' ? <MainNavigator /> : <AuthNavigator />;
 };
