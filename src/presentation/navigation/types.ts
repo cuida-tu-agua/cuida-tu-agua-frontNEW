@@ -18,6 +18,8 @@ export type MainStackParamList = {
   Places: { notice?: string } | undefined;
   CreatePlace: undefined;
   EditPlace: { placeId: string };
+  PlaceDevice: { placeId: string; placeName: string };
+  LinkDevice: { placeId: string; placeName: string };
   Profile: undefined;
   ChangePassword: undefined;
   DeleteAccount: undefined;

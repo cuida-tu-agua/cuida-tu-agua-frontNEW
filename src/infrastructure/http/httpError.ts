@@ -7,8 +7,18 @@ const DOMAIN_MESSAGES: Record<string, string> = {
   'place.not_found': 'El lugar no existe o no te pertenece.',
   'place.invalid': 'Los datos del lugar no son válidos.',
   'city.not_found': 'La ciudad seleccionada no existe. Vuelve a elegirla.',
-  'place.has_active_device': 'Este lugar tiene un dispositivo vinculado. Desvincúlalo antes de eliminar el lugar.',
+  'place.has_active_device': 'Este lugar tiene un medidor vinculado. Desvincúlalo antes de eliminar el lugar.',
   'service.unavailable': 'Un servicio necesario no está respondiendo. Inténtalo en unos minutos.',
+  // ms-devices
+  'device.invalid': 'Revisa el serial y el código de emparejamiento.',
+  'device.pairing_failed': 'El serial o el código de emparejamiento no son correctos.',
+  'device.pairing_locked': 'Demasiados intentos fallidos con este medidor.',
+  'device.too_many_attempts': 'Hiciste demasiados intentos de vinculación.',
+  'device.already_linked': 'Este medidor ya está vinculado a otro lugar. Desvincúlalo allá primero.',
+  'place.already_has_device': 'Este lugar ya tiene un medidor vinculado.',
+  'device.offline': 'El medidor no se ha conectado todavía. Enciéndelo, espera a que se conecte al WiFi y vuelve a intentarlo.',
+  'device.revoked': 'Este medidor fue dado de baja y no se puede vincular.',
+  'device.not_linked': 'Este lugar no tiene un medidor vinculado.',
   // ms-iam: login and session
   'auth.email_not_found': 'No encontramos una cuenta con este correo.',
   'auth.wrong_password': 'Contraseña incorrecta.',
@@ -40,6 +50,7 @@ const DOMAIN_MESSAGES: Record<string, string> = {
 /** Which form field shows the error, for errors that belong to ONE field. */
 const FIELD_OF_CODE: Record<string, string> = {
   'city.not_found': 'cityId',
+  'device.pairing_failed': 'pairingCode',
   'auth.email_not_found': 'email',
   'auth.wrong_password': 'password',
   'auth.email_already_registered': 'email',
@@ -68,6 +79,8 @@ const FIELD_MESSAGES: Record<string, string> = {
   currentPassword: 'Escribe tu contraseña actual.',
   code: 'Revisa el código.',
   identifier: 'Revisa el correo o teléfono.',
+  serialNumber: 'Revisa el serial.',
+  pairingCode: 'Revisa el código de emparejamiento.',
 };
 
 const KIND_BY_STATUS: Record<number, AppErrorKind> = {
@@ -94,13 +107,24 @@ const toFieldName = (key: string): string => {
 
 const attempts = (n: number) => (n === 1 ? 'Te queda 1 intento.' : `Te quedan ${n} intentos.`);
 
+/** 840 → "14 min", 30 → "1 min" (never "0 min"). */
+const waitText = (seconds: number) => `${Math.max(1, Math.ceil(seconds / 60))} min`;
+
 /** Adds the useful numbers to the base message (attempts left, missing password rules...). */
-const withDetails = (code: string | undefined, base: string, body: ProblemDetailsBody): string => {
+const withDetails = (
+  code: string | undefined,
+  base: string,
+  body: ProblemDetailsBody,
+  retryAfterSeconds: number | undefined,
+): string => {
   if ((code === 'auth.wrong_password' || code === 'auth.invalid_code') && typeof body.remainingAttempts === 'number') {
     return `${base} ${attempts(body.remainingAttempts)}`;
   }
   if (code === 'user.weak_password' && body.unmetRules?.length) {
     return `A la contraseña le falta ${describeRules(body.unmetRules)}.`;
+  }
+  if ((code === 'device.pairing_locked' || code === 'device.too_many_attempts') && retryAfterSeconds) {
+    return `${base} Inténtalo de nuevo en ${waitText(retryAfterSeconds)}.`;
   }
   return base;
 };
@@ -135,7 +159,8 @@ export const toAppError = (error: unknown): AppError => {
     : {}) as ProblemDetailsBody;
   const kind = KIND_BY_STATUS[status] ?? 'server';
   const code = body.title && DOMAIN_MESSAGES[body.title] ? body.title : undefined;
-  const message = withDetails(code, code ? DOMAIN_MESSAGES[code] : FALLBACK_BY_KIND[kind], body);
+  const retryAfterSeconds = body.retryAfterSeconds ?? parseRetryAfter(error.response.headers?.['retry-after']);
+  const message = withDetails(code, code ? DOMAIN_MESSAGES[code] : FALLBACK_BY_KIND[kind], body, retryAfterSeconds);
 
   const fieldErrors: Record<string, string> = {};
   if (kind === 'validation') {
@@ -150,7 +175,7 @@ export const toAppError = (error: unknown): AppError => {
     remainingAttempts: body.remainingAttempts,
     lockedUntil: body.lockedUntil,
     unmetRules: body.unmetRules,
-    retryAfterSeconds: body.retryAfterSeconds ?? parseRetryAfter(error.response.headers?.['retry-after']),
+    retryAfterSeconds,
   };
 
   return new AppError(kind, message, fieldErrors, { code: body.title, details });

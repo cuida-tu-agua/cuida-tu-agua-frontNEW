@@ -1,5 +1,5 @@
 import axios, { AxiosError, AxiosInstance, CreateAxiosDefaults, InternalAxiosRequestConfig } from 'axios';
-import { API_CONFIG, AUTH_ENDPOINTS, PLACES_API_CONFIG, PUBLIC_AUTH_PATHS } from '../../config/api';
+import { API_CONFIG, AUTH_ENDPOINTS, DEVICES_API_CONFIG, PLACES_API_CONFIG, PUBLIC_AUTH_PATHS } from '../../config/api';
 import { AppError } from '../../domain/common/AppError';
 import { Session } from '../../domain/entities/Auth';
 import { toAppError } from '../../infrastructure/http/httpError';
@@ -93,3 +93,4 @@ export const createApiClient = (config: CreateAxiosDefaults): AxiosInstance => {
 // One client per microservice (there is no API gateway yet).
 export const apiClient = createApiClient(API_CONFIG); // ms-iam    :3001
 export const placesApiClient = createApiClient(PLACES_API_CONFIG); // ms-places :3002
+export const devicesApiClient = createApiClient(DEVICES_API_CONFIG); // ms-devices :3003

@@ -1,5 +1,7 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { LinkDeviceScreen } from '../screens/devices/LinkDeviceScreen';
+import { PlaceDeviceScreen } from '../screens/devices/PlaceDeviceScreen';
 import { CreatePlaceScreen } from '../screens/places/CreatePlaceScreen';
 import { EditPlaceScreen } from '../screens/places/EditPlaceScreen';
 import { PlacesScreen } from '../screens/places/PlacesScreen';
@@ -26,6 +28,8 @@ export const MainNavigator: React.FC = () => (
     <Stack.Screen name="Places" component={PlacesScreen} options={{ headerShown: false }} />
     <Stack.Screen name="CreatePlace" component={CreatePlaceScreen} options={{ title: 'Registrar lugar' }} />
     <Stack.Screen name="EditPlace" component={EditPlaceScreen} options={{ title: 'Editar lugar' }} />
+    <Stack.Screen name="PlaceDevice" component={PlaceDeviceScreen} options={{ title: 'Medidor' }} />
+    <Stack.Screen name="LinkDevice" component={LinkDeviceScreen} options={{ title: 'Vincular medidor' }} />
     <Stack.Screen name="Profile" component={ProfileScreen} options={{ title: 'Mi perfil' }} />
     <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} options={{ title: 'Cambiar contraseña' }} />
     <Stack.Screen name="DeleteAccount" component={DeleteAccountScreen} options={{ title: 'Eliminar cuenta' }} />
