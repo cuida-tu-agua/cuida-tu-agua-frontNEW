@@ -176,6 +176,7 @@ export const PlacesScreen: React.FC<Props> = ({ navigation, route }) => {
             place={item}
             onSelect={() => select(item)}
             onEdit={() => navigation.navigate('EditPlace', { placeId: item.id })}
+            onOpenPanel={() => navigation.navigate('PlaceDashboard', { placeId: item.id, placeName: item.name })}
             selecting={selectingId === item.id}
             disabled={!!selectingId}
           />

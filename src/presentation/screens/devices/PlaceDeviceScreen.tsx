@@ -16,7 +16,6 @@ import { theme } from '../../styles/theme';
 
 type Props = NativeStackScreenProps<MainStackParamList, 'PlaceDevice'>;
 
-/** HU-013 (status) and HU-014 (unlink) of ONE place, and the entry to HU-012 (link). */
 export const PlaceDeviceScreen: React.FC<Props> = ({ navigation, route }) => {
   const { placeId, placeName } = route.params;
   const { loaded, device, error, checkedAt, reload, unlink } = usePlaceDevice(placeId);
@@ -45,12 +44,12 @@ export const PlaceDeviceScreen: React.FC<Props> = ({ navigation, route }) => {
     setUnlinkError(null);
   };
 
-  // useCallback: SuccessModal restarts its timer whenever this function changes
   const handleUnlinkedDismiss = useCallback(() => setUnlinked(false), []);
 
-  const goToLink = () => navigation.navigate('LinkDevice', { placeId, placeName });
+  const goToLink = () => navigation.navigate('DeviceWifiSetup', { placeId, placeName, next: 'link' });
+  const goToWifi = () => navigation.navigate('DeviceWifiSetup', { placeId, placeName });
+  const goToPanel = () => navigation.navigate('PlaceDashboard', { placeId, placeName });
 
-  // ── First load ─────────────────────────────────────────────────────
   if (!loaded) {
     return (
       <View style={centeredStyle}>
@@ -60,7 +59,6 @@ export const PlaceDeviceScreen: React.FC<Props> = ({ navigation, route }) => {
     );
   }
 
-  // ── First load failed and there is nothing to show ─────────────────
   if (error && !device) {
     const placeGone = error.code === 'place.not_found';
     return (
@@ -87,7 +85,18 @@ export const PlaceDeviceScreen: React.FC<Props> = ({ navigation, route }) => {
       {device ? (
         <>
           <DeviceStatusCard device={device} now={checkedAt ?? undefined} />
-          {!!hint && <Banner tone={device.status === 'DISCONNECTED' ? 'warning' : 'info'} message={hint} />}
+          {!!hint && (
+            <Banner
+              tone={device.status === 'DISCONNECTED' ? 'warning' : 'info'}
+              message={hint}
+              action={{ label: 'Configurar WiFi del medidor', onPress: goToWifi }}
+            />
+          )}
+          <Button
+            label="Ver consumo y válvula"
+            icon={<Ionicons name="stats-chart" size={18} color={theme.colors.textOnPrimary} />}
+            onPress={goToPanel}
+          />
           <Button
             label="Actualizar estado"
             variant="secondary"
@@ -111,9 +120,15 @@ export const PlaceDeviceScreen: React.FC<Props> = ({ navigation, route }) => {
           </View>
           <Text style={emptyTitleStyle}>Este lugar aún no tiene medidor</Text>
           <Text style={emptyTextStyle}>
-            Vincula tu medidor Cuida Tu Agua con el serial y el código que vienen en la caja.
+            Primero conecta el medidor a tu WiFi y después vincúlalo con el serial y el código de la etiqueta.
           </Text>
-          <Button label="Vincular medidor" onPress={goToLink} style={fullWidthStyle} />
+          <Button label="Empezar" onPress={goToLink} style={fullWidthStyle} />
+          <Button
+            label="Mi medidor ya está en el WiFi"
+            variant="ghost"
+            onPress={() => navigation.navigate('LinkDevice', { placeId, placeName })}
+            style={fullWidthStyle}
+          />
         </Card>
       )}
 

@@ -30,8 +30,8 @@ type Props = NativeStackScreenProps<MainStackParamList, 'LinkDevice'>;
 
 const STEPS = [
   'Instala el medidor y conéctalo a la corriente.',
-  'Espera a que se conecte al WiFi (menos de un minuto).',
-  'Escribe el serial y el código que vienen en la caja.',
+  'Conéctalo a tu WiFi (la luz azul queda fija cuando está en línea).',
+  'Escribe el serial y el código que vienen en la etiqueta.',
 ];
 
 /** HU-012: link a meter to the place (serial + pairing code printed on the box). */
@@ -46,6 +46,7 @@ export const LinkDeviceScreen: React.FC<Props> = ({ navigation, route }) => {
 
   const [submitting, setSubmitting] = useState(false);
   const [bannerMessage, setBannerMessage] = useState<string | null>(null);
+  const [offlineError, setOfflineError] = useState(false);
   const [linked, setLinked] = useState(false);
 
   const handleSubmit = async () => {
@@ -64,13 +65,13 @@ export const LinkDeviceScreen: React.FC<Props> = ({ navigation, route }) => {
         form.setServerErrors(appError.fieldErrors); // e.g. wrong code → under "Código"
       } else {
         setBannerMessage(appError.message); // offline meter, already linked, locked, no internet...
+        setOfflineError(appError.code === 'device.offline');
       }
     } finally {
       setSubmitting(false);
     }
   };
 
-  // useCallback: SuccessModal restarts its timer whenever this function changes
   const handleLinkedDismiss = useCallback(() => {
     setLinked(false);
     navigation.goBack(); // PlaceDeviceScreen reloads when it gets the focus back
@@ -93,7 +94,18 @@ export const LinkDeviceScreen: React.FC<Props> = ({ navigation, route }) => {
           ))}
         </View>
 
-        {!!bannerMessage && <Banner tone="error" message={bannerMessage} onClose={() => setBannerMessage(null)} />}
+        {!!bannerMessage && (
+          <Banner
+            tone="error"
+            message={bannerMessage}
+            onClose={() => setBannerMessage(null)}
+            action={
+              offlineError
+                ? { label: 'Configurar WiFi del medidor', onPress: () => navigation.navigate('DeviceWifiSetup', { placeId, placeName }) }
+                : undefined
+            }
+          />
+        )}
 
         <Input
           label="Serial del medidor"
