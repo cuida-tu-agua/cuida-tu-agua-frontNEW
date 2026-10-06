@@ -8,11 +8,12 @@ interface PlaceCardProps {
   place: Place;
   onSelect: () => void;
   onEdit: () => void;
+  onOpenPanel?: () => void;
   selecting?: boolean;
   disabled?: boolean;
 }
 
-export const PlaceCard: React.FC<PlaceCardProps> = ({ place, onSelect, onEdit, selecting, disabled }) => {
+export const PlaceCard: React.FC<PlaceCardProps> = ({ place, onSelect, onEdit, onOpenPanel, selecting, disabled }) => {
   const selected = place.isDefault;
   const location =
     place.cityName === place.subdivisionName ? place.cityName : `${place.cityName}, ${place.subdivisionName}`;
@@ -51,6 +52,18 @@ export const PlaceCard: React.FC<PlaceCardProps> = ({ place, onSelect, onEdit, s
           )}
         </View>
       </Pressable>
+
+      {!!onOpenPanel && !selecting && (
+        <TouchableOpacity
+          onPress={onOpenPanel}
+          style={[editButtonStyle, { backgroundColor: theme.colors.infoBg }]}
+          accessibilityRole="button"
+          accessibilityLabel={`Ver consumo y válvula de ${place.name}`}
+          hitSlop={8}
+        >
+          <Ionicons name="stats-chart" size={20} color={theme.colors.primary} />
+        </TouchableOpacity>
+      )}
 
       {selecting ? (
         <ActivityIndicator color={theme.colors.primary} style={editButtonStyle} />

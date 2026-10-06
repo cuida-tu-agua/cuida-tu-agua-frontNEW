@@ -1,5 +1,13 @@
 import axios, { AxiosError, AxiosInstance, CreateAxiosDefaults, InternalAxiosRequestConfig } from 'axios';
-import { API_CONFIG, AUTH_ENDPOINTS, DEVICES_API_CONFIG, PLACES_API_CONFIG, PUBLIC_AUTH_PATHS } from '../../config/api';
+import {
+  API_CONFIG,
+  AUTH_ENDPOINTS,
+  CONSUMPTION_API_CONFIG,
+  DEVICES_API_CONFIG,
+  PLACES_API_CONFIG,
+  PUBLIC_AUTH_PATHS,
+  VALVE_API_CONFIG,
+} from '../../config/api';
 import { AppError } from '../../domain/common/AppError';
 import { Session } from '../../domain/entities/Auth';
 import { toAppError } from '../../infrastructure/http/httpError';
@@ -94,3 +102,5 @@ export const createApiClient = (config: CreateAxiosDefaults): AxiosInstance => {
 export const apiClient = createApiClient(API_CONFIG); // ms-iam    :3001
 export const placesApiClient = createApiClient(PLACES_API_CONFIG); // ms-places :3002
 export const devicesApiClient = createApiClient(DEVICES_API_CONFIG); // ms-devices :3003
+export const consumptionApiClient = createApiClient(CONSUMPTION_API_CONFIG); // ms-consumption :3004
+export const valveApiClient = createApiClient(VALVE_API_CONFIG); // ms-valve :3005

@@ -19,6 +19,16 @@ const DOMAIN_MESSAGES: Record<string, string> = {
   'device.offline': 'El medidor no se ha conectado todavía. Enciéndelo, espera a que se conecte al WiFi y vuelve a intentarlo.',
   'device.revoked': 'Este medidor fue dado de baja y no se puede vincular.',
   'device.not_linked': 'Este lugar no tiene un medidor vinculado.',
+  // ms-consumption
+  'consumption.invalid_period': 'Periodo no válido.',
+  'consumption.invalid_time_zone': 'La zona horaria del teléfono no es válida.',
+  // ms-valve
+  'valve.not_found': 'Este lugar no tiene un medidor con válvula.',
+  'valve.command_in_progress': 'Ya hay una orden en curso. Espera la confirmación del medidor.',
+  'valve.already_in_state': 'La válvula ya está en ese estado.',
+  'valve.device_offline': 'El medidor no está conectado, así que la orden no le llegaría. Revisa su energía y el WiFi.',
+  'valve.code_required': 'Escribe el código que te enviamos al correo.',
+  'valve.command_not_found': 'No encontramos esa orden.',
   // ms-iam: login and session
   'auth.email_not_found': 'No encontramos una cuenta con este correo.',
   'auth.wrong_password': 'Contraseña incorrecta.',
@@ -56,6 +66,7 @@ const FIELD_OF_CODE: Record<string, string> = {
   'auth.email_already_registered': 'email',
   'auth.phone_already_registered': 'phone',
   'auth.invalid_code': 'code',
+  'valve.code_required': 'code',
   'auth.code_expired': 'code',
   'auth.account_not_found': 'identifier',
   'user.weak_password': 'password',
