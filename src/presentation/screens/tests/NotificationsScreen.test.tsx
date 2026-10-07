@@ -18,6 +18,9 @@ jest.mock('@react-navigation/native', () => {
 jest.mock('@expo/vector-icons', () => ({ Ionicons: () => null }));
 
 jest.useFakeTimers();
+// The first render of the screen is slow when Jest has no cache yet (first full run), so these
+// async tests get more than the default 5 s. Warm, they take milliseconds.
+jest.setTimeout(30_000);
 
 const repository = alertRepository as unknown as { list: jest.Mock; markAsRead: jest.Mock; remove: jest.Mock };
 
