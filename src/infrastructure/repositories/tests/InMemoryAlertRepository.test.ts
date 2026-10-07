@@ -13,8 +13,8 @@ describe('InMemoryAlertRepository', () => {
     await repository.markAsRead('sample-1');
 
     const alerts = await repository.list();
-    expect(alerts.find((a) => a.id === 'sample-1')?.read).toBe(true);
-    expect(alerts.find((a) => a.id === 'sample-2')?.read).toBe(false);
+    expect(alerts.find((a) => a.id === 'sample-1')?.readAt).not.toBeNull();
+    expect(alerts.find((a) => a.id === 'sample-2')?.readAt).toBeNull();
   });
 
   it('removes one alert', async () => {
@@ -38,8 +38,8 @@ describe('InMemoryAlertRepository', () => {
     const repository = new InMemoryAlertRepository(sampleAlerts());
 
     const first = await repository.list();
-    first[0].read = true;
+    first[0].readAt = 'changed';
 
-    expect((await repository.list())[0].read).toBe(false);
+    expect((await repository.list())[0].readAt).toBeNull();
   });
 });

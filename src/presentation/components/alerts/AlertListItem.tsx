@@ -2,11 +2,13 @@ import React from 'react';
 import { Text, TextStyle, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Alert, AlertSeverity } from '../../../domain/alerts/Alert';
-import { ALERT_TYPE_LABELS, SEVERITY_LABELS } from '../../../domain/alerts/alertRules';
+import { ALERT_TYPE_LABELS, isRead, SEVERITY_LABELS } from '../../../domain/alerts/alertRules';
 import { theme } from '../../styles/theme';
 
 interface AlertListItemProps {
   alert: Alert;
+  /** Name of the place of the alert (the alert itself only has the placeId). */
+  placeName: string;
   onMarkAsRead: () => void;
   onDelete: () => void;
 }
@@ -15,20 +17,21 @@ interface AlertListItemProps {
 const SEVERITY_LOOK: Record<AlertSeverity, { fg: string; bg: string; icon: keyof typeof Ionicons.glyphMap }> = {
   CRITICAL: { fg: theme.colors.error, bg: theme.colors.errorBg, icon: 'warning' },
   IMPORTANT: { fg: theme.colors.warning, bg: theme.colors.warningBg, icon: 'alert-circle' },
-  INFO: { fg: theme.colors.info, bg: theme.colors.infoBg, icon: 'information-circle' },
+  INFORMATIVE: { fg: theme.colors.info, bg: theme.colors.infoBg, icon: 'information-circle' },
 };
 
 const formatDate = (iso: string) => new Date(iso).toLocaleString('es-CO', { dateStyle: 'medium', timeStyle: 'short' });
 
 /** HU-025: one alert of the list, with its date, place and kind, and the actions to mark it as read or delete it. */
-export const AlertListItem: React.FC<AlertListItemProps> = ({ alert, onMarkAsRead, onDelete }) => {
+export const AlertListItem: React.FC<AlertListItemProps> = ({ alert, placeName, onMarkAsRead, onDelete }) => {
   const look = SEVERITY_LOOK[alert.severity];
+  const read = isRead(alert);
 
   return (
     <View
-      style={[rowStyle, !alert.read && { borderColor: look.fg }]}
+      style={[rowStyle, !read && { borderColor: look.fg }]}
       accessible
-      accessibilityLabel={`${alert.read ? '' : 'Sin leer. '}${SEVERITY_LABELS[alert.severity]}. ${ALERT_TYPE_LABELS[alert.type]}`}
+      accessibilityLabel={`${read ? '' : 'Sin leer. '}${SEVERITY_LABELS[alert.severity]}. ${ALERT_TYPE_LABELS[alert.alertType]}`}
     >
       <View style={[iconStyle, { backgroundColor: look.bg }]}>
         <Ionicons name={look.icon} size={20} color={look.fg} />
@@ -36,19 +39,19 @@ export const AlertListItem: React.FC<AlertListItemProps> = ({ alert, onMarkAsRea
 
       <View style={{ flex: 1 }}>
         <View style={titleRowStyle}>
-          <Text style={[titleStyle, !alert.read && { fontWeight: '800' }]} numberOfLines={1}>
-            {ALERT_TYPE_LABELS[alert.type]}
+          <Text style={[titleStyle, !read && { fontWeight: '800' }]} numberOfLines={2}>
+            {alert.title}
           </Text>
-          {!alert.read && <View style={[dotStyle, { backgroundColor: look.fg }]} />}
+          {!read && <View style={[dotStyle, { backgroundColor: look.fg }]} />}
         </View>
         <Text style={messageStyle} numberOfLines={3}>
           {alert.message}
         </Text>
         <Text style={metaStyle}>
-          {alert.placeName} · {formatDate(alert.createdAt)}
+          {ALERT_TYPE_LABELS[alert.alertType]} · {placeName} · {formatDate(alert.triggeredAt)}
         </Text>
 
-        {!alert.read && (
+        {!read && (
           <TouchableOpacity
             onPress={onMarkAsRead}
             accessibilityRole="button"

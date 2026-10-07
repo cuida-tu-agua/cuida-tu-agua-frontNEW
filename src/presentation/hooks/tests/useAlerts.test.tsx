@@ -19,12 +19,13 @@ jest.useFakeTimers();
 const alert = (overrides: Partial<Alert> = {}): Alert => ({
   id: 'a1',
   placeId: 'p1',
-  placeName: 'Casa',
-  type: 'LEAK_SUSPECTED',
+  alertType: 'SUSPECTED_LEAK',
   severity: 'CRITICAL',
+  title: 'Posible fuga de agua',
   message: 'Agua corriendo sin parar',
-  createdAt: '2026-10-03T15:00:00Z',
-  read: false,
+  metadata: null,
+  triggeredAt: '2026-10-03T15:00:00Z',
+  readAt: null,
   ...overrides,
 });
 
@@ -56,8 +57,8 @@ afterEach(() => {
 });
 
 describe('useAlerts', () => {
-  const older = alert({ id: 'older', createdAt: '2026-10-01T10:00:00Z' });
-  const newer = alert({ id: 'newer', createdAt: '2026-10-03T10:00:00Z', read: true });
+  const older = alert({ id: 'older', triggeredAt: '2026-10-01T10:00:00Z' });
+  const newer = alert({ id: 'newer', triggeredAt: '2026-10-03T10:00:00Z', readAt: '2026-10-03T11:00:00Z' });
 
   it('loads the alerts, newest first, with the unread count', async () => {
     const result = await setup(repositoryWith([older, newer]));

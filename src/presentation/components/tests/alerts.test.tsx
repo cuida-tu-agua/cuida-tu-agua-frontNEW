@@ -28,12 +28,13 @@ const press = (tree: ReactTestRenderer, accessibilityLabel: string) => {
 const alert = (overrides: Partial<Alert> = {}): Alert => ({
   id: 'a1',
   placeId: 'p1',
-  placeName: 'Casa',
-  type: 'LEAK_SUSPECTED',
+  alertType: 'SUSPECTED_LEAK',
   severity: 'CRITICAL',
+  title: 'Posible fuga de agua',
   message: 'Agua corriendo sin parar',
-  createdAt: '2026-10-03T15:00:00Z',
-  read: false,
+  metadata: null,
+  triggeredAt: '2026-10-03T15:00:00Z',
+  readAt: null,
   ...overrides,
 });
 
@@ -71,18 +72,20 @@ describe('NotificationBell', () => {
 });
 
 describe('AlertListItem', () => {
-  it('shows the kind, the message, the place and the date of the alert', () => {
-    const tree = render(<AlertListItem alert={alert()} onMarkAsRead={noop} onDelete={noop} />);
+  it('shows the title, the message, the kind, the place and the date of the alert', () => {
+    const tree = render(<AlertListItem alert={alert()} placeName="Casa" onMarkAsRead={noop} onDelete={noop} />);
     const shown = texts(tree);
 
-    expect(shown).toContain('Fuga sospechosa');
+    expect(shown).toContain('Posible fuga de agua');
     expect(shown).toContain('Agua corriendo sin parar');
+    expect(shown).toContain('Fuga sospechosa');
     expect(shown).toContain('Casa');
+    expect(shown).toContain('2026'); // the date of the alert
   });
 
   it('offers to mark an unread alert as read', () => {
     const onMarkAsRead = jest.fn();
-    const tree = render(<AlertListItem alert={alert()} onMarkAsRead={onMarkAsRead} onDelete={noop} />);
+    const tree = render(<AlertListItem alert={alert()} placeName="Casa" onMarkAsRead={onMarkAsRead} onDelete={noop} />);
 
     press(tree, 'Marcar como leída');
 
@@ -90,13 +93,13 @@ describe('AlertListItem', () => {
   });
 
   it('does not offer it when the alert is already read', () => {
-    const tree = render(<AlertListItem alert={alert({ read: true })} onMarkAsRead={noop} onDelete={noop} />);
+    const tree = render(<AlertListItem alert={alert({ readAt: '2026-10-03T16:00:00Z' })} placeName="Casa" onMarkAsRead={noop} onDelete={noop} />);
     expect(texts(tree)).not.toContain('Marcar como leída');
   });
 
   it('lets the user delete the alert', () => {
     const onDelete = jest.fn();
-    const tree = render(<AlertListItem alert={alert({ read: true })} onMarkAsRead={noop} onDelete={onDelete} />);
+    const tree = render(<AlertListItem alert={alert({ readAt: '2026-10-03T16:00:00Z' })} placeName="Casa" onMarkAsRead={noop} onDelete={onDelete} />);
 
     press(tree, 'Eliminar alerta');
 

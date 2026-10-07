@@ -3,12 +3,14 @@ import { ActivityIndicator, FlatList, RefreshControl, Text, TextStyle, View, Vie
 import { Ionicons } from '@expo/vector-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Alert } from '../../../domain/alerts/Alert';
+import { placeNameOf } from '../../../domain/places/placeNames';
 import { toAppError } from '../../../infrastructure/http/httpError';
 import { AlertListItem } from '../../components/alerts/AlertListItem';
 import { Banner } from '../../components/common/Banner';
 import { Button } from '../../components/common/Button';
 import { ConfirmDialog } from '../../components/common/ConfirmDialog';
 import { useAlerts } from '../../hooks/useAlerts';
+import { usePlaceNames } from '../../hooks/usePlaceNames';
 import { MainStackParamList } from '../../navigation/types';
 import { theme } from '../../styles/theme';
 
@@ -17,6 +19,7 @@ type Props = NativeStackScreenProps<MainStackParamList, 'Notifications'>;
 /** HU-025: notification center. Alerts from the newest to the oldest, mark as read, delete. */
 export const NotificationsScreen: React.FC<Props> = () => {
   const { loading, error, alerts, unreadCount, reload, markAsRead, remove } = useAlerts();
+  const placeNames = usePlaceNames();
 
   const [refreshing, setRefreshing] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -98,7 +101,12 @@ export const NotificationsScreen: React.FC<Props> = () => {
           </View>
         }
         renderItem={({ item }) => (
-          <AlertListItem alert={item} onMarkAsRead={() => handleMarkAsRead(item.id)} onDelete={() => setPendingDelete(item)} />
+          <AlertListItem
+            alert={item}
+            placeName={placeNameOf(placeNames, item.placeId)}
+            onMarkAsRead={() => handleMarkAsRead(item.id)}
+            onDelete={() => setPendingDelete(item)}
+          />
         )}
       />
 

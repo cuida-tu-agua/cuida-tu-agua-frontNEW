@@ -5,50 +5,55 @@ import { AlertRepository } from '../../domain/alerts/AlertRepository';
 const hoursAgo = (hours: number): string => new Date(Date.now() - hours * 3_600_000).toISOString();
 
 /**
- * Example data to see the notification center working WITHOUT a backend:
- * one alert of each level, some read and some not. Only used while the real alerts
- * service contract is unknown (see container.ts).
+ * Example data to see the notification center working WITHOUT a backend: the same shape as the
+ * AlertEvent of the docs, one alert of each level, some read and some not. The metadata of the leak
+ * and of the closed valve follow the payloads of the LeakSuspected and ValveClosed events.
+ * Only used while ms-notifications does not exist yet (see container.ts).
  */
 export const sampleAlerts = (): Alert[] => [
   {
     id: 'sample-1',
     placeId: 'place-1',
-    placeName: 'Casa',
-    type: 'LEAK_SUSPECTED',
+    alertType: 'SUSPECTED_LEAK',
     severity: 'CRITICAL',
-    message: 'El agua lleva corriendo más de 30 minutos sin parar. Podría ser una fuga.',
-    createdAt: hoursAgo(1),
-    read: false,
+    title: 'Posible fuga de agua',
+    message: 'El agua lleva más de 30 minutos corriendo sin parar. Podría ser una fuga.',
+    metadata: { detectedAt: hoursAgo(1), durationMinutes: 35, volumeConsumed: 120.5, isNighttime: true, unit: 'LITERS' },
+    triggeredAt: hoursAgo(1),
+    readAt: null,
   },
   {
     id: 'sample-2',
     placeId: 'place-1',
-    placeName: 'Casa',
-    type: 'VALVE_CLOSED',
+    alertType: 'VALVE_CLOSED',
     severity: 'CRITICAL',
-    message: 'Se cerró el paso del agua.',
-    createdAt: hoursAgo(5),
-    read: false,
+    title: 'Se cerró el paso del agua',
+    message: 'La válvula se cerró de forma manual.',
+    metadata: { origin: 'MANUAL', confirmedAt: hoursAgo(5) },
+    triggeredAt: hoursAgo(5),
+    readAt: null,
   },
   {
     id: 'sample-3',
     placeId: 'place-2',
-    placeName: 'Local',
-    type: 'SENSOR_DISCONNECTED',
+    alertType: 'SENSOR_DISCONNECTED',
     severity: 'IMPORTANT',
+    title: 'Sensor desconectado',
     message: 'El medidor dejó de reportar. Revisa que tenga energía y WiFi.',
-    createdAt: hoursAgo(26),
-    read: true,
+    metadata: null,
+    triggeredAt: hoursAgo(26),
+    readAt: hoursAgo(20),
   },
   {
     id: 'sample-4',
     placeId: 'place-1',
-    placeName: 'Casa',
-    type: 'GOAL_NEAR',
-    severity: 'INFO',
+    alertType: 'GOAL_80_PERCENT',
+    severity: 'INFORMATIVE',
+    title: 'Vas en el 80% de tu meta',
     message: 'Ya usaste el 80% de tu meta de este mes.',
-    createdAt: hoursAgo(72),
-    read: true,
+    metadata: null,
+    triggeredAt: hoursAgo(72),
+    readAt: hoursAgo(70),
   },
 ];
 
@@ -65,7 +70,8 @@ export class InMemoryAlertRepository implements AlertRepository {
   }
 
   async markAsRead(alertId: string): Promise<void> {
-    this.requireAlert(alertId).read = true;
+    const alert = this.requireAlert(alertId);
+    if (alert.readAt === null) alert.readAt = new Date().toISOString();
   }
 
   async remove(alertId: string): Promise<void> {
