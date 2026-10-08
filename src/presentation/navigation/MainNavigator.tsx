@@ -1,5 +1,6 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { NotificationsScreen } from '../screens/alerts/NotificationsScreen';
 import { PlaceDashboardScreen } from '../screens/dashboard/PlaceDashboardScreen';
 import { DeviceWifiSetupScreen } from '../screens/devices/DeviceWifiSetupScreen';
 import { LinkDeviceScreen } from '../screens/devices/LinkDeviceScreen';
@@ -36,6 +37,7 @@ export const MainNavigator: React.FC = () => (
     <Stack.Screen name="DeviceWifiSetup" component={DeviceWifiSetupScreen} options={{ title: 'WiFi del medidor' }} />
     <Stack.Screen name="PlaceDashboard" component={PlaceDashboardScreen} options={{ title: 'Panel' }} />
     <Stack.Screen name="ValveHistory" component={ValveHistoryScreen} options={{ title: 'Historial de la válvula' }} />
+    <Stack.Screen name="Notifications" component={NotificationsScreen} options={{ title: 'Notificaciones' }} />
     <Stack.Screen name="Profile" component={ProfileScreen} options={{ title: 'Mi perfil' }} />
     <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} options={{ title: 'Cambiar contraseña' }} />
     <Stack.Screen name="DeleteAccount" component={DeleteAccountScreen} options={{ title: 'Eliminar cuenta' }} />

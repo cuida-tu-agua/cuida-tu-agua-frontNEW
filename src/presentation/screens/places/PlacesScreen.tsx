@@ -21,10 +21,12 @@ import { AppError } from '../../../domain/common/AppError';
 import { Place } from '../../../domain/places/Place';
 import { markSelected } from '../../../domain/places/selection';
 import { toAppError } from '../../../infrastructure/http/httpError';
+import { NotificationBell } from '../../components/alerts/NotificationBell';
 import { Avatar } from '../../components/common/Avatar';
 import { Banner } from '../../components/common/Banner';
 import { Button } from '../../components/common/Button';
 import { PlaceCard } from '../../components/places/PlaceCard';
+import { useAlerts } from '../../hooks/useAlerts';
 import { MainStackParamList } from '../../navigation/types';
 import { theme } from '../../styles/theme';
 
@@ -33,6 +35,7 @@ type Props = NativeStackScreenProps<MainStackParamList, 'Places'>;
 export const PlacesScreen: React.FC<Props> = ({ navigation, route }) => {
   const insets = useSafeAreaInsets();
   const { user } = useAuth();
+  const { unreadCount } = useAlerts();
 
   const [places, setPlaces] = useState<Place[] | null>(null); // null = first load
   const [loadError, setLoadError] = useState<AppError | null>(null);
@@ -97,6 +100,7 @@ export const PlacesScreen: React.FC<Props> = ({ navigation, route }) => {
           {places && places.length > 0 ? 'Elige el lugar que quieres monitorear' : 'Empecemos a cuidar el agua'}
         </Text>
       </View>
+      <NotificationBell unreadCount={unreadCount} onPress={() => navigation.navigate('Notifications')} />
       <TouchableOpacity
         onPress={() => navigation.navigate('Profile')}
         accessibilityRole="button"
