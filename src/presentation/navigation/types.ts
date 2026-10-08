@@ -21,8 +21,9 @@ export type MainStackParamList = {
   PlaceDevice: { placeId: string; placeName: string };
   LinkDevice: { placeId: string; placeName: string };
   DeviceWifiSetup: { placeId: string; placeName: string; next?: 'link' };
-  PlaceDashboard: { placeId: string; placeName: string };
+  PlaceDashboard: { placeId: string; placeName: string; openCloseValve?: boolean };
   ValveHistory: { placeId: string; placeName: string };
+  Notifications: undefined;
   Profile: undefined;
   ChangePassword: undefined;
   DeleteAccount: undefined;
