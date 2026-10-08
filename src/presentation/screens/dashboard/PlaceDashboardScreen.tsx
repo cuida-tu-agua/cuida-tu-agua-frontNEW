@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, RefreshControl, ScrollView, Text, TextStyle, View, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -17,13 +17,14 @@ import { ValveCard } from '../../components/valve/ValveCard';
 import { useConsumption } from '../../hooks/useConsumption';
 import { usePlaceDevice } from '../../hooks/usePlaceDevice';
 import { useValve } from '../../hooks/useValve';
+import { shouldOpenCloseDialog } from '../../../domain/valve/closeFromAlert';
 import { MainStackParamList } from '../../navigation/types';
 import { theme } from '../../styles/theme';
 
 type Props = NativeStackScreenProps<MainStackParamList, 'PlaceDashboard'>;
 
 export const PlaceDashboardScreen: React.FC<Props> = ({ navigation, route }) => {
-  const { placeId, placeName } = route.params;
+  const { placeId, placeName, openCloseValve } = route.params;
   const [period, setPeriod] = useState<ConsumptionPeriod>('DAY');
   const [unit, setUnit] = useState<MeasurementUnit>('LITERS');
 
@@ -35,6 +36,14 @@ export const PlaceDashboardScreen: React.FC<Props> = ({ navigation, route }) => 
   const [opening, setOpening] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
   const [orderSent, setOrderSent] = useState(false);
+
+  // HU-029: coming from a leak alert, show the close dialog once the valve is known (only once per visit)
+  const closeFromAlertDone = useRef(false);
+  useEffect(() => {
+    if (closeFromAlertDone.current || !shouldOpenCloseDialog(openCloseValve, valve.valve)) return;
+    closeFromAlertDone.current = true;
+    setClosing(true);
+  }, [openCloseValve, valve.valve]);
 
   useEffect(() => {
     let active = true;
