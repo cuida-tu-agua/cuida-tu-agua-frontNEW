@@ -57,4 +57,21 @@ describe('HttpConsumptionRepository', () => {
     await expect(repository.get('p1', 'WEEK', 'America/Bogota')).resolves.toMatchObject({ totalLiters: 2.5 });
     expect(get).toHaveBeenCalledWith('/api/places/p1/consumption', { params: { period: 'week', tz: 'America/Bogota' } });
   });
+
+  it('lists the history with the date range as from/to (HU-022)', async () => {
+    const get = jest.fn().mockResolvedValue({ data: [command] });
+    const repository = new HttpValveRepository({ get } as unknown as AxiosInstance, {} as AxiosInstance);
+    const range = { from: '2026-10-01T05:00:00.000Z', to: '2026-10-06T04:59:59.999Z' };
+
+    await expect(repository.listCommands('p1', range)).resolves.toEqual([command]);
+    expect(get).toHaveBeenCalledWith('/api/places/p1/valve/commands', { params: range });
+  });
+
+  it('without a range it sends no dates so the server uses its 30 days', async () => {
+    const get = jest.fn().mockResolvedValue({ data: [] });
+    const repository = new HttpValveRepository({ get } as unknown as AxiosInstance, {} as AxiosInstance);
+
+    await repository.listCommands('p1');
+    expect(get).toHaveBeenCalledWith('/api/places/p1/valve/commands', undefined);
+  });
 });

@@ -61,3 +61,7 @@ export const describeRequester = (command: ValveCommand): string => {
   if (command.origin === 'AUTO_LEAK') return 'Automático (posible fuga)';
   return command.requestedByName ?? 'Tú';
 };
+
+/** HU-022: "manual o automático". */
+export const describeOrigin = (command: ValveCommand): string =>
+  command.origin === 'MANUAL' ? 'Manual' : 'Automático';

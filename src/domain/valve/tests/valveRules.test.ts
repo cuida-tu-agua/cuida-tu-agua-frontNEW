@@ -1,5 +1,5 @@
 import { Valve, ValveCommand } from '../Valve';
-import { availability, describeRequester, isFinished, outcomeMessage } from '../valveRules.ts';
+import { availability, describeOrigin, describeRequester, isFinished, outcomeMessage } from '../valveRules.ts';
 
 const command = (overrides: Partial<ValveCommand> = {}): ValveCommand => ({
   id: 'c1',
@@ -59,5 +59,10 @@ describe('valveRules', () => {
   it('names who gave the order', () => {
     expect(describeRequester(command())).toBe('Juan Ome');
     expect(describeRequester(command({ origin: 'AUTO_LEAK', requestedByName: null }))).toMatch(/fuga/);
+  });
+
+  it('says whether the order was manual or automatic (HU-022)', () => {
+    expect(describeOrigin(command())).toBe('Manual');
+    expect(describeOrigin(command({ origin: 'AUTO_LEAK', requestedByName: null }))).toBe('Automático');
   });
 });
