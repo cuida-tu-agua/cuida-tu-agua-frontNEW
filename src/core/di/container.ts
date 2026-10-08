@@ -1,3 +1,4 @@
+import { AlertRepository } from '../../domain/alerts/AlertRepository';
 import { AuthService, ProfileService } from '../../domain/services/AuthServices';
 import { ConsumptionRepository } from '../../domain/consumption/ConsumptionRepository';
 import { DeviceRepository } from '../../domain/devices/DeviceRepository';
@@ -11,6 +12,7 @@ import { HttpGeographyRepository } from '../../infrastructure/repositories/HttpG
 import { HttpPlaceRepository } from '../../infrastructure/repositories/HttpPlaceRepository';
 import { HttpProfileService } from '../../infrastructure/repositories/HttpProfileService';
 import { HttpValveRepository } from '../../infrastructure/repositories/HttpValveRepository';
+import { InMemoryAlertRepository, sampleAlerts } from '../../infrastructure/repositories/InMemoryAlertRepository';
 import { apiClient, consumptionApiClient, devicesApiClient, placesApiClient, valveApiClient } from '../http/ApiClient';
 
 export const authService: AuthService = new HttpAuthService(apiClient);
@@ -20,3 +22,7 @@ export const geographyRepository: GeographyRepository = new HttpGeographyReposit
 export const deviceRepository: DeviceRepository = new HttpDeviceRepository(devicesApiClient);
 export const consumptionRepository: ConsumptionRepository = new HttpConsumptionRepository(consumptionApiClient);
 export const valveRepository: ValveRepository = new HttpValveRepository(valveApiClient, apiClient);
+
+// HU-025: TEMPORARY. There is no alerts service contract yet, so the notification center runs on example
+// data. When the contract is known, replace this line with an HttpAlertRepository (same AlertRepository port).
+export const alertRepository: AlertRepository = new InMemoryAlertRepository(sampleAlerts());
