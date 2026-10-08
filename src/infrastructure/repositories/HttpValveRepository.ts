@@ -1,5 +1,6 @@
 import { AxiosInstance } from 'axios';
 import { PROFILE_ENDPOINTS, VALVE_ENDPOINTS } from '../../config/api';
+import { HistoryRange } from '../../domain/valve/historyRange';
 import { CodeSent, Valve, ValveCommand } from '../../domain/valve/Valve';
 import { ValveRepository } from '../../domain/valve/ValveRepository';
 import { toAppError } from '../http/httpError';
@@ -43,7 +44,9 @@ export class HttpValveRepository implements ValveRepository {
     return this.call(() => this.valveHttp.get<ValveCommand>(VALVE_ENDPOINTS.COMMAND(placeId, commandId)));
   }
 
-  listCommands(placeId: string): Promise<ValveCommand[]> {
-    return this.call(() => this.valveHttp.get<ValveCommand[]>(VALVE_ENDPOINTS.COMMANDS(placeId)));
+  listCommands(placeId: string, range?: HistoryRange): Promise<ValveCommand[]> {
+    return this.call(() =>
+      this.valveHttp.get<ValveCommand[]>(VALVE_ENDPOINTS.COMMANDS(placeId), range ? { params: { from: range.from, to: range.to } } : undefined),
+    );
   }
 }

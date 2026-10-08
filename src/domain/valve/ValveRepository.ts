@@ -1,3 +1,4 @@
+import { HistoryRange } from './historyRange';
 import { CodeSent, Valve, ValveCommand } from './Valve';
 
 export interface ValveRepository {
@@ -11,5 +12,6 @@ export interface ValveRepository {
 
   getCommand(placeId: string, commandId: string): Promise<ValveCommand>;
 
-  listCommands(placeId: string): Promise<ValveCommand[]>;
+  /** Without `range` the server returns the last 30 days. */
+  listCommands(placeId: string, range?: HistoryRange): Promise<ValveCommand[]>;
 }
