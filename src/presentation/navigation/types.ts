@@ -1,3 +1,4 @@
+import { MeasurementUnit } from '../../domain/places/Place';
 export type LoginNotice = 'verified' | 'password_reset';
 
 export type AuthStackParamList = {
@@ -23,6 +24,7 @@ export type MainStackParamList = {
   DeviceWifiSetup: { placeId: string; placeName: string; next?: 'link' };
   PlaceDashboard: { placeId: string; placeName: string; openCloseValve?: boolean };
   ValveHistory: { placeId: string; placeName: string };
+  ConsumptionReport: { placeId: string; placeName: string; unit?: MeasurementUnit };
   Notifications: undefined;
   Profile: undefined;
   ChangePassword: undefined;
