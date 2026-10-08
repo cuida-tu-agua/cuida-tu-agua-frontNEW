@@ -147,6 +147,11 @@ export const PlaceDashboardScreen: React.FC<Props> = ({ navigation, route }) => 
       />
 
       <ExportConsumptionButton data={consumption.data} period={period} unit={unit} placeName={placeName} />
+      <Button
+        label="Ver reporte de consumo"
+        variant="secondary"
+        onPress={() => navigation.navigate('ConsumptionReport', { placeId, placeName, unit })}
+      />
 
       {!!actionError && <Banner tone="error" message={actionError} onClose={() => setActionError(null)} />}
       {!!valve.error && <Banner tone="warning" message={`No pudimos consultar la válvula. ${valve.error.message}`} />}
