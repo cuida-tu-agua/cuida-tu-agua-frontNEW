@@ -1,5 +1,6 @@
 import {
   bucketLabel,
+  bucketTooltip,
   formatFlow,
   formatVolume,
   maxLiters,
@@ -43,5 +44,30 @@ describe('consumptionFormat', () => {
   it('never returns 0 as the largest bar', () => {
     expect(maxLiters([])).toBeGreaterThan(0);
     expect(maxLiters([{ start: '', liters: 3 }, { start: '', liters: 7 }])).toBe(7);
+  });
+});
+
+describe('bucketTooltip (HU-017)', () => {
+  const at = (y: number, m: number, d: number, h = 0, liters = 12.5) => ({ start: new Date(y, m, d, h).toISOString(), liters });
+
+  it('gives the hour range and the exact value for a day', () => {
+    expect(bucketTooltip(at(2026, 9, 3, 14), 'DAY')).toMatch(/^14:00 a 15:00 · 12[,.]5 L$/);
+  });
+
+  it('closes the last hour of the day at 00:00', () => {
+    expect(bucketTooltip(at(2026, 9, 3, 23), 'DAY')).toMatch(/^23:00 a 00:00 · /);
+  });
+
+  it('gives the day and the exact value for a week or a month', () => {
+    expect(bucketTooltip(at(2026, 9, 3, 0, 120), 'WEEK')).toMatch(/3( de)? oct.* · 120 L$/);
+    expect(bucketTooltip(at(2026, 9, 21, 0, 120), 'MONTH')).toMatch(/21( de)? oct.* · 120 L$/);
+  });
+
+  it('shows the value in the unit of the place', () => {
+    expect(bucketTooltip(at(2026, 9, 3, 14, 2500), 'DAY', 'CUBIC_METERS')).toMatch(/2[,.]5 m³$/);
+  });
+
+  it('shows zero consumption too', () => {
+    expect(bucketTooltip(at(2026, 9, 3, 3, 0), 'DAY')).toMatch(/ · 0 L$/);
   });
 });
