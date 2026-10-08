@@ -12,6 +12,7 @@ import { Button } from '../../components/common/Button';
 import { Card } from '../../components/common/Card';
 import { SuccessModal } from '../../components/common/SuccessModal';
 import { ConsumptionCard } from '../../components/consumption/ConsumptionCard';
+import { ExportConsumptionButton } from '../../components/consumption/ExportConsumptionButton';
 import { CloseValveDialog } from '../../components/valve/CloseValveDialog';
 import { ValveCard } from '../../components/valve/ValveCard';
 import { useConsumption } from '../../hooks/useConsumption';
@@ -144,6 +145,8 @@ export const PlaceDashboardScreen: React.FC<Props> = ({ navigation, route }) => 
         error={consumption.error}
         unit={unit}
       />
+
+      <ExportConsumptionButton data={consumption.data} period={period} unit={unit} placeName={placeName} />
 
       {!!actionError && <Banner tone="error" message={actionError} onClose={() => setActionError(null)} />}
       {!!valve.error && <Banner tone="warning" message={`No pudimos consultar la válvula. ${valve.error.message}`} />}
