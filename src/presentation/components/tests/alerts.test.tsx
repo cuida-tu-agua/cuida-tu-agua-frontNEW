@@ -106,3 +106,24 @@ describe('AlertListItem', () => {
     expect(onDelete).toHaveBeenCalledTimes(1);
   });
 });
+
+describe('AlertListItem — valve closed (HU-033)', () => {
+  const valveAlert = (origin: unknown) =>
+    alert({ alertType: 'VALVE_CLOSED', title: 'Se cerró el paso del agua', metadata: origin === undefined ? null : { origin } });
+
+  it('shows who or what closed the valve when the closure was manual', () => {
+    const tree = render(<AlertListItem alert={valveAlert('MANUAL')} placeName="Casa" onMarkAsRead={noop} onDelete={noop} />);
+    expect(texts(tree)).toContain('Cerrada por el usuario');
+  });
+
+  it('shows the automatic rule that closed it', () => {
+    const tree = render(<AlertListItem alert={valveAlert('AUTO_LEAK')} placeName="Casa" onMarkAsRead={noop} onDelete={noop} />);
+    expect(texts(tree)).toContain('Cierre automático por fuga');
+  });
+
+  it('shows no origin line when the backend did not send one', () => {
+    const tree = render(<AlertListItem alert={valveAlert(undefined)} placeName="Casa" onMarkAsRead={noop} onDelete={noop} />);
+    expect(texts(tree)).not.toContain('Cierre');
+    expect(texts(tree)).not.toContain('Cerrada por');
+  });
+});
