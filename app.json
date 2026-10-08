@@ -27,7 +27,8 @@
         {
           "photosPermission": "Cuida Tu Agua usa tus fotos solo para tu foto de perfil."
         }
-      ]
+      ],
+      "expo-sharing"
     ]
   }
 }
