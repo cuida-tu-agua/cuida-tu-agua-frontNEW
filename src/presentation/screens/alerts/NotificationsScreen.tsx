@@ -17,7 +17,7 @@ import { theme } from '../../styles/theme';
 type Props = NativeStackScreenProps<MainStackParamList, 'Notifications'>;
 
 /** HU-025: notification center. Alerts from the newest to the oldest, mark as read, delete. */
-export const NotificationsScreen: React.FC<Props> = () => {
+export const NotificationsScreen: React.FC<Props> = ({ navigation }) => {
   const { loading, error, alerts, unreadCount, reload, markAsRead, remove } = useAlerts();
   const placeNames = usePlaceNames();
 
@@ -106,6 +106,13 @@ export const NotificationsScreen: React.FC<Props> = () => {
             placeName={placeNameOf(placeNames, item.placeId)}
             onMarkAsRead={() => handleMarkAsRead(item.id)}
             onDelete={() => setPendingDelete(item)}
+            onCloseValve={() =>
+              navigation.navigate('PlaceDashboard', {
+                placeId: item.placeId,
+                placeName: placeNameOf(placeNames, item.placeId),
+                openCloseValve: true,
+              })
+            }
           />
         )}
       />

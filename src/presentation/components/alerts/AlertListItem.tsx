@@ -3,6 +3,7 @@ import { Text, TextStyle, TouchableOpacity, View, ViewStyle } from 'react-native
 import { Ionicons } from '@expo/vector-icons';
 import { Alert, AlertSeverity } from '../../../domain/alerts/Alert';
 import { ALERT_TYPE_LABELS, isRead, SEVERITY_LABELS } from '../../../domain/alerts/alertRules';
+import { leakDetails, leakSummaryText } from '../../../domain/alerts/leakDetails';
 import { valveClosedOriginText } from '../../../domain/alerts/valveClosedOrigin';
 import { theme } from '../../styles/theme';
 
@@ -12,6 +13,8 @@ interface AlertListItemProps {
   placeName: string;
   onMarkAsRead: () => void;
   onDelete: () => void;
+  /** HU-029: direct access to the close-valve action. Only used by suspected-leak alerts. */
+  onCloseValve?: () => void;
 }
 
 /** Colors and icon of each level: red = critical, amber = important, blue = information. */
@@ -24,10 +27,12 @@ const SEVERITY_LOOK: Record<AlertSeverity, { fg: string; bg: string; icon: keyof
 const formatDate = (iso: string) => new Date(iso).toLocaleString('es-CO', { dateStyle: 'medium', timeStyle: 'short' });
 
 /** HU-025: one alert of the list, with its date, place and kind, and the actions to mark it as read or delete it. */
-export const AlertListItem: React.FC<AlertListItemProps> = ({ alert, placeName, onMarkAsRead, onDelete }) => {
+export const AlertListItem: React.FC<AlertListItemProps> = ({ alert, placeName, onMarkAsRead, onDelete, onCloseValve }) => {
   const look = SEVERITY_LOOK[alert.severity];
   const read = isRead(alert);
   const origin = valveClosedOriginText(alert);
+  const leak = leakDetails(alert);
+  const leakSummary = leak ? leakSummaryText(leak) : null;
 
   return (
     <View
@@ -50,9 +55,24 @@ export const AlertListItem: React.FC<AlertListItemProps> = ({ alert, placeName, 
           {alert.message}
         </Text>
         {origin && <Text style={originStyle}>{origin}</Text>}
+        {leakSummary && <Text style={originStyle}>{leakSummary}</Text>}
+        {leak?.isNighttime && <Text style={nightStyle}>Consumo nocturno: más probable que sea una fuga</Text>}
         <Text style={metaStyle}>
           {ALERT_TYPE_LABELS[alert.alertType]} · {placeName} · {formatDate(alert.triggeredAt)}
         </Text>
+
+        {leak && onCloseValve && (
+          <TouchableOpacity
+            onPress={onCloseValve}
+            accessibilityRole="button"
+            accessibilityLabel="Cerrar válvula"
+            hitSlop={8}
+            style={closeValveStyle}
+          >
+            <Ionicons name="lock-closed" size={16} color={theme.colors.textOnPrimary} />
+            <Text style={closeValveTextStyle}>Cerrar válvula</Text>
+          </TouchableOpacity>
+        )}
 
         {!read && (
           <TouchableOpacity
@@ -91,6 +111,19 @@ const dotStyle: ViewStyle = { width: 8, height: 8, borderRadius: 4 };
 const titleStyle: TextStyle = { ...theme.textStyles.button, color: theme.colors.textPrimary, flexShrink: 1 };
 const messageStyle: TextStyle = { ...theme.textStyles.caption, color: theme.colors.textSecondary, marginTop: theme.spacing.xs };
 const originStyle: TextStyle = { ...theme.textStyles.caption, color: theme.colors.error, fontWeight: '800', marginTop: theme.spacing.xs };
+const nightStyle: TextStyle = { ...theme.textStyles.caption, color: theme.colors.warning, fontWeight: '800', marginTop: theme.spacing.xs };
+const closeValveStyle: ViewStyle = {
+  marginTop: theme.spacing.sm,
+  alignSelf: 'flex-start',
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: theme.spacing.xs,
+  paddingVertical: theme.spacing.sm,
+  paddingHorizontal: theme.spacing.md,
+  borderRadius: theme.borderRadius.medium,
+  backgroundColor: theme.colors.error,
+};
+const closeValveTextStyle: TextStyle = { ...theme.textStyles.caption, color: theme.colors.textOnPrimary, fontWeight: '800' };
 const metaStyle: TextStyle = { ...theme.textStyles.caption, color: theme.colors.textMuted, marginTop: theme.spacing.xs };
 const markReadStyle: ViewStyle = { marginTop: theme.spacing.sm, alignSelf: 'flex-start' };
 const markReadTextStyle: TextStyle = { ...theme.textStyles.caption, color: theme.colors.primary, fontWeight: '800' };
