@@ -5,6 +5,7 @@ import { ConsumptionPeriod } from '../../../domain/consumption/Consumption';
 import { PERIOD_LABELS } from '../../../domain/consumption/consumptionFormat';
 import { Banner } from '../../components/common/Banner';
 import { SegmentedControl } from '../../components/common/SegmentedControl';
+import { ExportReportPdfButton } from '../../components/consumption/ExportReportPdfButton';
 import { ConsumptionReportView } from '../../components/consumption/ConsumptionReportView';
 import { useConsumption } from '../../hooks/useConsumption';
 import { MainStackParamList } from '../../navigation/types';
@@ -33,7 +34,10 @@ export const ConsumptionReportScreen: React.FC<Props> = ({ route }) => {
       {!!consumption.error && <Banner tone="error" message={`No pudimos generar el reporte. ${consumption.error.message}`} />}
 
       {shown ? (
-        <ConsumptionReportView data={shown} placeName={placeName} unit={unit ?? 'LITERS'} />
+        <>
+          <ConsumptionReportView data={shown} placeName={placeName} unit={unit ?? 'LITERS'} />
+          <ExportReportPdfButton data={shown} placeName={placeName} unit={unit ?? 'LITERS'} />
+        </>
       ) : (
         <View style={centerStyle}>
           {consumption.loading ? <ActivityIndicator color={theme.colors.primary} /> : <Text style={mutedStyle}>Sin datos</Text>}
