@@ -11,6 +11,7 @@ import { PlacesScreen } from '../screens/places/PlacesScreen';
 import { ChangePasswordScreen } from '../screens/profile/ChangePasswordScreen';
 import { DeleteAccountScreen } from '../screens/profile/DeleteAccountScreen';
 import { ProfileScreen } from '../screens/profile/ProfileScreen';
+import { ConsumptionReportScreen } from '../screens/consumption/ConsumptionReportScreen';
 import { ValveHistoryScreen } from '../screens/valve/ValveHistoryScreen';
 import { theme } from '../styles/theme';
 import { MainStackParamList } from './types';
@@ -37,6 +38,7 @@ export const MainNavigator: React.FC = () => (
     <Stack.Screen name="DeviceWifiSetup" component={DeviceWifiSetupScreen} options={{ title: 'WiFi del medidor' }} />
     <Stack.Screen name="PlaceDashboard" component={PlaceDashboardScreen} options={{ title: 'Panel' }} />
     <Stack.Screen name="ValveHistory" component={ValveHistoryScreen} options={{ title: 'Historial de la válvula' }} />
+    <Stack.Screen name="ConsumptionReport" component={ConsumptionReportScreen} options={{ title: 'Reporte de consumo' }} />
     <Stack.Screen name="Notifications" component={NotificationsScreen} options={{ title: 'Notificaciones' }} />
     <Stack.Screen name="Profile" component={ProfileScreen} options={{ title: 'Mi perfil' }} />
     <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} options={{ title: 'Cambiar contraseña' }} />
