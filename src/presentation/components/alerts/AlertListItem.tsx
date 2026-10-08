@@ -3,6 +3,7 @@ import { Text, TextStyle, TouchableOpacity, View, ViewStyle } from 'react-native
 import { Ionicons } from '@expo/vector-icons';
 import { Alert, AlertSeverity } from '../../../domain/alerts/Alert';
 import { ALERT_TYPE_LABELS, isRead, SEVERITY_LABELS } from '../../../domain/alerts/alertRules';
+import { valveClosedOriginText } from '../../../domain/alerts/valveClosedOrigin';
 import { theme } from '../../styles/theme';
 
 interface AlertListItemProps {
@@ -26,6 +27,7 @@ const formatDate = (iso: string) => new Date(iso).toLocaleString('es-CO', { date
 export const AlertListItem: React.FC<AlertListItemProps> = ({ alert, placeName, onMarkAsRead, onDelete }) => {
   const look = SEVERITY_LOOK[alert.severity];
   const read = isRead(alert);
+  const origin = valveClosedOriginText(alert);
 
   return (
     <View
@@ -47,6 +49,7 @@ export const AlertListItem: React.FC<AlertListItemProps> = ({ alert, placeName, 
         <Text style={messageStyle} numberOfLines={3}>
           {alert.message}
         </Text>
+        {origin && <Text style={originStyle}>{origin}</Text>}
         <Text style={metaStyle}>
           {ALERT_TYPE_LABELS[alert.alertType]} · {placeName} · {formatDate(alert.triggeredAt)}
         </Text>
@@ -87,6 +90,7 @@ const titleRowStyle: ViewStyle = { flexDirection: 'row', alignItems: 'center', g
 const dotStyle: ViewStyle = { width: 8, height: 8, borderRadius: 4 };
 const titleStyle: TextStyle = { ...theme.textStyles.button, color: theme.colors.textPrimary, flexShrink: 1 };
 const messageStyle: TextStyle = { ...theme.textStyles.caption, color: theme.colors.textSecondary, marginTop: theme.spacing.xs };
+const originStyle: TextStyle = { ...theme.textStyles.caption, color: theme.colors.error, fontWeight: '800', marginTop: theme.spacing.xs };
 const metaStyle: TextStyle = { ...theme.textStyles.caption, color: theme.colors.textMuted, marginTop: theme.spacing.xs };
 const markReadStyle: ViewStyle = { marginTop: theme.spacing.sm, alignSelf: 'flex-start' };
 const markReadTextStyle: TextStyle = { ...theme.textStyles.caption, color: theme.colors.primary, fontWeight: '800' };
