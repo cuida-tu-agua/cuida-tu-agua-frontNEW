@@ -63,3 +63,21 @@ export const deviceTimeZone = (): string => {
     return 'America/Bogota';
   }
 };
+
+const pad2 = (n: number) => String(n).padStart(2, '0');
+
+/**
+ * HU-017: text shown when the user taps or hovers a bar, with the exact value of that interval.
+ * Day: "14:00 a 15:00 · 12,5 L". Week and month: "sáb, 3 oct · 120 L". Hours and days are in the
+ * local time of the phone, like the labels of the bars.
+ */
+export const bucketTooltip = (bucket: ConsumptionBucket, period: ConsumptionPeriod, unit: MeasurementUnit = 'LITERS'): string => {
+  const date = new Date(bucket.start);
+  const value = formatVolume(bucket.liters, unit);
+  if (period === 'DAY') {
+    const hour = date.getHours();
+    return `${pad2(hour)}:00 a ${pad2((hour + 1) % 24)}:00 · ${value}`;
+  }
+  const day = date.toLocaleDateString('es-CO', { weekday: 'short', day: 'numeric', month: 'short' });
+  return `${day} · ${value}`;
+};
