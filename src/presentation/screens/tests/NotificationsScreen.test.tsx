@@ -147,3 +147,24 @@ describe('NotificationsScreen', () => {
     expect(texts(tree)).toContain('Reintentar');
   });
 });
+
+describe('NotificationsScreen — close the valve from a leak alert (HU-029)', () => {
+  it('opens the dashboard of that place asking for the close dialog', async () => {
+    const navigate = jest.fn();
+    let tree!: ReactTestRenderer;
+    await act(async () => {
+      tree = create(<NotificationsScreen navigation={{ navigate } as never} route={{} as never} />);
+    });
+    renderers.push(tree);
+
+    await press(tree, byLabel('Cerrar válvula'));
+
+    // the sample leak belongs to place-1, which the fake place list names "Casa"
+    expect(navigate).toHaveBeenCalledWith('PlaceDashboard', { placeId: 'place-1', placeName: 'Casa', openCloseValve: true });
+  });
+
+  it('shows the close-valve button only on the leak alert', async () => {
+    const shown = texts(await openScreen());
+    expect(shown.split('Cerrar válvula')).toHaveLength(2); // exactly one occurrence
+  });
+});

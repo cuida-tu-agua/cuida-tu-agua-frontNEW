@@ -127,3 +127,48 @@ describe('AlertListItem — valve closed (HU-033)', () => {
     expect(texts(tree)).not.toContain('Cerrada por');
   });
 });
+
+describe('AlertListItem — suspected leak (HU-029)', () => {
+  const leak = (metadata: Alert['metadata']) => alert({ alertType: 'SUSPECTED_LEAK', metadata });
+  const details = { detectedAt: '2026-10-03T08:00:00Z', durationMinutes: 35, volumeConsumed: 120.5, isNighttime: true, unit: 'LITERS' };
+
+  it('shows since when, for how long and how much water', () => {
+    const tree = render(<AlertListItem alert={leak(details)} placeName="Casa" onMarkAsRead={noop} onDelete={noop} />);
+    const shown = texts(tree);
+    expect(shown).toContain('Desde las');
+    expect(shown).toContain('35 min');
+    expect(shown).toContain('121 L');
+  });
+
+  it('flags nighttime consumption', () => {
+    const tree = render(<AlertListItem alert={leak(details)} placeName="Casa" onMarkAsRead={noop} onDelete={noop} />);
+    expect(texts(tree)).toContain('Consumo nocturno');
+  });
+
+  it('does not flag a leak detected in the daytime', () => {
+    const tree = render(<AlertListItem alert={leak({ ...details, isNighttime: false })} placeName="Casa" onMarkAsRead={noop} onDelete={noop} />);
+    expect(texts(tree)).not.toContain('Consumo nocturno');
+  });
+
+  it('offers the close-valve action and calls it', () => {
+    const onCloseValve = jest.fn();
+    const tree = render(<AlertListItem alert={leak(details)} placeName="Casa" onMarkAsRead={noop} onDelete={noop} onCloseValve={onCloseValve} />);
+
+    expect(texts(tree)).toContain('Cerrar válvula');
+    press(tree, 'Cerrar válvula');
+
+    expect(onCloseValve).toHaveBeenCalledTimes(1);
+  });
+
+  it('shows no close-valve button when the screen gives no action', () => {
+    const tree = render(<AlertListItem alert={leak(details)} placeName="Casa" onMarkAsRead={noop} onDelete={noop} />);
+    expect(texts(tree)).not.toContain('Cerrar válvula');
+  });
+
+  it('never offers the close-valve action on other alerts', () => {
+    const tree = render(
+      <AlertListItem alert={alert({ alertType: 'GOAL_EXCEEDED', severity: 'IMPORTANT' })} placeName="Casa" onMarkAsRead={noop} onDelete={noop} onCloseValve={jest.fn()} />,
+    );
+    expect(texts(tree)).not.toContain('Cerrar válvula');
+  });
+});
