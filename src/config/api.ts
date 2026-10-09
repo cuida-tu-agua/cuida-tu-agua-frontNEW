@@ -136,6 +136,11 @@ export const NOTIFICATION_ENDPOINTS = {
   PREFERENCE: (severity: string) => `/api/notification-preferences/${severity}`,
 };
 
+/** ms-notification (HU-026): the Expo push token of this phone. */
+export const PUSH_ENDPOINTS = {
+  TOKENS: '/api/push-tokens',
+};
+
 /** Page served by the meter itself while it is in setup mode (its own WiFi network). */
 export const DEVICE_SETUP_URL = 'http://192.168.4.1';
 

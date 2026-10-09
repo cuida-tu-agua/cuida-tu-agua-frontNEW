@@ -1,5 +1,6 @@
 import React from 'react';
 import { useAuth } from '../../core/auth/AuthContext';
+import { PushBridge } from '../push/PushBridge';
 import { SplashScreen } from '../screens/SplashScreen';
 import { AppShell } from './AppShell';
 import { AuthNavigator } from './AuthNavigator';
@@ -12,6 +13,7 @@ export const RootNavigator: React.FC = () => {
   return status === 'signedIn' ? (
     <AppShell>
       <MainNavigator />
+      <PushBridge />
     </AppShell>
   ) : (
     <AuthNavigator />

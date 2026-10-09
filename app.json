@@ -35,6 +35,13 @@
       "expo-image",
       "expo-status-bar",
       [
+        "expo-notifications",
+        {
+          "color": "#0B6FA4",
+          "defaultChannel": "alerts"
+        }
+      ],
+      [
         "expo-image-picker",
         {
           "photosPermission": "Cuida Tu Agua usa tus fotos solo para tu foto de perfil."

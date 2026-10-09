@@ -1,5 +1,5 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { authService } from '../di/container';
+import { authService, pushService } from '../di/container';
 import { refreshAccessToken, setSessionExpiredHandler } from '../http/ApiClient';
 import { tokenManager } from './TokenManager';
 import { AppError } from '../../domain/common/AppError';
@@ -87,6 +87,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const logout = useCallback(async () => {
+    // First, while the session still works: this phone must stop receiving the alerts of the user who is leaving
+    await pushService.disable();
     if (tokenManager.isExpiring(await tokenManager.getAccessToken())) {
       await refreshAccessToken().catch(() => undefined);
     }
