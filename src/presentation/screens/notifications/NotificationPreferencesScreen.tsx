@@ -1,5 +1,5 @@
 import React from 'react';
-import { ActivityIndicator, ScrollView, Switch, Text, TextStyle, View, ViewStyle } from 'react-native';
+import { ActivityIndicator, ScrollView, Switch, Text, TextStyle, View, ViewStyle, Platform } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import {
   CHANNELS,
@@ -11,6 +11,8 @@ import {
   lockOf,
 } from '../../../domain/notifications/Notification';
 import { Banner } from '../../components/common/Banner';
+import { PageContainer } from '../../components/common/PageContainer';
+import { PageHeader } from '../../components/common/PageHeader';
 import { Button } from '../../components/common/Button';
 import { Card } from '../../components/common/Card';
 import { useNotificationPreferences } from '../../hooks/useNotificationPreferences';
@@ -21,7 +23,7 @@ import { themed } from '../../styles/themeRuntime';
 type Props = NativeStackScreenProps<MainStackParamList, 'NotificationPreferences'>;
 
 /** HU-034: for each urgency level the user chooses where the alert reaches them. Every switch saves by itself. */
-export const NotificationPreferencesScreen: React.FC<Props> = () => {
+export const NotificationPreferencesScreen: React.FC<Props> = ({ navigation }) => {
   const prefs = useNotificationPreferences();
 
   if (!prefs.levels) {
@@ -40,10 +42,17 @@ export const NotificationPreferencesScreen: React.FC<Props> = () => {
   }
 
   return (
-    <ScrollView style={screenStyle} contentContainerStyle={contentStyle}>
-      <Text style={introStyle}>
-        Elige por dónde quieres recibir cada tipo de alerta. Los cambios se guardan al instante y valen para las próximas alertas.
-      </Text>
+    <PageContainer medium gap={theme.spacing.lg}>
+      <PageHeader
+        back={{ label: 'Volver', onPress: () => navigation.goBack() }}
+        title="Preferencias de alertas"
+        subtitle="Elige por dónde quieres recibir cada tipo de alerta. Los cambios se guardan al instante y valen para las próximas alertas."
+      />
+      {Platform.OS !== 'web' && (
+        <Text style={introStyle}>
+          Elige por dónde quieres recibir cada tipo de alerta. Los cambios se guardan al instante y valen para las próximas alertas.
+        </Text>
+      )}
       {!!prefs.error && <Banner tone="error" message={prefs.error.message} onClose={prefs.dismissError} />}
 
       <View style={gridStyle}>
@@ -51,7 +60,7 @@ export const NotificationPreferencesScreen: React.FC<Props> = () => {
           <LevelCard key={level.severity} level={level} saving={prefs.saving} onToggle={(c) => void prefs.toggle(level.severity, c)} />
         ))}
       </View>
-    </ScrollView>
+    </PageContainer>
   );
 };
 

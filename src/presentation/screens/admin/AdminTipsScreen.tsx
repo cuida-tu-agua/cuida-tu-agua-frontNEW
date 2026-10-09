@@ -7,6 +7,8 @@ import { RequireAdmin } from '../../components/admin/RequireAdmin';
 import { Banner } from '../../components/common/Banner';
 import { Button } from '../../components/common/Button';
 import { Card } from '../../components/common/Card';
+import { PageContainer } from '../../components/common/PageContainer';
+import { PageHeader } from '../../components/common/PageHeader';
 import { SegmentedControl } from '../../components/common/SegmentedControl';
 import { TipFormDialog } from '../../components/tips/TipFormDialog';
 import { useAdminTips } from '../../hooks/useAdminTips';
@@ -54,19 +56,20 @@ const Tips: React.FC = () => {
   };
 
   return (
-    <ScrollView style={screenStyle} contentContainerStyle={contentStyle}>
-      <View style={headerRowStyle}>
-        <View style={{ flex: 1, minWidth: 220 }}>
-          <Text style={titleStyle}>Consejos de ahorro</Text>
-          <Text style={mutedStyle}>Los que publiques los ven todos los usuarios, según el tipo de lugar.</Text>
-        </View>
-        <Button
-          label="Nuevo consejo"
-          size="medium"
-          onPress={openNew}
-          icon={<Ionicons name="add" size={20} color={theme.colors.textOnPrimary} />}
-        />
-      </View>
+    <PageContainer gap={theme.spacing.md}>
+      <PageHeader
+        webOnly={false}
+        title="Recomendaciones de ahorro"
+        subtitle="Consejos que ven todos los usuarios según el tipo de su lugar. Cada usuario ve 3 al azar por sesión."
+        right={
+          <Button
+            label="Nueva recomendación"
+            size="medium"
+            onPress={openNew}
+            icon={<Ionicons name="add" size={20} color={theme.colors.textOnPrimary} />}
+          />
+        }
+      />
 
       <SegmentedControl
         options={FILTERS}
@@ -115,7 +118,7 @@ const Tips: React.FC = () => {
           <Banner tone="error" message={admin.error.message} onClose={admin.dismissError} />
         </View>
       )}
-    </ScrollView>
+    </PageContainer>
   );
 };
 
@@ -147,10 +150,6 @@ const TipRow: React.FC<{ tip: AdminTip; busy: boolean; onEdit: () => void; onTog
   </Card>
 );
 
-const screenStyle: ViewStyle = themed(() => ({ flex: 1, backgroundColor: theme.colors.background }));
-const contentStyle: ViewStyle = { padding: theme.spacing.lg, paddingBottom: theme.spacing.huge, gap: theme.spacing.md };
-const headerRowStyle: ViewStyle = { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: theme.spacing.md };
-const titleStyle: TextStyle = themed(() => ({ ...theme.textStyles.h2, color: theme.colors.textPrimary }));
 const mutedStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, color: theme.colors.textMuted }));
 const switchRowStyle: ViewStyle = { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.md };
 const switchLabelStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, color: theme.colors.textSecondary }));

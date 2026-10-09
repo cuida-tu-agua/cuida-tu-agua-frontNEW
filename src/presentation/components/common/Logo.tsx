@@ -13,6 +13,8 @@ interface LogoProps {
   theme?: LogoTheme;
  size?: number;
   style?: StyleProp<ViewStyle>;
+  /** One single color for the whole mark (white over the dark brand panel). Default: the brand colors of the theme. */
+  mono?: string;
 }
 
 // Trazos del isotipo (viewBox 0 0 64 64), extraídos de assets/logos/isotipo-claro.svg
@@ -20,14 +22,14 @@ const DROP_PATH = 'M32 5C32 5 14 23.5 14 38A18 18 0 1 0 50 38C50 31 47.5 24.5 44
 const WAVE_TOP_PATH = 'M21 40q5.5-5 11 0t11 0';
 const WAVE_BOTTOM_PATH = 'M23.5 48q4.25-4 8.5 0t8.5 0';
 
-export const Logo: React.FC<LogoProps> = ({ size = 48, style }) => {
+export const Logo: React.FC<LogoProps> = ({ size = 48, style, mono }) => {
   return (
     <View style={style} accessible accessibilityRole="image" accessibilityLabel="Cuida Tu Agua">
       <Svg width={size} height={size} viewBox="0 0 64 64">
         {/* Gota */}
         <Path
           d={DROP_PATH}
-          stroke={colors.textPrimary}
+          stroke={mono ?? colors.textPrimary}
           strokeWidth={4}
           strokeLinecap="round"
           fill="none"
@@ -35,7 +37,7 @@ export const Logo: React.FC<LogoProps> = ({ size = 48, style }) => {
         {/* Ola superior */}
         <Path
           d={WAVE_TOP_PATH}
-          stroke={colors.primary}
+          stroke={mono ?? colors.primary}
           strokeWidth={3.4}
           strokeLinecap="round"
           fill="none"
@@ -43,7 +45,7 @@ export const Logo: React.FC<LogoProps> = ({ size = 48, style }) => {
         {/* Ola inferior */}
         <Path
           d={WAVE_BOTTOM_PATH}
-          stroke={colors.secondary}
+          stroke={mono ?? colors.secondary}
           strokeWidth={3.4}
           strokeLinecap="round"
           fill="none"

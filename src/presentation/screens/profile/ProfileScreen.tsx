@@ -24,6 +24,8 @@ import { AppearanceSection } from '../../components/theme/AppearanceSection';
 import { Avatar } from '../../components/common/Avatar';
 import { Banner, BannerTone } from '../../components/common/Banner';
 import { Button } from '../../components/common/Button';
+import { PageContainer } from '../../components/common/PageContainer';
+import { PageHeader } from '../../components/common/PageHeader';
 import { ConfirmDialog } from '../../components/common/ConfirmDialog';
 import { Input } from '../../components/common/Input';
 import { useForm } from '../../hooks/useForm';
@@ -170,7 +172,8 @@ export const ProfileScreen: React.FC<Props> = ({ navigation }) => {
 
   return (
     <KeyboardAvoidingView style={screenStyle} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <ScrollView contentContainerStyle={contentStyle} keyboardShouldPersistTaps="handled">
+      <PageContainer narrow>
+        <PageHeader title="Mi perfil" />
         <View style={avatarBlockStyle}>
           <View>
             <Avatar uri={avatarUri(user.avatarUrl)} firstName={user.firstName} lastName={user.lastName} size={112} />
@@ -260,7 +263,7 @@ export const ProfileScreen: React.FC<Props> = ({ navigation }) => {
           danger
           onPress={() => navigation.navigate('DeleteAccount')}
         />
-      </ScrollView>
+      </PageContainer>
 
       <ConfirmDialog
         visible={confirmingLogout}

@@ -18,6 +18,8 @@ import { Banner } from '../../components/common/Banner';
 import { Button } from '../../components/common/Button';
 import { ConfirmDialog } from '../../components/common/ConfirmDialog';
 import { Input } from '../../components/common/Input';
+import { PageContainer } from '../../components/common/PageContainer';
+import { PageHeader } from '../../components/common/PageHeader';
 import { SegmentedControl } from '../../components/common/SegmentedControl';
 import { useAdminUsers } from '../../hooks/useAdminUsers';
 import { useLayout } from '../../layout/breakpoints';
@@ -77,8 +79,8 @@ const Users: React.FC = () => {
   const rows = users.data?.items ?? [];
 
   return (
-    <ScrollView style={screenStyle} contentContainerStyle={contentStyle} keyboardShouldPersistTaps="handled">
-      <Text style={titleStyle}>Usuarios</Text>
+    <PageContainer gap={theme.spacing.md}>
+      <PageHeader webOnly={false} title="Usuarios" subtitle="Cuentas registradas. Nunca se muestran contraseñas ni datos sensibles." />
 
       <View style={filtersStyle}>
         <Input
@@ -122,7 +124,7 @@ const Users: React.FC = () => {
           {!isCompact && (
             <View style={[tableRowStyle, tableHeadStyle]}>
               <Text style={[headCellStyle, nameCol]}>Nombre</Text>
-              <Text style={[headCellStyle, mailCol]}>Correo</Text>
+              <Text style={[headCellStyle, phoneCol]}>Teléfono</Text>
               <Text style={[headCellStyle, statusCol]}>Estado</Text>
               <Text style={[headCellStyle, dateCol]}>Registro</Text>
               <View style={actionCol} />
@@ -192,7 +194,7 @@ const Users: React.FC = () => {
         onConfirm={() => void confirmUnblock()}
         onCancel={() => setUnblocking(null)}
       />
-    </ScrollView>
+    </PageContainer>
   );
 };
 
@@ -238,18 +240,18 @@ const UserRow: React.FC<{
 
   return (
     <View style={[tableRowStyle, tableBodyStyle]}>
-      <Text style={[cellNameStyle, nameCol]} numberOfLines={1}>{fullName(user)}</Text>
-      <Text style={[cellStyle, mailCol]} numberOfLines={1}>{user.email}</Text>
+      <View style={nameCol}>
+        <Text style={cellNameStyle} numberOfLines={1}>{fullName(user)}</Text>
+        <Text style={cellMailStyle} numberOfLines={1}>{user.email}</Text>
+      </View>
+      <Text style={[cellStyle, phoneCol]} numberOfLines={1}>{user.phone ?? '—'}</Text>
       <View style={statusCol}>{pill}</View>
       <Text style={[cellStyle, dateCol]}>{date}</Text>
-      <View style={actionCol}>{button}</View>
+      <View style={actionCol}>{button ?? <Text style={mutedStyle}>Tu cuenta</Text>}</View>
     </View>
   );
 };
 
-const screenStyle: ViewStyle = themed(() => ({ flex: 1, backgroundColor: theme.colors.background }));
-const contentStyle: ViewStyle = { padding: theme.spacing.lg, paddingBottom: theme.spacing.huge, gap: theme.spacing.md };
-const titleStyle: TextStyle = themed(() => ({ ...theme.textStyles.h2, color: theme.colors.textPrimary }));
 const mutedStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, color: theme.colors.textMuted }));
 const filtersStyle: ViewStyle = { flexDirection: 'row', flexWrap: 'wrap', gap: theme.spacing.md, alignItems: 'flex-start' };
 const searchStyle: ViewStyle = { flexGrow: 1, flexBasis: 280, marginBottom: 0 };
@@ -265,8 +267,9 @@ const tableRowStyle: ViewStyle = { flexDirection: 'row', alignItems: 'center', g
 const tableHeadStyle: ViewStyle = themed(() => ({ height: 40, backgroundColor: theme.colors.surfaceAlt }));
 const tableBodyStyle: ViewStyle = themed(() => ({ minHeight: 60, borderTopWidth: 1, borderTopColor: theme.colors.border }));
 const headCellStyle: TextStyle = themed(() => ({ ...theme.textStyles.label, color: theme.colors.textMuted, textTransform: 'uppercase' }));
-const nameCol: TextStyle & ViewStyle = { flex: 2.2 };
-const mailCol: TextStyle & ViewStyle = { flex: 3 };
+const nameCol: ViewStyle = { flex: 3, minWidth: 0 };
+const phoneCol: TextStyle & ViewStyle = { flex: 2 };
+const cellMailStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, fontSize: 13, color: theme.colors.textMuted }));
 const statusCol: ViewStyle = { flex: 1.5, alignItems: 'flex-start' };
 const dateCol: TextStyle & ViewStyle = { flex: 1.5 };
 const actionCol: ViewStyle = { flex: 1.5, alignItems: 'flex-end' };

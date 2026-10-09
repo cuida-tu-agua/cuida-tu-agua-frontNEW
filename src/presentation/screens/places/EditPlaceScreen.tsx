@@ -3,7 +3,6 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
-  ScrollView,
   Text,
   TextStyle,
   View,
@@ -18,6 +17,8 @@ import { toUpdatePlaceInput } from '../../../domain/places/placeForm';
 import { Banner } from '../../components/common/Banner';
 import { Button } from '../../components/common/Button';
 import { ConfirmDialog } from '../../components/common/ConfirmDialog';
+import { PageContainer } from '../../components/common/PageContainer';
+import { PageHeader } from '../../components/common/PageHeader';
 import { SuccessModal } from '../../components/common/SuccessModal';
 import { PlaceForm } from '../../components/places/placeForm';
 import { usePlaceForm } from '../../hooks/usePlaceForm';
@@ -28,12 +29,6 @@ import { themed } from '../../styles/themeRuntime';
 type Props = NativeStackScreenProps<MainStackParamList, 'EditPlace'>;
 
 const containerStyle: ViewStyle = themed(() => ({ flex: 1, backgroundColor: theme.colors.background }));
-
-const contentStyle: ViewStyle = {
-  paddingHorizontal: theme.spacing.lg,
-  paddingTop: theme.spacing.xl,
-  paddingBottom: theme.spacing.huge,
-};
 
 const centeredStyle: ViewStyle = themed(() => ({
   flex: 1,
@@ -203,8 +198,13 @@ export const EditPlaceScreen: React.FC<Props> = ({ navigation, route }) => {
       style={containerStyle}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <ScrollView contentContainerStyle={contentStyle} keyboardShouldPersistTaps="handled">
-        <Text style={metaStyle}>Última modificación: {formatDate(place.updatedAt)}</Text>
+      <PageContainer narrow>
+        <PageHeader
+          back={{ label: 'Volver', onPress: () => navigation.goBack() }}
+          title="Editar lugar"
+          subtitle={`Última modificación: ${formatDate(place.updatedAt)}`}
+        />
+        {Platform.OS !== 'web' && <Text style={metaStyle}>Última modificación: {formatDate(place.updatedAt)}</Text>}
 
         <PlaceForm
           form={form}
@@ -242,7 +242,7 @@ export const EditPlaceScreen: React.FC<Props> = ({ navigation, route }) => {
           )}
           <Button label="Eliminar lugar" variant="danger" onPress={() => setConfirmingDelete(true)} />
         </View>
-      </ScrollView>
+      </PageContainer>
 
       <ConfirmDialog
         visible={confirmingDelete}

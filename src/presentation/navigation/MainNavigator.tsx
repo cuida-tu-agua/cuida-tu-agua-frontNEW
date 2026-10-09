@@ -1,4 +1,5 @@
 import React from 'react';
+import { Platform } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { PlaceDashboardScreen } from '../screens/dashboard/PlaceDashboardScreen';
 import { DeviceWifiSetupScreen } from '../screens/devices/DeviceWifiSetupScreen';
@@ -27,6 +28,8 @@ export const MainNavigator: React.FC = () => (
   <Stack.Navigator
     initialRouteName="Places"
     screenOptions={{
+      // The web draws its own page header (PageHeader) under the menu; the native bar is for the phone app
+      headerShown: Platform.OS !== 'web',
       headerTintColor: theme.colors.primary,
       headerTitleStyle: { color: theme.colors.textPrimary },
       headerShadowVisible: false,
@@ -45,8 +48,8 @@ export const MainNavigator: React.FC = () => (
     <Stack.Screen name="ValveHistory" component={ValveHistoryScreen} options={{ title: 'Historial de la válvula' }} />
     <Stack.Screen name="PlaceTariff" component={PlaceTariffScreen} options={{ title: 'Tarifa del agua' }} />
     <Stack.Screen name="Tips" component={TipsScreen} options={{ title: 'Consejos de ahorro' }} />
-    <Stack.Screen name="AdminTips" component={AdminTipsScreen} options={{ title: 'Consejos' }} />
-    <Stack.Screen name="AdminMetrics" component={AdminMetricsScreen} options={{ title: 'Métricas' }} />
+    <Stack.Screen name="AdminTips" component={AdminTipsScreen} options={{ title: 'Recomendaciones' }} />
+    <Stack.Screen name="AdminMetrics" component={AdminMetricsScreen} options={{ title: 'Resumen' }} />
     <Stack.Screen name="AdminUsers" component={AdminUsersScreen} options={{ title: 'Usuarios' }} />
     <Stack.Screen name="Notifications" component={NotificationsScreen} options={{ title: 'Notificaciones' }} />
     <Stack.Screen

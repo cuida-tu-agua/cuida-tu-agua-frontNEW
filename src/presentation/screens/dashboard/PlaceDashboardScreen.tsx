@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, RefreshControl, ScrollView, Text, TextStyle, View, ViewStyle } from 'react-native';
+import { ActivityIndicator, Platform, Pressable, RefreshControl, Text, TextStyle, View, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { placeRepository } from '../../../core/di/container';
@@ -10,6 +10,9 @@ import { toAppError } from '../../../infrastructure/http/httpError';
 import { Banner } from '../../components/common/Banner';
 import { Button } from '../../components/common/Button';
 import { Card } from '../../components/common/Card';
+import { PageContainer } from '../../components/common/PageContainer';
+import { PageHeader } from '../../components/common/PageHeader';
+import { TipsPanel } from '../../components/tips/TipsPanel';
 import { SuccessModal } from '../../components/common/SuccessModal';
 import { ConsumptionCard } from '../../components/consumption/ConsumptionCard';
 import { CostCard } from '../../components/tariffs/CostCard';
@@ -75,6 +78,11 @@ export const PlaceDashboardScreen: React.FC<Props> = ({ navigation, route }) => 
   const handleOrderSent = useCallback(() => setOrderSent(false), []);
   const goToDevice = () => navigation.navigate('PlaceDevice', { placeId, placeName });
 
+  const isWeb = Platform.OS === 'web';
+  const status = device.device?.status;
+  const back = { label: 'Mis lugares', onPress: () => navigation.navigate('Places') };
+  const tipsPanel = isWeb ? <TipsPanel placeId={placeId} onOpenFavorites={() => navigation.navigate('Tips', { placeId })} /> : null;
+
   if (!device.loaded) {
     return (
       <View style={centeredStyle}>
@@ -85,46 +93,59 @@ export const PlaceDashboardScreen: React.FC<Props> = ({ navigation, route }) => 
 
   if (!device.device && !device.error) {
     return (
-      <ScrollView style={screenStyle} contentContainerStyle={contentStyle}>
-        <Text style={placeNameStyle}>{placeName}</Text>
+      <PageContainer>
+        <PageHeader back={back} caption="Panel del lugar" title={placeName} webOnly={false} />
+        <View style={isCompact ? stackedStyle : splitStyle}>
+        <View style={isCompact ? stackedStyle : mainColumnStyle}>
         <Card variant="outlined" style={emptyCardStyle}>
           <Ionicons name="speedometer-outline" size={44} color={theme.colors.primary} />
           <Text style={emptyTitleStyle}>Vincula un medidor para ver tu consumo</Text>
           <Text style={mutedStyle}>Con el medidor verás cuánta agua usas y podrás abrir o cerrar el paso desde aquí.</Text>
           <Button label="Vincular medidor" onPress={goToDevice} style={{ alignSelf: 'stretch' }} />
         </Card>
-      </ScrollView>
+        </View>
+        {!!tipsPanel && <View style={isCompact ? stackedStyle : sideColumnStyle}>{tipsPanel}</View>}
+        </View>
+      </PageContainer>
     );
   }
 
-  const status = device.device?.status;
-
   return (
-    <ScrollView
-      style={screenStyle}
-      contentContainerStyle={contentStyle}
-      refreshControl={<RefreshControl refreshing={false} onRefresh={refreshAll} tintColor={theme.colors.primary} />}
-    >
-      <View style={titleRowStyle}>
-        <Text style={placeNameStyle} numberOfLines={1}>
-          {placeName}
-        </Text>
-        {!!status && (
-          <Button
-            label={DEVICE_STATUS_LABELS[status]}
-            variant="secondary"
-            size="small"
-            onPress={goToDevice}
-            icon={
-              <Ionicons
-                name={status === 'CONNECTED' ? 'wifi' : 'cloud-offline-outline'}
-                size={16}
-                color={status === 'CONNECTED' ? theme.colors.success : theme.colors.warning}
+    <PageContainer refreshControl={<RefreshControl refreshing={false} onRefresh={refreshAll} tintColor={theme.colors.primary} />}>
+      <PageHeader
+        back={back}
+        caption="Panel del lugar"
+        title={placeName}
+        webOnly={false}
+        right={
+          <>
+            {!!status && (
+              <Pressable
+                onPress={goToDevice}
+                style={chipStyle}
+                accessibilityRole="button"
+                accessibilityLabel={`Medidor: ${DEVICE_STATUS_LABELS[status]}. Ver el medidor`}
+              >
+                <Ionicons
+                  name={status === 'CONNECTED' ? 'wifi' : 'cloud-offline-outline'}
+                  size={16}
+                  color={status === 'CONNECTED' ? theme.colors.success : theme.colors.warning}
+                />
+                <Text style={chipTextStyle}>Medidor: {DEVICE_STATUS_LABELS[status]}</Text>
+              </Pressable>
+            )}
+            {isWeb && (
+              <Button
+                label="Actualizar"
+                variant="ghost"
+                size="small"
+                onPress={refreshAll}
+                icon={<Ionicons name="refresh" size={16} color={theme.colors.primary} />}
               />
-            }
-          />
-        )}
-      </View>
+            )}
+          </>
+        }
+      />
 
       {status === 'DISCONNECTED' && (
         <Banner
@@ -176,6 +197,7 @@ export const PlaceDashboardScreen: React.FC<Props> = ({ navigation, route }) => 
       {valve.noDevice && (
         <Text style={mutedStyle}>La válvula aparecerá en cuanto el servicio de válvulas registre el medidor.</Text>
       )}
+      {tipsPanel}
         </View>
       </View>
 
@@ -197,20 +219,23 @@ export const PlaceDashboardScreen: React.FC<Props> = ({ navigation, route }) => 
         onDismiss={handleOrderSent}
         autoCloseDuration={1500}
       />
-    </ScrollView>
+    </PageContainer>
   );
 };
 
-const screenStyle: ViewStyle = themed(() => ({ flex: 1, backgroundColor: theme.colors.background }));
-const contentStyle: ViewStyle = {
-  paddingHorizontal: theme.spacing.lg,
-  paddingTop: theme.spacing.lg,
-  paddingBottom: theme.spacing.huge,
-  gap: theme.spacing.lg,
-};
 const centeredStyle: ViewStyle = themed(() => ({ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: theme.colors.background }));
-const titleRowStyle: ViewStyle = { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: theme.spacing.md };
-const placeNameStyle: TextStyle = themed(() => ({ ...theme.textStyles.h2, color: theme.colors.textPrimary, flexShrink: 1 }));
+const chipStyle: ViewStyle = themed(() => ({
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: theme.spacing.sm,
+  minHeight: 44,
+  paddingHorizontal: theme.spacing.md,
+  borderRadius: theme.borderRadius.medium,
+  borderWidth: 1,
+  borderColor: theme.colors.border,
+  backgroundColor: theme.colors.surface,
+}));
+const chipTextStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, fontWeight: '800', color: theme.colors.textPrimary }));
 const mutedStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, color: theme.colors.textMuted, textAlign: 'center' }));
 /** Phone: one column. Tablet / desktop: the consumption on the left, the valve (and its notices) on the right. */
 const stackedStyle: ViewStyle = { gap: theme.spacing.lg };

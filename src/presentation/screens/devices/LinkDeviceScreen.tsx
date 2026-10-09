@@ -19,6 +19,8 @@ import {
 } from '../../../domain/devices/linkDeviceForm';
 import { toAppError } from '../../../infrastructure/http/httpError';
 import { Banner } from '../../components/common/Banner';
+import { PageContainer } from '../../components/common/PageContainer';
+import { PageHeader } from '../../components/common/PageHeader';
 import { Button } from '../../components/common/Button';
 import { Input } from '../../components/common/Input';
 import { SuccessModal } from '../../components/common/SuccessModal';
@@ -80,7 +82,8 @@ export const LinkDeviceScreen: React.FC<Props> = ({ navigation, route }) => {
 
   return (
     <KeyboardAvoidingView style={screenStyle} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <ScrollView contentContainerStyle={contentStyle} keyboardShouldPersistTaps="handled">
+      <PageContainer medium>
+        <PageHeader back={{ label: 'Volver', onPress: () => navigation.goBack() }} title="Vincular medidor" />
         <Text style={titleStyle}>Vincular medidor a {placeName}</Text>
 
         <View style={stepsStyle}>
@@ -137,7 +140,7 @@ export const LinkDeviceScreen: React.FC<Props> = ({ navigation, route }) => {
         />
 
         <Button label="Vincular medidor" onPress={handleSubmit} loading={submitting} />
-      </ScrollView>
+      </PageContainer>
 
       <SuccessModal
         visible={linked}

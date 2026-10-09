@@ -7,6 +7,8 @@ import { placeRepository } from '../../../core/di/container';
 import { AppNotification } from '../../../domain/notifications/Notification';
 import { Banner } from '../../components/common/Banner';
 import { Button } from '../../components/common/Button';
+import { listContentStyle } from '../../components/common/PageContainer';
+import { PageHeader } from '../../components/common/PageHeader';
 import { NotificationItem } from '../../components/notifications/NotificationItem';
 import { useNotifications } from '../../hooks/useNotifications';
 import { MainStackParamList } from '../../navigation/types';
@@ -69,7 +71,7 @@ export const NotificationsScreen: React.FC<Props> = ({ navigation }) => {
       style={screenStyle}
       data={inbox.items}
       keyExtractor={(item) => item.id}
-      contentContainerStyle={[contentStyle, { paddingBottom: insets.bottom + theme.spacing.xl }]}
+      contentContainerStyle={[contentStyle, listContentStyle(), { paddingBottom: insets.bottom + theme.spacing.xl }]}
       refreshControl={
         <RefreshControl refreshing={inbox.refreshing} onRefresh={() => void inbox.refresh()} tintColor={theme.colors.primary} />
       }
@@ -77,6 +79,7 @@ export const NotificationsScreen: React.FC<Props> = ({ navigation }) => {
       onEndReachedThreshold={0.4}
       ListHeaderComponent={
         <>
+          <PageHeader title="Notificaciones" />
           {toolbar}
           {!!inbox.error && (
             <Banner

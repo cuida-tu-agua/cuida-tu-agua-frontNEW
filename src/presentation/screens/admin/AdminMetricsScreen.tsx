@@ -1,11 +1,13 @@
 import React from 'react';
-import { ActivityIndicator, RefreshControl, ScrollView, Text, TextStyle, View, ViewStyle } from 'react-native';
+import { ActivityIndicator, RefreshControl, Text, TextStyle, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { percent, unavailableLabels } from '../../../domain/admin/Admin';
+import { PlatformMetrics, unavailableLabels } from '../../../domain/admin/Admin';
 import { Banner } from '../../components/common/Banner';
 import { Button } from '../../components/common/Button';
 import { Card } from '../../components/common/Card';
+import { PageContainer } from '../../components/common/PageContainer';
+import { PageHeader } from '../../components/common/PageHeader';
 import { RequireAdmin } from '../../components/admin/RequireAdmin';
 import { useAdminMetrics } from '../../hooks/useAdminMetrics';
 import { MainStackParamList } from '../../navigation/types';
@@ -20,14 +22,14 @@ interface Line {
   tone?: 'good' | 'warn';
 }
 
-/** HU-062: the platform at a glance. Each card is one section; a section whose service is down says so. */
-export const AdminMetricsScreen: React.FC<Props> = () => (
+/** HU-062: the platform at a glance. Each block is one section; a section whose service is down says so. */
+export const AdminMetricsScreen: React.FC<Props> = ({ navigation }) => (
   <RequireAdmin>
-    <Metrics />
+    <Metrics onUsers={() => navigation.navigate('AdminUsers')} />
   </RequireAdmin>
 );
 
-const Metrics: React.FC = () => {
+const Metrics: React.FC<{ onUsers: () => void }> = ({ onUsers }) => {
   const { metrics, error, loading, reload } = useAdminMetrics();
 
   if (!metrics) {
@@ -46,141 +48,133 @@ const Metrics: React.FC = () => {
   }
 
   const down = unavailableLabels(metrics.unavailable);
+  const { users, places, devices } = metrics;
 
   return (
-    <ScrollView
-      style={screenStyle}
-      contentContainerStyle={contentStyle}
-      refreshControl={<RefreshControl refreshing={loading} onRefresh={() => void reload()} tintColor={theme.colors.primary} />}
-    >
-      <View style={titleRowStyle}>
-        <View style={{ flex: 1 }}>
-          <Text style={titleStyle}>Métricas de la plataforma</Text>
-          <Text style={mutedStyle}>
-            Actualizado a las {new Date(metrics.generatedAt).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })}
-          </Text>
-        </View>
-        <Button
-          label="Actualizar"
-          size="small"
-          variant="secondary"
-          loading={loading}
-          icon={<Ionicons name="refresh" size={18} color={theme.colors.textPrimary} />}
-          onPress={() => void reload()}
-        />
-      </View>
+    <PageContainer gap={theme.spacing.lg} refreshControl={<RefreshControl refreshing={loading} onRefresh={() => void reload()} tintColor={theme.colors.primary} />}>
+      <PageHeader
+        webOnly={false}
+        title="Resumen de la plataforma"
+        subtitle={`Datos actualizados a las ${new Date(metrics.generatedAt).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })}`}
+        right={
+          <Button
+            label="Actualizar"
+            size="small"
+            variant="secondary"
+            loading={loading}
+            icon={<Ionicons name="refresh" size={18} color={theme.colors.primary} />}
+            onPress={() => void reload()}
+          />
+        }
+      />
 
       {!!error && <Banner tone="warning" message={`No pudimos actualizar. ${error.message}`} />}
       {down.length > 0 && (
-        <Banner
-          tone="warning"
-          title="Datos incompletos"
-          message={`No respondió: ${down.join(', ')}. Los demás números sí están al día.`}
-        />
+        <Banner tone="warning" title="Datos incompletos" message={`No respondió: ${down.join(', ')}. Los demás números sí están al día.`} />
       )}
 
       <View style={gridStyle}>
-        <StatCard
-          icon="people-outline"
+        <Stat title="Cuentas activas" value={users.active} detail={`de ${users.total} cuentas`} flag={users.blocked > 0 ? `${users.blocked} bloqueada${users.blocked === 1 ? '' : 's'}` : undefined} flagTone="bad" />
+        <Stat
+          title="Medidores conectados"
+          value={devices?.active}
+          detail={devices ? `de ${devices.total} registrados` : undefined}
+          flag={devices && devices.inactive > 0 ? `${devices.inactive} sin conexión` : undefined}
+          flagTone="warn"
+        />
+        <Stat title="Lugares registrados" value={places?.total} detail={places ? `${places.active} con medidor` : undefined} />
+        <Stat
+          title="Sin verificar"
+          value={users.unverified}
+          detail="cuentas esperando su código"
+          flag={users.unverified > 0 ? 'Pendientes de verificar' : undefined}
+          flagTone="warn"
+        />
+      </View>
+
+      <View style={gridStyle}>
+        <Section
           title="Usuarios"
-          total={metrics.users.total}
-          active={metrics.users.active}
-          activeLabel="activos"
+          action={{ label: 'Ver usuarios', onPress: onUsers }}
           lines={[
-            { label: 'Activos (verificados y sin bloqueo)', value: metrics.users.active, tone: 'good' },
-            { label: 'Inactivos', value: metrics.users.inactive, tone: 'warn' },
-            { label: '· Bloqueados', value: metrics.users.blocked },
-            { label: '· Sin verificar', value: metrics.users.unverified },
+            { label: 'Cuentas en total', value: users.total },
+            { label: 'Activas', value: users.active, tone: 'good' },
+            { label: 'Sin verificar el correo', value: users.unverified, tone: users.unverified > 0 ? 'warn' : undefined },
+            { label: 'Bloqueadas', value: users.blocked, tone: users.blocked > 0 ? 'warn' : undefined },
           ]}
         />
-        <StatCard
-          icon="home-outline"
-          title="Lugares"
-          total={metrics.places?.total}
-          active={metrics.places?.active}
-          activeLabel="con medidor"
-          lines={
-            metrics.places && [
-              { label: 'Activos (con un medidor vinculado)', value: metrics.places.active, tone: 'good' },
-              { label: 'Inactivos', value: metrics.places.inactive, tone: 'warn' },
-            ]
-          }
-        />
-        <StatCard
-          icon="speedometer-outline"
-          title="Dispositivos"
-          total={metrics.devices?.total}
-          active={metrics.devices?.active}
-          activeLabel="conectados"
-          lines={
-            metrics.devices && [
-              { label: 'Activos (conectados ahora)', value: metrics.devices.active, tone: 'good' },
-              { label: 'Inactivos', value: metrics.devices.inactive, tone: 'warn' },
-              { label: '· Vinculados a un lugar', value: metrics.devices.linked },
-            ]
-          }
-        />
+        <Section title="Medidores" lines={devicesLines(metrics)} />
       </View>
-    </ScrollView>
+    </PageContainer>
   );
 };
 
-const StatCard: React.FC<{
-  icon: keyof typeof Ionicons.glyphMap;
-  title: string;
-  total?: number;
-  active?: number;
-  activeLabel: string;
-  lines?: Line[] | null;
-}> = ({ icon, title, total, active, activeLabel, lines }) => {
-  const available = typeof total === 'number' && !!lines;
-  const share = available ? percent(active ?? 0, total) : 0;
+const devicesLines = (metrics: PlatformMetrics): Line[] | null =>
+  metrics.devices && [
+    { label: 'Registrados', value: metrics.devices.total },
+    { label: 'Conectados', value: metrics.devices.active, tone: 'good' },
+    { label: 'Desconectados', value: metrics.devices.inactive, tone: metrics.devices.inactive > 0 ? 'warn' : undefined },
+    { label: 'Vinculados a un lugar', value: metrics.devices.linked },
+  ];
 
-  return (
-    <Card variant="outlined" style={cardStyle}>
-      <View style={cardHeaderStyle}>
-        <View style={iconStyle}>
-          <Ionicons name={icon} size={22} color={theme.colors.primary} />
-        </View>
-        <Text style={cardTitleStyle}>{title}</Text>
-      </View>
-
-      {available ? (
-        <>
-          <Text style={bigNumberStyle}>{total}</Text>
-          <View style={barStyle} accessibilityRole="progressbar" accessibilityValue={{ min: 0, max: 100, now: share }}>
-            <View style={[barFillStyle, { width: `${share}%` }]} />
+/** One number of the top row. A service that did not answer shows a dash and says why, never a zero. */
+const Stat: React.FC<{ title: string; value?: number; detail?: string; flag?: string; flagTone?: 'warn' | 'bad' }> = ({ title, value, detail, flag, flagTone }) => (
+  <Card variant="outlined" style={statStyle}>
+    <Text style={statTitleStyle}>{title}</Text>
+    {typeof value === 'number' ? (
+      <>
+        <Text style={bigNumberStyle}>{value}</Text>
+        {!!detail && <Text style={mutedStyle}>{detail}</Text>}
+        {!!flag && (
+          <View style={flagRowStyle}>
+            <Ionicons
+              name={flagTone === 'bad' ? 'alert-circle' : 'alert-circle-outline'}
+              size={16}
+              color={flagTone === 'bad' ? theme.colors.error : theme.colors.warning}
+            />
+            <Text style={flagTextStyle}>{flag}</Text>
           </View>
-          <Text style={mutedStyle}>
-            {share}% {activeLabel}
-          </Text>
-          {lines.map((line) => (
-            <View key={line.label} style={lineStyle}>
-              <Text style={[lineLabelStyle, line.tone === undefined && { color: theme.colors.textMuted }]}>{line.label}</Text>
-              <Text
-                style={[
-                  lineValueStyle,
-                  line.tone === 'good' && { color: theme.colors.success },
-                  line.tone === 'warn' && { color: theme.colors.warning },
-                ]}
-              >
-                {line.value}
-              </Text>
-            </View>
-          ))}
-        </>
-      ) : (
-        <View style={unavailableStyle}>
-          <Ionicons name="cloud-offline-outline" size={28} color={theme.colors.textMuted} />
-          <Text style={mutedStyle}>No disponible: el servicio no respondió.</Text>
-        </View>
-      )}
-    </Card>
-  );
-};
+        )}
+      </>
+    ) : (
+      <>
+        <Text style={bigNumberStyle}>–</Text>
+        <Text style={mutedStyle}>No disponible: el servicio no respondió.</Text>
+      </>
+    )}
+  </Card>
+);
 
-const screenStyle: ViewStyle = themed(() => ({ flex: 1, backgroundColor: theme.colors.background }));
-const contentStyle: ViewStyle = { padding: theme.spacing.lg, paddingBottom: theme.spacing.huge, gap: theme.spacing.lg };
+const Section: React.FC<{ title: string; lines: Line[] | null; action?: { label: string; onPress: () => void } }> = ({ title, lines, action }) => (
+  <Card variant="outlined" style={sectionStyle}>
+    <View style={sectionHeaderStyle}>
+      <Text style={sectionTitleStyle} accessibilityRole="header">
+        {title}
+      </Text>
+      {!!action && (
+        <TouchableOpacity onPress={action.onPress} accessibilityRole="link" hitSlop={8}>
+          <Text style={linkStyle}>{action.label}</Text>
+        </TouchableOpacity>
+      )}
+    </View>
+    {lines ? (
+      lines.map((line) => (
+        <View key={line.label} style={lineStyle}>
+          <Text style={lineLabelStyle}>{line.label}</Text>
+          <Text style={[lineValueStyle, line.tone === 'good' && { color: theme.colors.success }, line.tone === 'warn' && { color: theme.colors.warning }]}>
+            {line.value}
+          </Text>
+        </View>
+      ))
+    ) : (
+      <View style={unavailableStyle}>
+        <Ionicons name="cloud-offline-outline" size={28} color={theme.colors.textMuted} />
+        <Text style={mutedStyle}>No disponible: el servicio no respondió.</Text>
+      </View>
+    )}
+  </Card>
+);
+
 const centerStyle: ViewStyle = themed(() => ({
   flex: 1,
   alignItems: 'center',
@@ -189,28 +183,21 @@ const centerStyle: ViewStyle = themed(() => ({
   gap: theme.spacing.md,
   backgroundColor: theme.colors.background,
 }));
-const titleRowStyle: ViewStyle = { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.md };
-const titleStyle: TextStyle = themed(() => ({ ...theme.textStyles.h2, color: theme.colors.textPrimary }));
 const mutedStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, color: theme.colors.textMuted }));
 const gridStyle: ViewStyle = { flexDirection: 'row', flexWrap: 'wrap', gap: theme.spacing.lg };
-const cardStyle: ViewStyle = { flexGrow: 1, flexBasis: 260, gap: theme.spacing.sm };
-const cardHeaderStyle: ViewStyle = { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.md };
-const iconStyle: ViewStyle = themed(() => ({
-  width: 40,
-  height: 40,
-  borderRadius: 20,
-  backgroundColor: theme.colors.infoBg,
-  alignItems: 'center',
-  justifyContent: 'center',
-}));
-const cardTitleStyle: TextStyle = themed(() => ({ ...theme.textStyles.h2, fontSize: 18, color: theme.colors.textPrimary }));
-const bigNumberStyle: TextStyle = themed(() => ({ fontSize: 44, fontWeight: '800', color: theme.colors.textPrimary, lineHeight: 52 }));
-const barStyle: ViewStyle = themed(() => ({ height: 8, borderRadius: 4, backgroundColor: theme.colors.grayLight, overflow: 'hidden' }));
-const barFillStyle: ViewStyle = themed(() => ({ height: 8, borderRadius: 4, backgroundColor: theme.colors.success }));
+const statStyle: ViewStyle = { flexGrow: 1, flexBasis: 200, gap: theme.spacing.xs };
+const statTitleStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, fontWeight: '800', color: theme.colors.textSecondary }));
+const bigNumberStyle: TextStyle = themed(() => ({ fontSize: 40, fontWeight: '800', color: theme.colors.textPrimary, lineHeight: 48 }));
+const flagRowStyle: ViewStyle = { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 2 };
+const flagTextStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, fontWeight: '800', color: theme.colors.textPrimary }));
+const sectionStyle: ViewStyle = { flexGrow: 1, flexBasis: 320, gap: theme.spacing.xs };
+const sectionHeaderStyle: ViewStyle = { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: theme.spacing.xs };
+const sectionTitleStyle: TextStyle = themed(() => ({ ...theme.textStyles.h3, fontSize: 18, fontWeight: '800', color: theme.colors.textPrimary }));
+const linkStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, fontWeight: '800', color: theme.colors.primary }));
 const lineStyle: ViewStyle = themed(() => ({
   flexDirection: 'row',
   justifyContent: 'space-between',
-  paddingVertical: theme.spacing.xs,
+  paddingVertical: theme.spacing.sm,
   borderTopWidth: 1,
   borderTopColor: theme.colors.border,
 }));

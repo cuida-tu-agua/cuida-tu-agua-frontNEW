@@ -10,10 +10,36 @@ interface TipCardProps {
   tip: Tip;
   busy?: boolean;
   onToggleFavorite: () => void;
+  /** Figma "Consejos favoritos": a small card (icon, title, text and the heart), without the category line. */
+  compact?: boolean;
 }
 
 /** HU-065: one tip. The star marks it as favorite; the state is also said in words for screen readers (never only color). */
-export const TipCard: React.FC<TipCardProps> = ({ tip, busy = false, onToggleFavorite }) => (
+export const TipCard: React.FC<TipCardProps> = ({ tip, busy = false, onToggleFavorite, compact = false }) =>
+  compact ? (
+    <Card variant="outlined" style={compactCardStyle}>
+      <Ionicons name="bulb-outline" size={22} color={theme.colors.primary} style={{ marginTop: 2 }} />
+      <View style={{ flex: 1, gap: 2 }}>
+        <Text style={compactTitleStyle}>{tip.title}</Text>
+        <Text style={compactBodyStyle}>{tip.body}</Text>
+      </View>
+      <TouchableOpacity
+        onPress={onToggleFavorite}
+        disabled={busy}
+        style={heartButtonStyle}
+        hitSlop={8}
+        accessibilityRole="button"
+        accessibilityLabel={tip.isFavorite ? 'Quitar de favoritos' : 'Marcar como favorito'}
+        accessibilityState={{ selected: tip.isFavorite, busy }}
+      >
+        {busy ? (
+          <ActivityIndicator size="small" color={theme.colors.primary} />
+        ) : (
+          <Ionicons name={tip.isFavorite ? 'heart' : 'heart-outline'} size={24} color={tip.isFavorite ? theme.colors.error : theme.colors.textMuted} />
+        )}
+      </TouchableOpacity>
+    </Card>
+  ) : (
   <Card variant="outlined" style={cardStyle}>
     <View style={topRowStyle}>
       <View style={iconStyle}>
@@ -35,13 +61,18 @@ export const TipCard: React.FC<TipCardProps> = ({ tip, busy = false, onToggleFav
         {busy ? (
           <ActivityIndicator size="small" color={theme.colors.primary} />
         ) : (
-          <Ionicons name={tip.isFavorite ? 'star' : 'star-outline'} size={24} color={tip.isFavorite ? theme.colors.warning : theme.colors.textMuted} />
+          <Ionicons name={tip.isFavorite ? 'heart' : 'heart-outline'} size={24} color={tip.isFavorite ? theme.colors.error : theme.colors.textMuted} />
         )}
       </TouchableOpacity>
     </View>
     <Text style={bodyStyle}>{tip.body}</Text>
   </Card>
-);
+  );
+
+const compactCardStyle: ViewStyle = { flexDirection: 'row', alignItems: 'flex-start', gap: theme.spacing.md };
+const compactTitleStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, fontSize: 15, fontWeight: '800', color: theme.colors.textPrimary }));
+const compactBodyStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, color: theme.colors.textSecondary }));
+const heartButtonStyle: ViewStyle = { width: 32, height: 32, alignItems: 'center', justifyContent: 'center' };
 
 const cardStyle: ViewStyle = { gap: theme.spacing.md };
 const topRowStyle: ViewStyle = { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.md };

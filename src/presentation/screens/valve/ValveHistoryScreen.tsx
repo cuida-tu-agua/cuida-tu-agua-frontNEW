@@ -9,6 +9,8 @@ import { ValveCommand, ValveCommandStatus } from '../../../domain/valve/Valve';
 import { describeRequester, STATUS_LABELS } from '../../../domain/valve/valveRules';
 import { toAppError } from '../../../infrastructure/http/httpError';
 import { Banner } from '../../components/common/Banner';
+import { listContentStyle } from '../../components/common/PageContainer';
+import { PageHeader } from '../../components/common/PageHeader';
 import { MainStackParamList } from '../../navigation/types';
 import { theme } from '../../styles/theme';
 import { themed } from '../../styles/themeRuntime';
@@ -24,7 +26,7 @@ const STATUS_COLOR: Record<ValveCommandStatus, string> = themed(() => ({
 
 const formatDate = (iso: string) => new Date(iso).toLocaleString('es-CO', { dateStyle: 'medium', timeStyle: 'short' });
 
-export const ValveHistoryScreen: React.FC<Props> = ({ route }) => {
+export const ValveHistoryScreen: React.FC<Props> = ({ navigation, route }) => {
   const { placeId } = route.params;
   const [items, setItems] = useState<ValveCommand[] | null>(null);
   const [error, setError] = useState<AppError | null>(null);
@@ -75,12 +77,13 @@ export const ValveHistoryScreen: React.FC<Props> = ({ route }) => {
   return (
     <FlatList
       style={screenStyle}
-      contentContainerStyle={contentStyle}
+      contentContainerStyle={[contentStyle, listContentStyle()]}
       data={items ?? []}
       keyExtractor={(c) => c.id}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} tintColor={theme.colors.primary} />}
       ListHeaderComponent={
         <>
+          <PageHeader back={{ label: 'Volver', onPress: () => navigation.goBack() }} title="Historial de la válvula" />
           {!!error && <Banner tone="error" message={error.message} />}
           <Text style={mutedStyle}>Últimos 30 días</Text>
         </>

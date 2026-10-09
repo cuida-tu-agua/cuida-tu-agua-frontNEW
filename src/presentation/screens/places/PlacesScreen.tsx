@@ -2,6 +2,7 @@ import React, { useCallback, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
+  Platform,
   RefreshControl,
   Text,
   TextStyle,
@@ -25,6 +26,7 @@ import { Avatar } from '../../components/common/Avatar';
 import { Banner } from '../../components/common/Banner';
 import { NotificationBell } from '../../components/notifications/NotificationBell';
 import { Button } from '../../components/common/Button';
+import { PageHeader } from '../../components/common/PageHeader';
 import { PlaceCard } from '../../components/places/PlaceCard';
 import { useLayout } from '../../layout/breakpoints';
 import { MainStackParamList } from '../../navigation/types';
@@ -93,7 +95,29 @@ export const PlacesScreen: React.FC<Props> = ({ navigation, route }) => {
     }
   };
 
-  const header = (
+  const isWeb = Platform.OS === 'web';
+  const welcome = places && places.length > 0 ? 'Elige el lugar que quieres monitorear o abre su panel para ver el consumo y la válvula.' : 'Empecemos a cuidar el agua.';
+
+  // Web: the Figma page header inside the content (the menu already has the bell and the profile). Phone: the bar with bell + avatar.
+  const webHeader = (
+    <PageHeader
+      caption={`Hola, ${user?.firstName ?? ''}`}
+      title="Mis lugares"
+      subtitle={welcome}
+      right={
+        places && places.length > 0 ? (
+          <Button
+            label="Registrar lugar"
+            size="medium"
+            onPress={() => navigation.navigate('CreatePlace')}
+            icon={<Ionicons name="add" size={20} color={theme.colors.textOnPrimary} />}
+          />
+        ) : undefined
+      }
+    />
+  );
+
+  const header = isWeb ? null : (
     <View style={[headerStyle, { paddingTop: insets.top + theme.spacing.lg }]}>
       <View style={headerTextStyle}>
         <Text style={helloStyle}>Hola, {user?.firstName ?? ''}</Text>
@@ -124,6 +148,7 @@ export const PlacesScreen: React.FC<Props> = ({ navigation, route }) => {
     return (
       <View style={screenStyle}>
         {header}
+        {isWeb && <View style={webPageStyle}>{webHeader}</View>}
         <View style={centerStyle}>
           {loadError ? (
             <>
@@ -145,8 +170,11 @@ export const PlacesScreen: React.FC<Props> = ({ navigation, route }) => {
     return (
       <View style={screenStyle}>
         {header}
-        <View style={contentStyle}>{banners}</View>
-        <View style={centerStyle}>
+        <View style={[contentStyle, isWeb && webPageStyle]}>
+          {isWeb && webHeader}
+          {banners}
+        </View>
+        <View style={[centerStyle, isWeb && emptyCardStyle]}>
           <View style={emptyIconStyle}>
             <Ionicons name="water-outline" size={48} color={theme.colors.primary} />
           </View>
@@ -169,14 +197,17 @@ export const PlacesScreen: React.FC<Props> = ({ navigation, route }) => {
         columnWrapperStyle={columns > 1 ? gridRowStyle : undefined}
         data={places}
         keyExtractor={(place) => place.id}
-        contentContainerStyle={[contentStyle, { paddingBottom: insets.bottom + theme.spacing.xl }]}
+        contentContainerStyle={[contentStyle, isWeb && { paddingTop: theme.spacing.xl }, { paddingBottom: insets.bottom + theme.spacing.xl }]}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} tintColor={theme.colors.primary} />}
         accessibilityRole="radiogroup"
         ListHeaderComponent={
           <>
+            {isWeb && webHeader}
             {banners}
             {!!loadError && <Banner tone="warning" message={`No pudimos actualizar la lista. ${loadError.message}`} />}
-            <Text style={sectionTitleStyle}>Mis lugares ({places.length})</Text>
+            <Text style={isWeb ? webCountStyle : sectionTitleStyle}>
+              {isWeb ? `${places.length} ${places.length === 1 ? 'lugar' : 'lugares'}` : `Mis lugares (${places.length})`}
+            </Text>
           </>
         }
         renderItem={({ item }) => (
@@ -192,6 +223,7 @@ export const PlacesScreen: React.FC<Props> = ({ navigation, route }) => {
           </View>
         )}
         ListFooterComponent={
+          isWeb ? null : (
           <Button
             label="Registrar otro lugar"
             variant="secondary"
@@ -199,6 +231,7 @@ export const PlacesScreen: React.FC<Props> = ({ navigation, route }) => {
             onPress={() => navigation.navigate('CreatePlace')}
             style={{ marginTop: theme.spacing.sm }}
           />
+          )
         }
       />
     </View>
@@ -221,6 +254,19 @@ const headerStyle: ViewStyle = themed(() => ({
 const headerTextStyle: ViewStyle = { flex: 1 };
 
 const gridRowStyle: ViewStyle = { gap: theme.spacing.lg };
+
+const webPageStyle: ViewStyle = { paddingHorizontal: theme.spacing.lg, paddingTop: theme.spacing.xl };
+const webCountStyle: TextStyle = themed(() => ({ ...theme.textStyles.h3, fontSize: 19, fontWeight: '800', color: theme.colors.textPrimary, marginBottom: theme.spacing.md }));
+const emptyCardStyle: ViewStyle = themed(() => ({
+  flex: 0,
+  alignSelf: 'stretch',
+  marginHorizontal: theme.spacing.lg,
+  paddingVertical: theme.spacing.huge,
+  borderRadius: theme.borderRadius.large,
+  borderWidth: 1,
+  borderColor: theme.colors.border,
+  backgroundColor: theme.colors.surface,
+}));
 
 const helloStyle: TextStyle = themed(() => ({ ...theme.textStyles.h2, color: theme.colors.textPrimary }));
 

@@ -5,6 +5,8 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { toAppError } from '../../../infrastructure/http/httpError';
 import { DEVICE_STATUS_HINTS } from '../../../domain/devices/deviceStatus';
 import { Banner } from '../../components/common/Banner';
+import { PageContainer } from '../../components/common/PageContainer';
+import { PageHeader } from '../../components/common/PageHeader';
 import { Button } from '../../components/common/Button';
 import { Card } from '../../components/common/Card';
 import { ConfirmDialog } from '../../components/common/ConfirmDialog';
@@ -77,7 +79,8 @@ export const PlaceDeviceScreen: React.FC<Props> = ({ navigation, route }) => {
   const hint = device ? DEVICE_STATUS_HINTS[device.status] : null;
 
   return (
-    <ScrollView style={screenStyle} contentContainerStyle={contentStyle}>
+    <PageContainer medium gap={theme.spacing.lg}>
+      <PageHeader back={{ label: 'Volver', onPress: () => navigation.goBack() }} title="Medidor" />
       <Text style={eyebrowStyle}>Lugar</Text>
       <Text style={placeNameStyle}>{placeName}</Text>
 
@@ -153,7 +156,7 @@ export const PlaceDeviceScreen: React.FC<Props> = ({ navigation, route }) => {
         onDismiss={handleUnlinkedDismiss}
         autoCloseDuration={1500}
       />
-    </ScrollView>
+    </PageContainer>
   );
 };
 

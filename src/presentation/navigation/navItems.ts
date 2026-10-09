@@ -16,23 +16,35 @@ export interface NavItem {
 }
 
 const BASE_ITEMS: NavItem[] = [
-  { section: 'places', label: 'Mis lugares', icon: 'water-outline', route: 'Places' },
-  { section: 'tips', label: 'Consejos', icon: 'bulb-outline', route: 'Tips' },
+  { section: 'places', label: 'Mis lugares', icon: 'home-outline', route: 'Places' },
   { section: 'notifications', label: 'Notificaciones', icon: 'notifications-outline', route: 'Notifications' },
+  { section: 'tips', label: 'Consejos favoritos', icon: 'heart-outline', route: 'Tips' },
   { section: 'profile', label: 'Mi perfil', icon: 'person-circle-outline', route: 'Profile' },
 ];
 
 /** Administration (E14): only the ADMIN role sees it. The servers refuse these calls to anybody else anyway. */
 const ADMIN_ITEMS: NavItem[] = [
-  { section: 'adminMetrics', label: 'Métricas', icon: 'stats-chart-outline', route: 'AdminMetrics' },
+  { section: 'adminMetrics', label: 'Resumen', icon: 'stats-chart-outline', route: 'AdminMetrics' },
   { section: 'adminUsers', label: 'Usuarios', icon: 'people-outline', route: 'AdminUsers' },
-  { section: 'adminTips', label: 'Gestionar consejos', icon: 'create-outline', route: 'AdminTips' },
+  { section: 'adminTips', label: 'Recomendaciones', icon: 'bulb-outline', route: 'AdminTips' },
 ];
 
-/** What the side menu shows for a user: places, inbox and, for administrators, the administration, then the profile. */
-export const navItemsFor = (roles: readonly string[] = []): NavItem[] => {
-  const [places, tips, notifications, profile] = BASE_ITEMS;
-  return isAdmin(roles) ? [places, tips, notifications, ...ADMIN_ITEMS, profile] : [...BASE_ITEMS];
+/** The menu of a person using their places: places, inbox, favorite tips, profile. */
+export const userNavItems = (): NavItem[] => [...BASE_ITEMS];
+
+/** The menu of the administration area (its own menu, like the Figma boards). */
+export const adminNavItems = (): NavItem[] => [...ADMIN_ITEMS];
+
+/** Door between the two areas: an administrator sees it in the user menu, and the admin menu has the way back. */
+export const ADMIN_DOOR: NavItem = { section: 'adminMetrics', label: 'Administración', icon: 'shield-checkmark-outline', route: 'AdminMetrics' };
+export const USER_DOOR: NavItem = { section: 'places', label: 'Ir a mis lugares', icon: 'home-outline', route: 'Places' };
+
+export const isAdminSection = (section: NavSection | null): boolean => !!section && section.startsWith('admin');
+
+/** What the side menu shows: the admin area has its own menu, everybody else the user menu (+ the door for admins). */
+export const navItemsFor = (roles: readonly string[] = [], section: NavSection | null = null): NavItem[] => {
+  if (isAdmin(roles) && isAdminSection(section)) return [...ADMIN_ITEMS];
+  return isAdmin(roles) ? [...BASE_ITEMS, ADMIN_DOOR] : [...BASE_ITEMS];
 };
 
 const SECTION_OF_ROUTE: Partial<Record<keyof MainStackParamList, NavSection>> = {

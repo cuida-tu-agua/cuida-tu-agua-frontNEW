@@ -17,6 +17,18 @@ export const CONTENT_MAX_WIDTH = 1120;
 export const layoutFor = (width: number): LayoutSize =>
   width >= BREAKPOINTS.expanded ? 'expanded' : width >= BREAKPOINTS.medium ? 'medium' : 'compact';
 
+export type ShellMode = 'none' | 'rail' | 'sidebar' | 'topbar';
+
+/**
+ * How the menu is drawn (Figma boards):
+ *  - web, wide window: full side menu. Web, narrower window: a top bar with a ☰ button that opens the menu.
+ *  - phone / tablet app: nothing on a phone (the stack navigator is the menu), an icon rail on a tablet.
+ */
+export const shellModeFor = (size: LayoutSize, platform: string): ShellMode => {
+  if (platform === 'web') return size === 'expanded' ? 'sidebar' : 'topbar';
+  return size === 'compact' ? 'none' : size === 'medium' ? 'rail' : 'sidebar';
+};
+
 export const SIDEBAR_WIDTH = 248;
 export const RAIL_WIDTH = 76;
 

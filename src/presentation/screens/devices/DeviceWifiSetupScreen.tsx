@@ -4,6 +4,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { DEVICE_SETUP_URL } from '../../../config/api';
 import { Banner } from '../../components/common/Banner';
+import { PageContainer } from '../../components/common/PageContainer';
+import { PageHeader } from '../../components/common/PageHeader';
 import { Button } from '../../components/common/Button';
 import { MainStackParamList } from '../../navigation/types';
 import { theme } from '../../styles/theme';
@@ -53,7 +55,8 @@ export const DeviceWifiSetupScreen: React.FC<Props> = ({ navigation, route }) =>
       : navigation.goBack(); // PlaceDeviceScreen reloads the status on focus
 
   return (
-    <ScrollView style={screenStyle} contentContainerStyle={contentStyle}>
+    <PageContainer medium gap={theme.spacing.md}>
+      <PageHeader back={{ label: 'Volver', onPress: () => navigation.goBack() }} title="WiFi del medidor" />
       <Text style={titleStyle}>Conectar el medidor a tu WiFi</Text>
       <Text style={mutedStyle}>Solo se hace una vez, o cuando cambies de router o de contraseña.</Text>
 
@@ -85,7 +88,7 @@ export const DeviceWifiSetupScreen: React.FC<Props> = ({ navigation, route }) =>
         tone="info"
         message="El medidor solo funciona con redes de 2.4 GHz. Si escribiste mal la contraseña, en un minuto vuelve a crear su red CuidaTuAgua para que lo intentes de nuevo."
       />
-    </ScrollView>
+    </PageContainer>
   );
 };
 

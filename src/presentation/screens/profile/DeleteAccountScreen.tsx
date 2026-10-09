@@ -8,6 +8,8 @@ import { toAppError } from '../../../infrastructure/http/httpError';
 import { PasswordField } from '../../components/auth';
 import { Banner } from '../../components/common/Banner';
 import { Button } from '../../components/common/Button';
+import { PageContainer } from '../../components/common/PageContainer';
+import { PageHeader } from '../../components/common/PageHeader';
 import { Checkbox } from '../../components/common/Checkbox';
 import { MainStackParamList } from '../../navigation/types';
 import { theme } from '../../styles/theme';
@@ -57,7 +59,8 @@ export const DeleteAccountScreen: React.FC<Props> = ({ navigation }) => {
 
   return (
     <KeyboardAvoidingView style={screenStyle} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <ScrollView contentContainerStyle={contentStyle} keyboardShouldPersistTaps="handled">
+      <PageContainer narrow gap={theme.spacing.xs}>
+        <PageHeader back={{ label: 'Volver', onPress: () => navigation.goBack() }} title="Eliminar cuenta" />
         <View style={warningCardStyle}>
           <Ionicons name="warning" size={32} color={theme.colors.error} />
           <Text style={warningTitleStyle}>Vas a eliminar tu cuenta</Text>
@@ -94,7 +97,7 @@ export const DeleteAccountScreen: React.FC<Props> = ({ navigation }) => {
 
         <Button label="Eliminar mi cuenta" variant="danger" onPress={handleDelete} loading={deleting} />
         <Button label="No, volver" variant="ghost" onPress={() => navigation.goBack()} disabled={deleting} />
-      </ScrollView>
+      </PageContainer>
     </KeyboardAvoidingView>
   );
 };

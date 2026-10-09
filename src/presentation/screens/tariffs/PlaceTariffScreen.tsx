@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, ScrollView, Text, TextStyle, TouchableOpacity, View, ViewStyle } from 'react-native';
+import { ActivityIndicator, ScrollView, Text, TextStyle, TouchableOpacity, View, ViewStyle, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import {
@@ -12,6 +12,8 @@ import {
   validateManualTariff,
 } from '../../../domain/tariffs/Tariff';
 import { Banner } from '../../components/common/Banner';
+import { PageContainer } from '../../components/common/PageContainer';
+import { PageHeader } from '../../components/common/PageHeader';
 import { Button } from '../../components/common/Button';
 import { Card } from '../../components/common/Card';
 import { Input } from '../../components/common/Input';
@@ -26,7 +28,7 @@ type Props = NativeStackScreenProps<MainStackParamList, 'PlaceTariff'>;
  * HU-054 / HU-066 / HU-069: how much the water costs in this place. Two ways: use the tariff the city already has for the
  * stratum (preloaded) or type the price of the bill. Both are kept in a history; the app always says which one is in use.
  */
-export const PlaceTariffScreen: React.FC<Props> = ({ route }) => {
+export const PlaceTariffScreen: React.FC<Props> = ({ navigation, route }) => {
   const { placeId, placeName } = route.params;
   const t = usePlaceTariffs(placeId);
 
@@ -75,9 +77,19 @@ export const PlaceTariffScreen: React.FC<Props> = ({ route }) => {
   };
 
   return (
-    <ScrollView style={screenStyle} contentContainerStyle={contentStyle} keyboardShouldPersistTaps="handled">
-      <Text style={titleStyle}>Tarifa de {placeName}</Text>
-      <Text style={mutedStyle}>El agua se cobra por metro cúbico (m³). Con la tarifa calculamos cuánto dinero llevas gastado.</Text>
+    <PageContainer medium gap={theme.spacing.lg}>
+      <PageHeader
+        back={{ label: 'Panel del lugar', onPress: () => navigation.goBack() }}
+        caption={placeName}
+        title="Tarifa del agua"
+        subtitle="El agua se cobra por metro cúbico (m³). Con la tarifa calculamos cuánto dinero llevas gastado."
+      />
+      {Platform.OS !== 'web' && (
+        <>
+          <Text style={titleStyle}>Tarifa de {placeName}</Text>
+          <Text style={mutedStyle}>El agua se cobra por metro cúbico (m³). Con la tarifa calculamos cuánto dinero llevas gastado.</Text>
+        </>
+      )}
 
       {!!t.notice && <Banner tone="success" message={t.notice} onClose={t.dismissNotice} />}
       {!!t.error && <Banner tone="error" message={t.error.message} onClose={t.dismissError} />}
@@ -191,7 +203,7 @@ export const PlaceTariffScreen: React.FC<Props> = ({ route }) => {
           ))}
         </Card>
       )}
-    </ScrollView>
+    </PageContainer>
   );
 };
 

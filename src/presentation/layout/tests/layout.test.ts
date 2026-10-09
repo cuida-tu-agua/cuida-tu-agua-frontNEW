@@ -1,5 +1,5 @@
 import { navItemsFor, sectionOf } from '../../navigation/navItems';
-import { BREAKPOINTS, columnsFor, contentWidthFor, layoutFor } from '../breakpoints';
+import { BREAKPOINTS, columnsFor, contentWidthFor, layoutFor, shellModeFor } from '../breakpoints';
 
 describe('layoutFor: the width decides the layout, on any platform', () => {
   it('phone, tablet and desktop widths', () => {
@@ -28,14 +28,20 @@ describe('layoutFor: the width decides the layout, on any platform', () => {
 });
 
 describe('side menu', () => {
-  it('lists the places, the tips, the inbox and the profile for a normal user', () => {
-    expect(navItemsFor(['USER']).map((i) => i.route)).toEqual(['Places', 'Tips', 'Notifications', 'Profile']);
+  it('lists the places, the inbox, the favorite tips and the profile for a normal user', () => {
+    expect(navItemsFor(['USER']).map((i) => i.route)).toEqual(['Places', 'Notifications', 'Tips', 'Profile']);
   });
 
-  it('administrators also get the metrics and the users, before the profile', () => {
-    expect(navItemsFor(['USER', 'ADMIN']).map((i) => i.route)).toEqual([
-      'Places', 'Tips', 'Notifications', 'AdminMetrics', 'AdminUsers', 'AdminTips', 'Profile',
-    ]);
+  it('administrators get a door to the administration in the user menu', () => {
+    expect(navItemsFor(['USER', 'ADMIN']).map((i) => i.route)).toEqual(['Places', 'Notifications', 'Tips', 'Profile', 'AdminMetrics']);
+  });
+
+  it('the administration has its own menu: summary, users and tips', () => {
+    expect(navItemsFor(['USER', 'ADMIN'], 'adminUsers').map((i) => i.route)).toEqual(['AdminMetrics', 'AdminUsers', 'AdminTips']);
+  });
+
+  it('a normal user never gets the administration menu, whatever the section', () => {
+    expect(navItemsFor(['USER'], 'adminUsers').map((i) => i.route)).toEqual(['Places', 'Notifications', 'Tips', 'Profile']);
   });
 
   it('lights the parent item for sub-screens', () => {
@@ -49,5 +55,19 @@ describe('side menu', () => {
     expect(sectionOf('AdminTips')).toBe('adminTips');
     expect(sectionOf('Nope')).toBeNull();
     expect(sectionOf(undefined)).toBeNull();
+  });
+});
+
+describe('shell mode: how the menu is drawn', () => {
+  it('web: side menu when wide, a top bar with the menu button when narrower', () => {
+    expect(shellModeFor('expanded', 'web')).toBe('sidebar');
+    expect(shellModeFor('medium', 'web')).toBe('topbar');
+    expect(shellModeFor('compact', 'web')).toBe('topbar');
+  });
+
+  it('phone / tablet app: nothing on a phone, an icon rail on a tablet, side menu on a big one', () => {
+    expect(shellModeFor('compact', 'android')).toBe('none');
+    expect(shellModeFor('medium', 'ios')).toBe('rail');
+    expect(shellModeFor('expanded', 'android')).toBe('sidebar');
   });
 });
