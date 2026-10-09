@@ -1,22 +1,34 @@
 {
   "expo": {
     "sdkVersion": "57.0.0",
-    "name": "save-your-water",
+    "name": "Cuida Tu Agua",
     "slug": "save-your-water",
     "version": "1.0.0",
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "./assets/images/icon.png",
     "scheme": "saveyourwater",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.cuidatuagua.saveyourwater"
     },
     "android": {
+      "package": "com.cuidatuagua.saveyourwater",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png"
       }
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single",
+      "name": "Cuida Tu Agua",
+      "shortName": "Cuida Tu Agua",
+      "description": "Monitorea y cuida el agua de tu hogar o negocio.",
+      "lang": "es",
+      "themeColor": "#0B6FA4",
+      "backgroundColor": "#F4F8FB"
     },
     "plugins": [
       "expo-font",

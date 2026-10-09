@@ -1,8 +1,15 @@
+import { Platform } from 'react-native';
+
+// Manrope / IBM Plex Mono are not bundled with the app. Phones fall back to their system font by themselves;
+// a browser falls back to a serif unless it is told what to use, so on web the stacks end in a system font.
+const sansStack = "Manrope, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif";
+const monoStack = "'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace";
+
 export const typography = {
   // Font families
   fontFamily: {
-    manrope: 'Manrope',
-    monospace: 'IBM Plex Mono',
+    manrope: Platform.OS === 'web' ? sansStack : 'Manrope',
+    monospace: Platform.OS === 'web' ? monoStack : 'IBM Plex Mono',
   },
 
   // Font weights

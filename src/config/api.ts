@@ -1,9 +1,12 @@
-// On a physical phone use your PC's LAN IP, never "localhost". Values come from .env.
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://192.168.20.180:3001'; // ms-iam
-const PLACES_API_BASE_URL = process.env.EXPO_PUBLIC_PLACES_API_URL || 'http://192.168.20.180:3002'; // ms-places
-const DEVICES_API_BASE_URL = process.env.EXPO_PUBLIC_DEVICES_API_URL || 'http://192.168.20.180:3003'; // ms-devices
-const CONSUMPTION_API_BASE_URL = process.env.EXPO_PUBLIC_CONSUMPTION_API_URL || 'http://192.168.20.180:3004'; // ms-consumption
-const VALVE_API_BASE_URL = process.env.EXPO_PUBLIC_VALVE_API_URL || 'http://192.168.20.180:3005'; // ms-valve
+import { serviceUrl } from './serviceUrl';
+
+// One project for web and mobile. Each address comes from its EXPO_PUBLIC_* variable when it is set; otherwise
+// serviceUrl() works it out (web: the host of the page; phone in development: the PC running Expo). See serviceUrl.ts.
+const API_BASE_URL = serviceUrl(process.env.EXPO_PUBLIC_API_URL, 3001); // ms-iam
+const PLACES_API_BASE_URL = serviceUrl(process.env.EXPO_PUBLIC_PLACES_API_URL, 3002); // ms-places
+const DEVICES_API_BASE_URL = serviceUrl(process.env.EXPO_PUBLIC_DEVICES_API_URL, 3003); // ms-devices
+const CONSUMPTION_API_BASE_URL = serviceUrl(process.env.EXPO_PUBLIC_CONSUMPTION_API_URL, 3004); // ms-consumption
+const VALVE_API_BASE_URL = serviceUrl(process.env.EXPO_PUBLIC_VALVE_API_URL, 3005); // ms-valve
 
 export const API_CONFIG = {
   baseURL: API_BASE_URL,

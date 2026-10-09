@@ -25,6 +25,7 @@ import { Avatar } from '../../components/common/Avatar';
 import { Banner } from '../../components/common/Banner';
 import { Button } from '../../components/common/Button';
 import { PlaceCard } from '../../components/places/PlaceCard';
+import { useLayout } from '../../layout/breakpoints';
 import { MainStackParamList } from '../../navigation/types';
 import { theme } from '../../styles/theme';
 
@@ -33,6 +34,7 @@ type Props = NativeStackScreenProps<MainStackParamList, 'Places'>;
 export const PlacesScreen: React.FC<Props> = ({ navigation, route }) => {
   const insets = useSafeAreaInsets();
   const { user } = useAuth();
+  const { columns } = useLayout();
 
   const [places, setPlaces] = useState<Place[] | null>(null); // null = first load
   const [loadError, setLoadError] = useState<AppError | null>(null);
@@ -159,6 +161,9 @@ export const PlacesScreen: React.FC<Props> = ({ navigation, route }) => {
     <View style={screenStyle}>
       {header}
       <FlatList
+        key={columns} // numColumns cannot change on a mounted list
+        numColumns={columns}
+        columnWrapperStyle={columns > 1 ? gridRowStyle : undefined}
         data={places}
         keyExtractor={(place) => place.id}
         contentContainerStyle={[contentStyle, { paddingBottom: insets.bottom + theme.spacing.xl }]}
@@ -172,14 +177,16 @@ export const PlacesScreen: React.FC<Props> = ({ navigation, route }) => {
           </>
         }
         renderItem={({ item }) => (
-          <PlaceCard
-            place={item}
-            onSelect={() => select(item)}
-            onEdit={() => navigation.navigate('EditPlace', { placeId: item.id })}
-            onOpenPanel={() => navigation.navigate('PlaceDashboard', { placeId: item.id, placeName: item.name })}
-            selecting={selectingId === item.id}
-            disabled={!!selectingId}
-          />
+          <View style={columns > 1 ? { flex: 1, maxWidth: `${100 / columns}%` } : undefined}>
+            <PlaceCard
+              place={item}
+              onSelect={() => select(item)}
+              onEdit={() => navigation.navigate('EditPlace', { placeId: item.id })}
+              onOpenPanel={() => navigation.navigate('PlaceDashboard', { placeId: item.id, placeName: item.name })}
+              selecting={selectingId === item.id}
+              disabled={!!selectingId}
+            />
+          </View>
         )}
         ListFooterComponent={
           <Button
@@ -209,6 +216,8 @@ const headerStyle: ViewStyle = {
 };
 
 const headerTextStyle: ViewStyle = { flex: 1 };
+
+const gridRowStyle: ViewStyle = { gap: theme.spacing.lg };
 
 const helloStyle: TextStyle = { ...theme.textStyles.h2, color: theme.colors.textPrimary };
 

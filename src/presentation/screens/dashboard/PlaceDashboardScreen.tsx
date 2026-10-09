@@ -17,6 +17,7 @@ import { ValveCard } from '../../components/valve/ValveCard';
 import { useConsumption } from '../../hooks/useConsumption';
 import { usePlaceDevice } from '../../hooks/usePlaceDevice';
 import { useValve } from '../../hooks/useValve';
+import { useLayout } from '../../layout/breakpoints';
 import { MainStackParamList } from '../../navigation/types';
 import { theme } from '../../styles/theme';
 
@@ -24,6 +25,7 @@ type Props = NativeStackScreenProps<MainStackParamList, 'PlaceDashboard'>;
 
 export const PlaceDashboardScreen: React.FC<Props> = ({ navigation, route }) => {
   const { placeId, placeName } = route.params;
+  const { isCompact } = useLayout();
   const [period, setPeriod] = useState<ConsumptionPeriod>('DAY');
   const [unit, setUnit] = useState<MeasurementUnit>('LITERS');
 
@@ -127,14 +129,18 @@ export const PlaceDashboardScreen: React.FC<Props> = ({ navigation, route }) => 
         />
       )}
 
-      <ConsumptionCard
-        period={period}
-        onPeriodChange={setPeriod}
-        data={consumption.data}
-        loading={consumption.loading}
-        error={consumption.error}
-        unit={unit}
-      />
+      <View style={isCompact ? stackedStyle : splitStyle}>
+        <View style={isCompact ? undefined : mainColumnStyle}>
+          <ConsumptionCard
+            period={period}
+            onPeriodChange={setPeriod}
+            data={consumption.data}
+            loading={consumption.loading}
+            error={consumption.error}
+            unit={unit}
+          />
+        </View>
+        <View style={isCompact ? stackedStyle : sideColumnStyle}>
 
       {!!actionError && <Banner tone="error" message={actionError} onClose={() => setActionError(null)} />}
       {!!valve.error && <Banner tone="warning" message={`No pudimos consultar la válvula. ${valve.error.message}`} />}
@@ -158,6 +164,8 @@ export const PlaceDashboardScreen: React.FC<Props> = ({ navigation, route }) => 
       {valve.noDevice && (
         <Text style={mutedStyle}>La válvula aparecerá en cuanto el servicio de válvulas registre el medidor.</Text>
       )}
+        </View>
+      </View>
 
       <CloseValveDialog
         visible={closing}
@@ -192,5 +200,10 @@ const centeredStyle: ViewStyle = { flex: 1, alignItems: 'center', justifyContent
 const titleRowStyle: ViewStyle = { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: theme.spacing.md };
 const placeNameStyle: TextStyle = { ...theme.textStyles.h2, color: theme.colors.textPrimary, flexShrink: 1 };
 const mutedStyle: TextStyle = { ...theme.textStyles.caption, color: theme.colors.textMuted, textAlign: 'center' };
+/** Phone: one column. Tablet / desktop: the consumption on the left, the valve (and its notices) on the right. */
+const stackedStyle: ViewStyle = { gap: theme.spacing.lg };
+const splitStyle: ViewStyle = { flexDirection: 'row', alignItems: 'flex-start', gap: theme.spacing.lg };
+const mainColumnStyle: ViewStyle = { flex: 3, minWidth: 0 };
+const sideColumnStyle: ViewStyle = { flex: 2, minWidth: 0, gap: theme.spacing.lg };
 const emptyCardStyle: ViewStyle = { alignItems: 'center', gap: theme.spacing.md, paddingVertical: theme.spacing.xl };
 const emptyTitleStyle: TextStyle = { ...theme.textStyles.h2, fontSize: 20, color: theme.colors.textPrimary, textAlign: 'center' };

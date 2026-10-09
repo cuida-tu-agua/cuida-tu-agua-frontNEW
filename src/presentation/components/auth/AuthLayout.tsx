@@ -12,6 +12,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Logo } from '../common/Logo';
+import { useLayout } from '../../layout/breakpoints';
 import { theme } from '../../styles/theme';
 
 interface AuthLayoutProps {
@@ -24,6 +25,7 @@ interface AuthLayoutProps {
 
 export const AuthLayout: React.FC<AuthLayoutProps> = ({ title, subtitle, onBack, footer, children }) => {
   const insets = useSafeAreaInsets();
+  const { isCompact } = useLayout();
 
   return (
     <KeyboardAvoidingView
@@ -31,11 +33,12 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ title, subtitle, onBack,
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <ScrollView
-        contentContainerStyle={contentStyle}
+        contentContainerStyle={[contentStyle, !isCompact && wideContentStyle]}
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
         showsVerticalScrollIndicator={false}
       >
+        <View style={isCompact ? undefined : formColumnStyle}>
         {onBack && (
           <TouchableOpacity
             onPress={onBack}
@@ -59,6 +62,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ title, subtitle, onBack,
         <View style={cardStyle}>{children}</View>
 
         {footer}
+        </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -72,6 +76,10 @@ const contentStyle: ViewStyle = {
   paddingTop: theme.spacing.xl,
   paddingBottom: theme.spacing.xxxl,
 };
+
+/** Wide screen: the form stays a narrow card in the middle instead of stretching across the monitor. */
+const wideContentStyle: ViewStyle = { alignItems: 'center', justifyContent: 'center' };
+const formColumnStyle: ViewStyle = { width: '100%', maxWidth: 460 };
 
 const backStyle: ViewStyle = {
   width: 44,
