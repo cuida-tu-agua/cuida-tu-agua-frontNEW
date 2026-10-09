@@ -14,6 +14,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
+import { isAdmin } from '../../../domain/admin/Admin';
 import { useAuth } from '../../../core/auth/AuthContext';
 import { profileService } from '../../../core/di/container';
 import { avatarUri } from '../../../config/api';
@@ -226,7 +227,15 @@ export const ProfileScreen: React.FC<Props> = ({ navigation }) => {
         />
         <Button label={isDirty ? 'Guardar cambios' : 'Sin cambios'} onPress={save} loading={saving} disabled={!isDirty} />
 
-        <Text style={[sectionStyle, { marginTop: theme.spacing.xxl }]}>Alertas</Text>
+        {isAdmin(user.roles) && (
+          <>
+            <Text style={[sectionStyle, { marginTop: theme.spacing.xxl }]}>Administración</Text>
+            <MenuRow icon="stats-chart-outline" label="Métricas de la plataforma" onPress={() => navigation.navigate('AdminMetrics')} />
+            <MenuRow icon="people-outline" label="Usuarios" onPress={() => navigation.navigate('AdminUsers')} />
+          </>
+        )}
+
+        <Text style={[sectionStyle, { marginTop: theme.spacing.xl }]}>Alertas</Text>
         <MenuRow
           icon="notifications-outline"
           label="Preferencias de notificaciones"

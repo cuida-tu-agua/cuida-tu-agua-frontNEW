@@ -1,10 +1,11 @@
 import type { ComponentProps } from 'react';
 import type { Ionicons } from '@expo/vector-icons';
+import { isAdmin } from '../../domain/admin/Admin';
 import { MainStackParamList } from './types';
 
 type IconName = ComponentProps<typeof Ionicons>['name'];
 
-export type NavSection = 'places' | 'notifications' | 'profile';
+export type NavSection = 'places' | 'notifications' | 'adminMetrics' | 'adminUsers' | 'profile';
 
 export interface NavItem {
   section: NavSection;
@@ -20,8 +21,17 @@ const BASE_ITEMS: NavItem[] = [
   { section: 'profile', label: 'Mi perfil', icon: 'person-circle-outline', route: 'Profile' },
 ];
 
-/** What the side menu shows for a user. Later steps add the inbox and the administration to this list. */
-export const navItemsFor = (_roles: readonly string[] = []): NavItem[] => [...BASE_ITEMS];
+/** Administration (E14): only the ADMIN role sees it. The servers refuse these calls to anybody else anyway. */
+const ADMIN_ITEMS: NavItem[] = [
+  { section: 'adminMetrics', label: 'Métricas', icon: 'stats-chart-outline', route: 'AdminMetrics' },
+  { section: 'adminUsers', label: 'Usuarios', icon: 'people-outline', route: 'AdminUsers' },
+];
+
+/** What the side menu shows for a user: places, inbox and, for administrators, the administration, then the profile. */
+export const navItemsFor = (roles: readonly string[] = []): NavItem[] => {
+  const [places, notifications, profile] = BASE_ITEMS;
+  return isAdmin(roles) ? [places, notifications, ...ADMIN_ITEMS, profile] : [...BASE_ITEMS];
+};
 
 const SECTION_OF_ROUTE: Partial<Record<keyof MainStackParamList, NavSection>> = {
   Places: 'places',
@@ -32,6 +42,8 @@ const SECTION_OF_ROUTE: Partial<Record<keyof MainStackParamList, NavSection>> = 
   DeviceWifiSetup: 'places',
   PlaceDashboard: 'places',
   ValveHistory: 'places',
+  AdminMetrics: 'adminMetrics',
+  AdminUsers: 'adminUsers',
   Notifications: 'notifications',
   NotificationPreferences: 'notifications',
   Profile: 'profile',

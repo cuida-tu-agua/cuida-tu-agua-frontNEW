@@ -32,11 +32,18 @@ describe('side menu', () => {
     expect(navItemsFor(['USER']).map((i) => i.route)).toEqual(['Places', 'Notifications', 'Profile']);
   });
 
+  it('administrators also get the metrics and the users, before the profile', () => {
+    expect(navItemsFor(['USER', 'ADMIN']).map((i) => i.route)).toEqual([
+      'Places', 'Notifications', 'AdminMetrics', 'AdminUsers', 'Profile',
+    ]);
+  });
+
   it('lights the parent item for sub-screens', () => {
     expect(sectionOf('PlaceDashboard')).toBe('places');
     expect(sectionOf('ValveHistory')).toBe('places');
     expect(sectionOf('ChangePassword')).toBe('profile');
     expect(sectionOf('NotificationPreferences')).toBe('notifications');
+    expect(sectionOf('AdminUsers')).toBe('adminUsers');
     expect(sectionOf('Nope')).toBeNull();
     expect(sectionOf(undefined)).toBeNull();
   });

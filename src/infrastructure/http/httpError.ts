@@ -29,6 +29,10 @@ const DOMAIN_MESSAGES: Record<string, string> = {
   'valve.device_offline': 'El medidor no está conectado, así que la orden no le llegaría. Revisa su energía y el WiFi.',
   'valve.code_required': 'Escribe el código que te enviamos al correo.',
   'valve.command_not_found': 'No encontramos esa orden.',
+  // ms-iam: administration
+  'auth.admin_required': 'Solo un administrador puede hacer esto.',
+  'user.cannot_block_self': 'No puedes bloquear tu propia cuenta.',
+  'validation.invalid_filter': 'Revisa la búsqueda o el filtro.',
   // ms-notification
   'notification.not_found': 'Esa notificación ya no existe.',
   'preferences.critical_requires_in_app': 'Las alertas críticas siempre se muestran en la app: no se puede apagar.',

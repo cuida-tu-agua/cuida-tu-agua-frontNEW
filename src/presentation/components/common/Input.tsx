@@ -72,6 +72,8 @@ const textInputStyle: TextStyle = {
   margin: 0,
   textAlignVertical: 'center',
   includeFontPadding: false, // Android: quita el espacio extra que empuja el texto hacia abajo
+  // Web: the field already draws its own focus border; without this the browser adds its orange outline on top
+  ...({ outlineStyle: 'none' } as unknown as TextStyle),
 };
 
 const textAreaStyle: ViewStyle = {

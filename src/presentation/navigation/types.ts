@@ -23,6 +23,8 @@ export type MainStackParamList = {
   DeviceWifiSetup: { placeId: string; placeName: string; next?: 'link' };
   PlaceDashboard: { placeId: string; placeName: string };
   ValveHistory: { placeId: string; placeName: string };
+  AdminMetrics: undefined;
+  AdminUsers: undefined;
   Notifications: undefined;
   NotificationPreferences: undefined;
   Profile: undefined;

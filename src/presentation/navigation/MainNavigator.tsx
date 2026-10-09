@@ -9,6 +9,8 @@ import { EditPlaceScreen } from '../screens/places/EditPlaceScreen';
 import { NotificationPreferencesScreen } from '../screens/notifications/NotificationPreferencesScreen';
 import { NotificationsScreen } from '../screens/notifications/NotificationsScreen';
 import { PlacesScreen } from '../screens/places/PlacesScreen';
+import { AdminMetricsScreen } from '../screens/admin/AdminMetricsScreen';
+import { AdminUsersScreen } from '../screens/admin/AdminUsersScreen';
 import { ChangePasswordScreen } from '../screens/profile/ChangePasswordScreen';
 import { DeleteAccountScreen } from '../screens/profile/DeleteAccountScreen';
 import { ProfileScreen } from '../screens/profile/ProfileScreen';
@@ -38,6 +40,8 @@ export const MainNavigator: React.FC = () => (
     <Stack.Screen name="DeviceWifiSetup" component={DeviceWifiSetupScreen} options={{ title: 'WiFi del medidor' }} />
     <Stack.Screen name="PlaceDashboard" component={PlaceDashboardScreen} options={{ title: 'Panel' }} />
     <Stack.Screen name="ValveHistory" component={ValveHistoryScreen} options={{ title: 'Historial de la válvula' }} />
+    <Stack.Screen name="AdminMetrics" component={AdminMetricsScreen} options={{ title: 'Métricas' }} />
+    <Stack.Screen name="AdminUsers" component={AdminUsersScreen} options={{ title: 'Usuarios' }} />
     <Stack.Screen name="Notifications" component={NotificationsScreen} options={{ title: 'Notificaciones' }} />
     <Stack.Screen
       name="NotificationPreferences"

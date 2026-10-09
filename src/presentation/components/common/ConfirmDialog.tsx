@@ -64,10 +64,13 @@ const backdropStyle: ViewStyle = {
   flex: 1,
   backgroundColor: 'rgba(2, 62, 138, 0.35)',
   justifyContent: 'center',
+  alignItems: 'center',
   padding: theme.spacing.lg,
 };
 
 const cardStyle: ViewStyle = {
+  width: '100%',
+  maxWidth: 440, // on a wide screen the dialog stays a dialog instead of a banner across the monitor
   backgroundColor: theme.colors.surface,
   borderRadius: theme.borderRadius.large,
   padding: theme.spacing.xl,

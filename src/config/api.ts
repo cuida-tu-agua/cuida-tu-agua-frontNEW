@@ -99,6 +99,14 @@ export const VALVE_ENDPOINTS = {
   COMMAND: (placeId: string, commandId: string) => `/api/places/${placeId}/valve/commands/${commandId}`,
 };
 
+/** ms-iam, administrator only (HU-059, HU-060, HU-062). */
+export const ADMIN_ENDPOINTS = {
+  USERS: '/api/admin/users',
+  BLOCK: (userId: string) => `/api/admin/users/${userId}/block`,
+  UNBLOCK: (userId: string) => `/api/admin/users/${userId}/unblock`,
+  METRICS: '/api/admin/metrics',
+};
+
 /** ms-notification (HU-025, HU-034): the inbox of the user and the channels they chose for each urgency level. */
 export const NOTIFICATION_ENDPOINTS = {
   LIST: '/api/notifications',
