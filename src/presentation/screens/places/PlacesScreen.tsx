@@ -23,6 +23,7 @@ import { markSelected } from '../../../domain/places/selection';
 import { toAppError } from '../../../infrastructure/http/httpError';
 import { Avatar } from '../../components/common/Avatar';
 import { Banner } from '../../components/common/Banner';
+import { NotificationBell } from '../../components/notifications/NotificationBell';
 import { Button } from '../../components/common/Button';
 import { PlaceCard } from '../../components/places/PlaceCard';
 import { useLayout } from '../../layout/breakpoints';
@@ -99,6 +100,7 @@ export const PlacesScreen: React.FC<Props> = ({ navigation, route }) => {
           {places && places.length > 0 ? 'Elige el lugar que quieres monitorear' : 'Empecemos a cuidar el agua'}
         </Text>
       </View>
+      <NotificationBell onPress={() => navigation.navigate('Notifications')} />
       <TouchableOpacity
         onPress={() => navigation.navigate('Profile')}
         accessibilityRole="button"

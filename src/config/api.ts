@@ -7,6 +7,7 @@ const PLACES_API_BASE_URL = serviceUrl(process.env.EXPO_PUBLIC_PLACES_API_URL, 3
 const DEVICES_API_BASE_URL = serviceUrl(process.env.EXPO_PUBLIC_DEVICES_API_URL, 3003); // ms-devices
 const CONSUMPTION_API_BASE_URL = serviceUrl(process.env.EXPO_PUBLIC_CONSUMPTION_API_URL, 3004); // ms-consumption
 const VALVE_API_BASE_URL = serviceUrl(process.env.EXPO_PUBLIC_VALVE_API_URL, 3005); // ms-valve
+const NOTIFICATIONS_API_BASE_URL = serviceUrl(process.env.EXPO_PUBLIC_NOTIFICATIONS_API_URL, 3006); // ms-notification
 
 export const API_CONFIG = {
   baseURL: API_BASE_URL,
@@ -34,6 +35,11 @@ export const CONSUMPTION_API_CONFIG = {
 export const VALVE_API_CONFIG = {
   ...API_CONFIG,
   baseURL: VALVE_API_BASE_URL,
+};
+
+export const NOTIFICATIONS_API_CONFIG = {
+  ...API_CONFIG,
+  baseURL: NOTIFICATIONS_API_BASE_URL,
 };
 
 export const AUTH_ENDPOINTS = {
@@ -91,6 +97,16 @@ export const VALVE_ENDPOINTS = {
   OPEN: (placeId: string) => `/api/places/${placeId}/valve/open`,
   COMMANDS: (placeId: string) => `/api/places/${placeId}/valve/commands`,
   COMMAND: (placeId: string, commandId: string) => `/api/places/${placeId}/valve/commands/${commandId}`,
+};
+
+/** ms-notification (HU-025, HU-034): the inbox of the user and the channels they chose for each urgency level. */
+export const NOTIFICATION_ENDPOINTS = {
+  LIST: '/api/notifications',
+  UNREAD_COUNT: '/api/notifications/unread-count',
+  READ: (id: string) => `/api/notifications/${id}/read`,
+  READ_ALL: '/api/notifications/read-all',
+  PREFERENCES: '/api/notification-preferences',
+  PREFERENCE: (severity: string) => `/api/notification-preferences/${severity}`,
 };
 
 /** Page served by the meter itself while it is in setup mode (its own WiFi network). */

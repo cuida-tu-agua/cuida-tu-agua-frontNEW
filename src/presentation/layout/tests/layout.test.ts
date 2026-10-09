@@ -28,14 +28,15 @@ describe('layoutFor: the width decides the layout, on any platform', () => {
 });
 
 describe('side menu', () => {
-  it('lists the places and the profile for a normal user', () => {
-    expect(navItemsFor(['USER']).map((i) => i.route)).toEqual(['Places', 'Profile']);
+  it('lists the places, the inbox and the profile for a normal user', () => {
+    expect(navItemsFor(['USER']).map((i) => i.route)).toEqual(['Places', 'Notifications', 'Profile']);
   });
 
   it('lights the parent item for sub-screens', () => {
     expect(sectionOf('PlaceDashboard')).toBe('places');
     expect(sectionOf('ValveHistory')).toBe('places');
     expect(sectionOf('ChangePassword')).toBe('profile');
+    expect(sectionOf('NotificationPreferences')).toBe('notifications');
     expect(sectionOf('Nope')).toBeNull();
     expect(sectionOf(undefined)).toBeNull();
   });

@@ -5,6 +5,8 @@ import { useAuth } from '../../core/auth/AuthContext';
 import { avatarUri } from '../../config/api';
 import { Avatar } from '../components/common/Avatar';
 import { Logo } from '../components/common/Logo';
+import { UnreadBadge } from '../components/notifications/NotificationBell';
+import { useUnreadCount } from '../hooks/useUnreadCount';
 import { CONTENT_MAX_WIDTH, RAIL_WIDTH, SIDEBAR_WIDTH, useLayout } from '../layout/breakpoints';
 import { theme } from '../styles/theme';
 import { NavSection, navItemsFor, sectionOf } from './navItems';
@@ -51,6 +53,7 @@ const SideMenu: React.FC<{ collapsed: boolean }> = ({ collapsed }) => {
   const { user, logout } = useAuth();
   const section = useCurrentSection();
   const items = navItemsFor(user?.roles ?? []);
+  const { count: unread } = useUnreadCount();
 
   const open = (route: (typeof items)[number]['route']) => {
     if (!navigationRef.isReady()) return;
@@ -78,7 +81,8 @@ const SideMenu: React.FC<{ collapsed: boolean }> = ({ collapsed }) => {
               accessibilityState={{ selected: active }}
             >
               <Ionicons name={item.icon} size={22} color={active ? theme.colors.primary : theme.colors.textSecondary} />
-              {!collapsed && <Text style={[itemTextStyle, active && itemTextActiveStyle]}>{item.label}</Text>}
+              {!collapsed && <Text style={[itemTextStyle, active && itemTextActiveStyle, { flex: 1 }]}>{item.label}</Text>}
+              {item.section === 'notifications' && <UnreadBadge count={unread} style={collapsed ? railBadgeStyle : undefined} />}
             </TouchableOpacity>
           );
         })}
@@ -146,6 +150,7 @@ const itemStyle: ViewStyle = {
   height: 46,
   borderRadius: theme.borderRadius.medium,
 };
+const railBadgeStyle: ViewStyle = { position: 'absolute', top: 4, right: 10 };
 const itemCollapsedStyle: ViewStyle = { justifyContent: 'center', paddingHorizontal: 0 };
 const itemActiveStyle: ViewStyle = { backgroundColor: theme.colors.infoBg };
 const itemTextStyle: TextStyle = { ...theme.textStyles.caption, fontSize: 15, fontWeight: '600', color: theme.colors.textSecondary };

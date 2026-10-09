@@ -226,7 +226,14 @@ export const ProfileScreen: React.FC<Props> = ({ navigation }) => {
         />
         <Button label={isDirty ? 'Guardar cambios' : 'Sin cambios'} onPress={save} loading={saving} disabled={!isDirty} />
 
-        <Text style={[sectionStyle, { marginTop: theme.spacing.xxl }]}>Seguridad</Text>
+        <Text style={[sectionStyle, { marginTop: theme.spacing.xxl }]}>Alertas</Text>
+        <MenuRow
+          icon="notifications-outline"
+          label="Preferencias de notificaciones"
+          onPress={() => navigation.navigate('NotificationPreferences')}
+        />
+
+        <Text style={[sectionStyle, { marginTop: theme.spacing.xl }]}>Seguridad</Text>
         <MenuRow icon="key-outline" label="Cambiar contraseña" onPress={() => navigation.navigate('ChangePassword')} />
         <MenuRow icon="log-out-outline" label="Cerrar sesión" onPress={() => setConfirmingLogout(true)} />
         <MenuRow

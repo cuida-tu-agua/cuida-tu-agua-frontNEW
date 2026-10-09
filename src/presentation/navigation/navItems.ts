@@ -4,7 +4,7 @@ import { MainStackParamList } from './types';
 
 type IconName = ComponentProps<typeof Ionicons>['name'];
 
-export type NavSection = 'places' | 'profile';
+export type NavSection = 'places' | 'notifications' | 'profile';
 
 export interface NavItem {
   section: NavSection;
@@ -16,6 +16,7 @@ export interface NavItem {
 
 const BASE_ITEMS: NavItem[] = [
   { section: 'places', label: 'Mis lugares', icon: 'water-outline', route: 'Places' },
+  { section: 'notifications', label: 'Notificaciones', icon: 'notifications-outline', route: 'Notifications' },
   { section: 'profile', label: 'Mi perfil', icon: 'person-circle-outline', route: 'Profile' },
 ];
 
@@ -31,6 +32,8 @@ const SECTION_OF_ROUTE: Partial<Record<keyof MainStackParamList, NavSection>> = 
   DeviceWifiSetup: 'places',
   PlaceDashboard: 'places',
   ValveHistory: 'places',
+  Notifications: 'notifications',
+  NotificationPreferences: 'notifications',
   Profile: 'profile',
   ChangePassword: 'profile',
   DeleteAccount: 'profile',

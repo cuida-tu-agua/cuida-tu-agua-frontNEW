@@ -4,6 +4,7 @@ import {
   AUTH_ENDPOINTS,
   CONSUMPTION_API_CONFIG,
   DEVICES_API_CONFIG,
+  NOTIFICATIONS_API_CONFIG,
   PLACES_API_CONFIG,
   PUBLIC_AUTH_PATHS,
   VALVE_API_CONFIG,
@@ -104,3 +105,5 @@ export const placesApiClient = createApiClient(PLACES_API_CONFIG); // ms-places 
 export const devicesApiClient = createApiClient(DEVICES_API_CONFIG); // ms-devices :3003
 export const consumptionApiClient = createApiClient(CONSUMPTION_API_CONFIG); // ms-consumption :3004
 export const valveApiClient = createApiClient(VALVE_API_CONFIG); // ms-valve :3005
+
+export const notificationsApiClient = createApiClient(NOTIFICATIONS_API_CONFIG); // ms-notification :3006
