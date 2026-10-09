@@ -23,14 +23,15 @@ import { useAdminUsers } from '../../hooks/useAdminUsers';
 import { useLayout } from '../../layout/breakpoints';
 import { MainStackParamList } from '../../navigation/types';
 import { theme } from '../../styles/theme';
+import { themed } from '../../styles/themeRuntime';
 
 type Props = NativeStackScreenProps<MainStackParamList, 'AdminUsers'>;
 
-const STATUS_TONES: Record<UserStatus, { fg: string; bg: string }> = {
+const STATUS_TONES: Record<UserStatus, { fg: string; bg: string }> = themed(() => ({
   ACTIVE: { fg: theme.colors.success, bg: theme.colors.successBg },
   BLOCKED: { fg: theme.colors.error, bg: theme.colors.errorBg },
   UNVERIFIED: { fg: theme.colors.warning, bg: theme.colors.warningBg },
-};
+}));
 
 /** HU-059 + HU-060: registered users with search, status filter and pages; an administrator can block and unblock. */
 export const AdminUsersScreen: React.FC<Props> = () => (
@@ -246,43 +247,43 @@ const UserRow: React.FC<{
   );
 };
 
-const screenStyle: ViewStyle = { flex: 1, backgroundColor: theme.colors.background };
+const screenStyle: ViewStyle = themed(() => ({ flex: 1, backgroundColor: theme.colors.background }));
 const contentStyle: ViewStyle = { padding: theme.spacing.lg, paddingBottom: theme.spacing.huge, gap: theme.spacing.md };
-const titleStyle: TextStyle = { ...theme.textStyles.h2, color: theme.colors.textPrimary };
-const mutedStyle: TextStyle = { ...theme.textStyles.caption, color: theme.colors.textMuted };
+const titleStyle: TextStyle = themed(() => ({ ...theme.textStyles.h2, color: theme.colors.textPrimary }));
+const mutedStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, color: theme.colors.textMuted }));
 const filtersStyle: ViewStyle = { flexDirection: 'row', flexWrap: 'wrap', gap: theme.spacing.md, alignItems: 'flex-start' };
 const searchStyle: ViewStyle = { flexGrow: 1, flexBasis: 280, marginBottom: 0 };
 const statusFilterStyle: ViewStyle = { flexGrow: 2, flexBasis: 360 };
-const listStyle: ViewStyle = {
+const listStyle: ViewStyle = themed(() => ({
   backgroundColor: theme.colors.surface,
   borderRadius: theme.borderRadius.medium,
   borderWidth: 1,
   borderColor: theme.colors.border,
   overflow: 'hidden',
-};
+}));
 const tableRowStyle: ViewStyle = { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.md, paddingHorizontal: theme.spacing.lg };
-const tableHeadStyle: ViewStyle = { height: 40, backgroundColor: theme.colors.surfaceAlt };
-const tableBodyStyle: ViewStyle = { minHeight: 60, borderTopWidth: 1, borderTopColor: theme.colors.border };
-const headCellStyle: TextStyle = { ...theme.textStyles.label, color: theme.colors.textMuted, textTransform: 'uppercase' };
+const tableHeadStyle: ViewStyle = themed(() => ({ height: 40, backgroundColor: theme.colors.surfaceAlt }));
+const tableBodyStyle: ViewStyle = themed(() => ({ minHeight: 60, borderTopWidth: 1, borderTopColor: theme.colors.border }));
+const headCellStyle: TextStyle = themed(() => ({ ...theme.textStyles.label, color: theme.colors.textMuted, textTransform: 'uppercase' }));
 const nameCol: TextStyle & ViewStyle = { flex: 2.2 };
 const mailCol: TextStyle & ViewStyle = { flex: 3 };
 const statusCol: ViewStyle = { flex: 1.5, alignItems: 'flex-start' };
 const dateCol: TextStyle & ViewStyle = { flex: 1.5 };
 const actionCol: ViewStyle = { flex: 1.5, alignItems: 'flex-end' };
-const cellStyle: TextStyle = { ...theme.textStyles.caption, color: theme.colors.textSecondary };
-const cellNameStyle: TextStyle = { ...theme.textStyles.caption, fontWeight: '800', color: theme.colors.textPrimary };
+const cellStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, color: theme.colors.textSecondary }));
+const cellNameStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, fontWeight: '800', color: theme.colors.textPrimary }));
 const pillStyle: ViewStyle = { paddingHorizontal: theme.spacing.md, paddingVertical: 4, borderRadius: theme.borderRadius.full };
 const pillTextStyle: TextStyle = { ...theme.textStyles.label, fontWeight: '800' };
-const cardRowStyle: ViewStyle = {
+const cardRowStyle: ViewStyle = themed(() => ({
   flexDirection: 'row',
   alignItems: 'center',
   gap: theme.spacing.md,
   padding: theme.spacing.lg,
   borderTopWidth: 1,
   borderTopColor: theme.colors.border,
-};
+}));
 const cardMetaStyle: ViewStyle = { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.sm, marginTop: theme.spacing.xs };
 const emptyStyle: ViewStyle = { alignItems: 'center', gap: theme.spacing.md, paddingVertical: theme.spacing.huge };
-const emptyTextStyle: TextStyle = { ...theme.textStyles.caption, color: theme.colors.textSecondary, textAlign: 'center' };
+const emptyTextStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, color: theme.colors.textSecondary, textAlign: 'center' }));
 const pagerStyle: ViewStyle = { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: theme.spacing.md };
 const pagerButtonsStyle: ViewStyle = { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.md };

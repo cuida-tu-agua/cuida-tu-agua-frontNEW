@@ -20,6 +20,7 @@ import { profileService } from '../../../core/di/container';
 import { avatarUri } from '../../../config/api';
 import { User } from '../../../domain/entities/User';
 import { toAppError } from '../../../infrastructure/http/httpError';
+import { AppearanceSection } from '../../components/theme/AppearanceSection';
 import { Avatar } from '../../components/common/Avatar';
 import { Banner, BannerTone } from '../../components/common/Banner';
 import { Button } from '../../components/common/Button';
@@ -29,6 +30,7 @@ import { useForm } from '../../hooks/useForm';
 import { MainStackParamList } from '../../navigation/types';
 import { theme } from '../../styles/theme';
 import { normalizePhone, validateName, validatePhone } from '../../utils/validation';
+import { themed } from '../../styles/themeRuntime';
 
 type Props = NativeStackScreenProps<MainStackParamList, 'Profile'>;
 
@@ -232,8 +234,15 @@ export const ProfileScreen: React.FC<Props> = ({ navigation }) => {
             <Text style={[sectionStyle, { marginTop: theme.spacing.xxl }]}>Administración</Text>
             <MenuRow icon="stats-chart-outline" label="Métricas de la plataforma" onPress={() => navigation.navigate('AdminMetrics')} />
             <MenuRow icon="people-outline" label="Usuarios" onPress={() => navigation.navigate('AdminUsers')} />
+            <MenuRow icon="create-outline" label="Gestionar consejos" onPress={() => navigation.navigate('AdminTips')} />
           </>
         )}
+
+        <Text style={[sectionStyle, { marginTop: theme.spacing.xxl }]}>Ahorro</Text>
+        <MenuRow icon="bulb-outline" label="Consejos para ahorrar agua" onPress={() => navigation.navigate('Tips')} />
+
+        <Text style={[sectionStyle, { marginTop: theme.spacing.xl }]}>Apariencia</Text>
+        <AppearanceSection />
 
         <Text style={[sectionStyle, { marginTop: theme.spacing.xl }]}>Alertas</Text>
         <MenuRow
@@ -279,34 +288,34 @@ const MenuRow: React.FC<{
   </TouchableOpacity>
 );
 
-const screenStyle: ViewStyle = { flex: 1, backgroundColor: theme.colors.background };
+const screenStyle: ViewStyle = themed(() => ({ flex: 1, backgroundColor: theme.colors.background }));
 
 const contentStyle: ViewStyle = { padding: theme.spacing.lg, paddingBottom: theme.spacing.huge };
 
 const avatarBlockStyle: ViewStyle = { alignItems: 'center', gap: theme.spacing.md, marginBottom: theme.spacing.xl };
 
-const avatarOverlayStyle: ViewStyle = {
+const avatarOverlayStyle: ViewStyle = themed(() => ({
   position: 'absolute',
   top: 0,
   left: 0,
   right: 0,
   bottom: 0,
   borderRadius: 56,
-  backgroundColor: 'rgba(0,0,0,0.35)',
+  backgroundColor: theme.colors.overlay,
   alignItems: 'center',
   justifyContent: 'center',
-};
+}));
 
 const avatarActionsStyle: ViewStyle = { flexDirection: 'row', gap: theme.spacing.sm };
 
-const sectionStyle: TextStyle = {
+const sectionStyle: TextStyle = themed(() => ({
   ...theme.textStyles.label,
   color: theme.colors.textMuted,
   textTransform: 'uppercase',
   marginBottom: theme.spacing.md,
-};
+}));
 
-const rowStyle: ViewStyle = {
+const rowStyle: ViewStyle = themed(() => ({
   flexDirection: 'row',
   alignItems: 'center',
   gap: theme.spacing.md,
@@ -317,6 +326,6 @@ const rowStyle: ViewStyle = {
   backgroundColor: theme.colors.surface,
   borderWidth: 1,
   borderColor: theme.colors.border,
-};
+}));
 
-const rowTextStyle: TextStyle = { ...theme.textStyles.button, flex: 1, color: theme.colors.textPrimary };
+const rowTextStyle: TextStyle = themed(() => ({ ...theme.textStyles.button, flex: 1, color: theme.colors.textPrimary }));

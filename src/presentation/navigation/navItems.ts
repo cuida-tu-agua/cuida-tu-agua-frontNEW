@@ -5,7 +5,7 @@ import { MainStackParamList } from './types';
 
 type IconName = ComponentProps<typeof Ionicons>['name'];
 
-export type NavSection = 'places' | 'notifications' | 'adminMetrics' | 'adminUsers' | 'profile';
+export type NavSection = 'places' | 'tips' | 'notifications' | 'adminMetrics' | 'adminUsers' | 'adminTips' | 'profile';
 
 export interface NavItem {
   section: NavSection;
@@ -17,6 +17,7 @@ export interface NavItem {
 
 const BASE_ITEMS: NavItem[] = [
   { section: 'places', label: 'Mis lugares', icon: 'water-outline', route: 'Places' },
+  { section: 'tips', label: 'Consejos', icon: 'bulb-outline', route: 'Tips' },
   { section: 'notifications', label: 'Notificaciones', icon: 'notifications-outline', route: 'Notifications' },
   { section: 'profile', label: 'Mi perfil', icon: 'person-circle-outline', route: 'Profile' },
 ];
@@ -25,12 +26,13 @@ const BASE_ITEMS: NavItem[] = [
 const ADMIN_ITEMS: NavItem[] = [
   { section: 'adminMetrics', label: 'Métricas', icon: 'stats-chart-outline', route: 'AdminMetrics' },
   { section: 'adminUsers', label: 'Usuarios', icon: 'people-outline', route: 'AdminUsers' },
+  { section: 'adminTips', label: 'Gestionar consejos', icon: 'create-outline', route: 'AdminTips' },
 ];
 
 /** What the side menu shows for a user: places, inbox and, for administrators, the administration, then the profile. */
 export const navItemsFor = (roles: readonly string[] = []): NavItem[] => {
-  const [places, notifications, profile] = BASE_ITEMS;
-  return isAdmin(roles) ? [places, notifications, ...ADMIN_ITEMS, profile] : [...BASE_ITEMS];
+  const [places, tips, notifications, profile] = BASE_ITEMS;
+  return isAdmin(roles) ? [places, tips, notifications, ...ADMIN_ITEMS, profile] : [...BASE_ITEMS];
 };
 
 const SECTION_OF_ROUTE: Partial<Record<keyof MainStackParamList, NavSection>> = {
@@ -41,6 +43,9 @@ const SECTION_OF_ROUTE: Partial<Record<keyof MainStackParamList, NavSection>> = 
   LinkDevice: 'places',
   DeviceWifiSetup: 'places',
   PlaceDashboard: 'places',
+  PlaceTariff: 'places',
+  Tips: 'tips',
+  AdminTips: 'adminTips',
   ValveHistory: 'places',
   AdminMetrics: 'adminMetrics',
   AdminUsers: 'adminUsers',

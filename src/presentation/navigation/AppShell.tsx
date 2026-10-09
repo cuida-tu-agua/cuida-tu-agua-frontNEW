@@ -11,6 +11,7 @@ import { CONTENT_MAX_WIDTH, RAIL_WIDTH, SIDEBAR_WIDTH, useLayout } from '../layo
 import { theme } from '../styles/theme';
 import { NavSection, navItemsFor, sectionOf } from './navItems';
 import { navigationRef } from './navigationRef';
+import { themed } from '../styles/themeRuntime';
 
 /** The section of the screen that is open now, kept in sync with the navigator. */
 const useCurrentSection = (): NavSection | null => {
@@ -118,18 +119,18 @@ const SideMenu: React.FC<{ collapsed: boolean }> = ({ collapsed }) => {
   );
 };
 
-const rootStyle: ViewStyle = { flex: 1, flexDirection: 'row', backgroundColor: theme.colors.background };
+const rootStyle: ViewStyle = themed(() => ({ flex: 1, flexDirection: 'row', backgroundColor: theme.colors.background }));
 
-const contentOuterStyle: ViewStyle = { flex: 1, alignItems: 'center', backgroundColor: theme.colors.background };
+const contentOuterStyle: ViewStyle = themed(() => ({ flex: 1, alignItems: 'center', backgroundColor: theme.colors.background }));
 const contentColumnStyle: ViewStyle = { flex: 1, width: '100%', maxWidth: CONTENT_MAX_WIDTH };
 
-const menuStyle: ViewStyle = {
+const menuStyle: ViewStyle = themed(() => ({
   backgroundColor: theme.colors.surface,
   borderRightWidth: 1,
   borderRightColor: theme.colors.border,
   paddingVertical: theme.spacing.lg,
   paddingHorizontal: theme.spacing.md,
-};
+}));
 
 const brandStyle: ViewStyle = {
   flexDirection: 'row',
@@ -139,7 +140,7 @@ const brandStyle: ViewStyle = {
   paddingBottom: theme.spacing.xl,
 };
 const brandCollapsedStyle: ViewStyle = { justifyContent: 'center', paddingHorizontal: 0 };
-const brandTextStyle: TextStyle = { ...theme.textStyles.h2, fontSize: 18, color: theme.colors.textPrimary, flexShrink: 1 };
+const brandTextStyle: TextStyle = themed(() => ({ ...theme.textStyles.h2, fontSize: 18, color: theme.colors.textPrimary, flexShrink: 1 }));
 
 const itemsStyle: ViewStyle = { flex: 1, gap: theme.spacing.xs };
 const itemStyle: ViewStyle = {
@@ -152,17 +153,17 @@ const itemStyle: ViewStyle = {
 };
 const railBadgeStyle: ViewStyle = { position: 'absolute', top: 4, right: 10 };
 const itemCollapsedStyle: ViewStyle = { justifyContent: 'center', paddingHorizontal: 0 };
-const itemActiveStyle: ViewStyle = { backgroundColor: theme.colors.infoBg };
-const itemTextStyle: TextStyle = { ...theme.textStyles.caption, fontSize: 15, fontWeight: '600', color: theme.colors.textSecondary };
-const itemTextActiveStyle: TextStyle = { color: theme.colors.primary, fontWeight: '800' };
+const itemActiveStyle: ViewStyle = themed(() => ({ backgroundColor: theme.colors.infoBg }));
+const itemTextStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, fontSize: 15, fontWeight: '600', color: theme.colors.textSecondary }));
+const itemTextActiveStyle: TextStyle = themed(() => ({ color: theme.colors.primary, fontWeight: '800' }));
 
-const footerStyle: ViewStyle = {
+const footerStyle: ViewStyle = themed(() => ({
   gap: theme.spacing.sm,
   borderTopWidth: 1,
   borderTopColor: theme.colors.border,
   paddingTop: theme.spacing.md,
-};
+}));
 const userStyle: ViewStyle = { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.md, paddingHorizontal: theme.spacing.sm };
 const userCollapsedStyle: ViewStyle = { justifyContent: 'center', paddingHorizontal: 0 };
-const userNameStyle: TextStyle = { ...theme.textStyles.caption, fontWeight: '800', color: theme.colors.textPrimary };
-const userMailStyle: TextStyle = { ...theme.textStyles.label, color: theme.colors.textMuted };
+const userNameStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, fontWeight: '800', color: theme.colors.textPrimary }));
+const userMailStyle: TextStyle = themed(() => ({ ...theme.textStyles.label, color: theme.colors.textMuted }));

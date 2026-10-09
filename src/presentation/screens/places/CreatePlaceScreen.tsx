@@ -17,10 +17,11 @@ import { PlaceForm } from '../../components/places/placeForm';
 import { usePlaceForm } from '../../hooks/usePlaceForm';
 import { MainStackParamList } from '../../navigation/types';
 import { theme } from '../../styles/theme';
+import { themed } from '../../styles/themeRuntime';
 
 type Props = NativeStackScreenProps<MainStackParamList, 'CreatePlace'>;
 
-const containerStyle: ViewStyle = { flex: 1, backgroundColor: theme.colors.background };
+const containerStyle: ViewStyle = themed(() => ({ flex: 1, backgroundColor: theme.colors.background }));
 
 const contentStyle: ViewStyle = {
   paddingHorizontal: theme.spacing.lg,
@@ -28,11 +29,11 @@ const contentStyle: ViewStyle = {
   paddingBottom: theme.spacing.huge,
 };
 
-const introStyle: TextStyle = {
+const introStyle: TextStyle = themed(() => ({
   ...theme.textStyles.body,
   color: theme.colors.textSecondary,
   marginBottom: theme.spacing.xl,
-};
+}));
 
 export const CreatePlaceScreen: React.FC<Props> = ({ navigation }) => {
   const form = usePlaceForm();

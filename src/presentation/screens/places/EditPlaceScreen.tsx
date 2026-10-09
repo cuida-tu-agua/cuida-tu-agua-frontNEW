@@ -23,10 +23,11 @@ import { PlaceForm } from '../../components/places/placeForm';
 import { usePlaceForm } from '../../hooks/usePlaceForm';
 import { MainStackParamList } from '../../navigation/types';
 import { theme } from '../../styles/theme';
+import { themed } from '../../styles/themeRuntime';
 
 type Props = NativeStackScreenProps<MainStackParamList, 'EditPlace'>;
 
-const containerStyle: ViewStyle = { flex: 1, backgroundColor: theme.colors.background };
+const containerStyle: ViewStyle = themed(() => ({ flex: 1, backgroundColor: theme.colors.background }));
 
 const contentStyle: ViewStyle = {
   paddingHorizontal: theme.spacing.lg,
@@ -34,60 +35,60 @@ const contentStyle: ViewStyle = {
   paddingBottom: theme.spacing.huge,
 };
 
-const centeredStyle: ViewStyle = {
+const centeredStyle: ViewStyle = themed(() => ({
   flex: 1,
   alignItems: 'center',
   justifyContent: 'center',
   padding: theme.spacing.xl,
   backgroundColor: theme.colors.background,
-};
+}));
 
-const messageStyle: TextStyle = {
+const messageStyle: TextStyle = themed(() => ({
   ...theme.textStyles.body,
   color: theme.colors.textSecondary,
   textAlign: 'center',
   marginVertical: theme.spacing.lg,
-};
+}));
 
-const sectionStyle: ViewStyle = {
+const sectionStyle: ViewStyle = themed(() => ({
   marginTop: theme.spacing.xxl,
   paddingTop: theme.spacing.xl,
   borderTopWidth: 1,
   borderTopColor: theme.colors.border,
-};
+}));
 
-const sectionTitleStyle: TextStyle = {
+const sectionTitleStyle: TextStyle = themed(() => ({
   ...theme.textStyles.label,
   color: theme.colors.textPrimary,
   textTransform: 'uppercase',
   marginBottom: theme.spacing.sm,
-};
+}));
 
-const dangerZoneStyle: ViewStyle = {
+const dangerZoneStyle: ViewStyle = themed(() => ({
   marginTop: theme.spacing.xxl,
   paddingTop: theme.spacing.xl,
   borderTopWidth: 1,
   borderTopColor: theme.colors.border,
-};
+}));
 
-const dangerTitleStyle: TextStyle = {
+const dangerTitleStyle: TextStyle = themed(() => ({
   ...theme.textStyles.label,
   color: theme.colors.error,
   textTransform: 'uppercase',
   marginBottom: theme.spacing.sm,
-};
+}));
 
-const dangerTextStyle: TextStyle = {
+const dangerTextStyle: TextStyle = themed(() => ({
   ...theme.textStyles.caption,
   color: theme.colors.textSecondary,
   marginBottom: theme.spacing.lg,
-};
+}));
 
-const metaStyle: TextStyle = {
+const metaStyle: TextStyle = themed(() => ({
   ...theme.textStyles.label, // dates are data: IBM Plex Mono
   color: theme.colors.textMuted,
   marginBottom: theme.spacing.lg,
-};
+}));
 
 const formatDate = (iso: string) =>
   new Date(iso).toLocaleString('es-CO', { dateStyle: 'medium', timeStyle: 'short' });

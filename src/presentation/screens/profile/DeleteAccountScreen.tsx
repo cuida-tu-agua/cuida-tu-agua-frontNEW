@@ -11,6 +11,7 @@ import { Button } from '../../components/common/Button';
 import { Checkbox } from '../../components/common/Checkbox';
 import { MainStackParamList } from '../../navigation/types';
 import { theme } from '../../styles/theme';
+import { themed } from '../../styles/themeRuntime';
 
 type Props = NativeStackScreenProps<MainStackParamList, 'DeleteAccount'>;
 
@@ -98,21 +99,21 @@ export const DeleteAccountScreen: React.FC<Props> = ({ navigation }) => {
   );
 };
 
-const screenStyle: ViewStyle = { flex: 1, backgroundColor: theme.colors.background };
+const screenStyle: ViewStyle = themed(() => ({ flex: 1, backgroundColor: theme.colors.background }));
 const contentStyle: ViewStyle = { padding: theme.spacing.lg, paddingBottom: theme.spacing.huge, gap: theme.spacing.xs };
 
-const warningCardStyle: ViewStyle = {
+const warningCardStyle: ViewStyle = themed(() => ({
   backgroundColor: theme.colors.errorBg,
   borderRadius: theme.borderRadius.medium,
   padding: theme.spacing.lg,
   gap: theme.spacing.sm,
   marginBottom: theme.spacing.xl,
-};
+}));
 
-const warningTitleStyle: TextStyle = { ...theme.textStyles.h2, fontSize: 22, color: theme.colors.error };
+const warningTitleStyle: TextStyle = themed(() => ({ ...theme.textStyles.h2, fontSize: 22, color: theme.colors.error }));
 
 const bulletRowStyle: ViewStyle = { flexDirection: 'row', alignItems: 'flex-start', gap: theme.spacing.sm };
 
-const bulletTextStyle: TextStyle = { ...theme.textStyles.caption, flex: 1, color: theme.colors.textPrimary };
+const bulletTextStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, flex: 1, color: theme.colors.textPrimary }));
 
-const checkboxTextStyle: TextStyle = { ...theme.textStyles.caption, color: theme.colors.textPrimary };
+const checkboxTextStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, color: theme.colors.textPrimary }));

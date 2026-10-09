@@ -11,15 +11,16 @@ import { toAppError } from '../../../infrastructure/http/httpError';
 import { Banner } from '../../components/common/Banner';
 import { MainStackParamList } from '../../navigation/types';
 import { theme } from '../../styles/theme';
+import { themed } from '../../styles/themeRuntime';
 
 type Props = NativeStackScreenProps<MainStackParamList, 'ValveHistory'>;
 
-const STATUS_COLOR: Record<ValveCommandStatus, string> = {
+const STATUS_COLOR: Record<ValveCommandStatus, string> = themed(() => ({
   SENT: theme.colors.info,
   ACK_SUCCESS: theme.colors.success,
   ACK_TIMEOUT: theme.colors.warning,
   FAILED: theme.colors.error,
-};
+}));
 
 const formatDate = (iso: string) => new Date(iso).toLocaleString('es-CO', { dateStyle: 'medium', timeStyle: 'short' });
 
@@ -112,10 +113,10 @@ export const ValveHistoryScreen: React.FC<Props> = ({ route }) => {
   );
 };
 
-const screenStyle: ViewStyle = { flex: 1, backgroundColor: theme.colors.background };
+const screenStyle: ViewStyle = themed(() => ({ flex: 1, backgroundColor: theme.colors.background }));
 const contentStyle: ViewStyle = { padding: theme.spacing.lg, gap: theme.spacing.sm };
-const centeredStyle: ViewStyle = { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: theme.colors.background };
-const rowStyle: ViewStyle = {
+const centeredStyle: ViewStyle = themed(() => ({ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: theme.colors.background }));
+const rowStyle: ViewStyle = themed(() => ({
   flexDirection: 'row',
   alignItems: 'center',
   gap: theme.spacing.md,
@@ -124,9 +125,9 @@ const rowStyle: ViewStyle = {
   borderWidth: 1,
   borderColor: theme.colors.border,
   backgroundColor: theme.colors.surface,
-};
+}));
 const iconStyle: ViewStyle = { width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center' };
-const titleStyle: TextStyle = { ...theme.textStyles.button, color: theme.colors.textPrimary };
-const mutedStyle: TextStyle = { ...theme.textStyles.caption, color: theme.colors.textMuted, textAlign: 'center', marginBottom: theme.spacing.sm };
-const mutedLeftStyle: TextStyle = { ...theme.textStyles.caption, color: theme.colors.textMuted };
+const titleStyle: TextStyle = themed(() => ({ ...theme.textStyles.button, color: theme.colors.textPrimary }));
+const mutedStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, color: theme.colors.textMuted, textAlign: 'center', marginBottom: theme.spacing.sm }));
+const mutedLeftStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, color: theme.colors.textMuted }));
 const statusStyle: TextStyle = { ...theme.textStyles.caption, fontWeight: '800', maxWidth: 96, textAlign: 'right' };

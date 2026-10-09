@@ -61,7 +61,8 @@ export const ConsumptionChart: React.FC<ConsumptionChartProps> = ({ buckets, per
                   <SvgText
                     x={Math.min(Math.max(x + barWidth / 2, 24), width - 24)}
                     y={TOP_SPACE + plotHeight - barHeight - 4}
-                    fontSize={10}
+                    fontSize={11}
+                    fontFamily={theme.typography.fontFamily.monospace} // data labels use IBM Plex Mono (manual, 3.1)
                     fill={theme.colors.textPrimary}
                     textAnchor="middle"
                   >
@@ -73,6 +74,7 @@ export const ConsumptionChart: React.FC<ConsumptionChartProps> = ({ buckets, per
                     x={x + barWidth / 2}
                     y={height - 4}
                     fontSize={11}
+                    fontFamily={theme.typography.fontFamily.monospace}
                     fill={theme.colors.textMuted}
                     textAnchor="middle"
                   >

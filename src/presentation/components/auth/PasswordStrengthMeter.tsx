@@ -3,6 +3,7 @@ import { View, Text, ViewStyle, TextStyle } from 'react-native';
 import { theme } from '../../styles/theme';
 import { UIcon } from './UIcon';
 import { passwordRules } from '../../../domain/auth/passwordPolicy';
+import { themed } from '../../styles/themeRuntime';
 
 interface PasswordStrengthMeterProps {
   password: string;
@@ -10,13 +11,13 @@ interface PasswordStrengthMeterProps {
 
 const SEGMENTS = 4;
 
-const LEVELS = [
+const LEVELS = themed(() => [
   { label: '', color: theme.colors.grayMedium },
   { label: 'Débil', color: theme.colors.error },
   { label: 'Regular', color: theme.colors.warning },
   { label: 'Fuerte', color: theme.colors.primaryActive },
   { label: 'Muy fuerte', color: theme.colors.success },
-];
+]);
 
 export const PasswordStrengthMeter: React.FC<PasswordStrengthMeterProps> = ({ password }) => {
   const rules = passwordRules(password);

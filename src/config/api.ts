@@ -99,6 +99,25 @@ export const VALVE_ENDPOINTS = {
   COMMAND: (placeId: string, commandId: string) => `/api/places/${placeId}/valve/commands/${commandId}`,
 };
 
+/** ms-places: tariffs and cost (HU-054, HU-056, HU-066, HU-069). */
+export const TARIFF_ENDPOINTS = {
+  TARIFF: (placeId: string) => `/api/places/${placeId}/tariff`,
+  MANUAL: (placeId: string) => `/api/places/${placeId}/tariff/manual`,
+  CATALOG_CHOICE: (placeId: string) => `/api/places/${placeId}/tariff/catalog`,
+  CATALOG: (cityId: string) => `/api/tariffs/catalog/cities/${cityId}`,
+  COST: (placeId: string) => `/api/places/${placeId}/cost`,
+};
+
+/** ms-places: water saving tips, favorites and their administration (HU-063, HU-064, HU-065). */
+export const TIP_ENDPOINTS = {
+  TIPS: '/api/tips',
+  FAVORITES: '/api/tips/favorites',
+  FAVORITE: (tipId: string) => `/api/tips/${tipId}/favorite`,
+  ADMIN: '/api/admin/tips',
+  ADMIN_TIP: (tipId: string) => `/api/admin/tips/${tipId}`,
+  ADMIN_ACTIVE: (tipId: string) => `/api/admin/tips/${tipId}/active`,
+};
+
 /** ms-iam, administrator only (HU-059, HU-060, HU-062). */
 export const ADMIN_ENDPOINTS = {
   USERS: '/api/admin/users',

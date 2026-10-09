@@ -2,6 +2,7 @@ import React from 'react';
 import { Pressable, Text, TextStyle, View, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { theme } from '../../styles/theme';
+import { themed } from '../../styles/themeRuntime';
 
 interface CheckboxProps {
   checked: boolean;
@@ -38,7 +39,7 @@ const wrapperStyle: ViewStyle = { marginBottom: theme.spacing.xl };
 
 const rowStyle: ViewStyle = { flexDirection: 'row', alignItems: 'flex-start', gap: theme.spacing.md };
 
-const boxStyle: ViewStyle = {
+const boxStyle: ViewStyle = themed(() => ({
   width: 24,
   height: 24,
   borderRadius: 6,
@@ -47,12 +48,12 @@ const boxStyle: ViewStyle = {
   alignItems: 'center',
   justifyContent: 'center',
   marginTop: 2,
-};
+}));
 
 const labelStyle: ViewStyle = { flex: 1 };
 
-const errorStyle: TextStyle = {
+const errorStyle: TextStyle = themed(() => ({
   ...theme.textStyles.caption,
   color: theme.colors.error,
   marginTop: theme.spacing.sm,
-};
+}));

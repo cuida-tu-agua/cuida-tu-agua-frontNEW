@@ -13,6 +13,7 @@ import {
   PLACE_TYPE_OPTIONS,
   subdivisionLabel,
 } from './placeLabels';
+import { themed } from '../../styles/themeRuntime';
 
 interface PlaceFormProps {
   form: PlaceFormController;
@@ -23,40 +24,40 @@ interface PlaceFormProps {
   submitDisabled?: boolean;
 }
 
-const sectionTitleStyle: TextStyle = {
+const sectionTitleStyle: TextStyle = themed(() => ({
   ...theme.textStyles.h2,
   fontSize: theme.typography.sizes.h3,
   color: theme.colors.textPrimary,
   marginBottom: theme.spacing.lg,
-};
+}));
 
 const cardStyle: ViewStyle = { marginBottom: theme.spacing.lg };
 
-const hintStyle: TextStyle = {
+const hintStyle: TextStyle = themed(() => ({
   ...theme.textStyles.caption,
   color: theme.colors.textMuted,
   marginTop: -theme.spacing.sm,
   marginBottom: theme.spacing.lg,
-};
+}));
 
-const currencyStyle: TextStyle = {
+const currencyStyle: TextStyle = themed(() => ({
   ...theme.textStyles.label, // IBM Plex Mono: codes and data
   color: theme.colors.textSecondary,
-};
+}));
 
-const bannerStyle: ViewStyle = {
+const bannerStyle: ViewStyle = themed(() => ({
   backgroundColor: theme.colors.errorBg,
   borderRadius: theme.borderRadius.small,
   borderWidth: 1,
   borderColor: theme.colors.error,
   padding: theme.spacing.md,
   marginBottom: theme.spacing.lg,
-};
+}));
 
-const bannerTextStyle: TextStyle = {
+const bannerTextStyle: TextStyle = themed(() => ({
   ...theme.textStyles.caption,
   color: theme.colors.error,
-};
+}));
 
 export const PlaceForm: React.FC<PlaceFormProps> = ({
   form,

@@ -3,6 +3,7 @@ import { Modal, Text, TextStyle, View, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { theme } from '../../styles/theme';
 import { Button } from './Button';
+import { themed } from '../../styles/themeRuntime';
 
 interface ConfirmDialogProps {
   visible: boolean;
@@ -60,24 +61,24 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   </Modal>
 );
 
-const backdropStyle: ViewStyle = {
+const backdropStyle: ViewStyle = themed(() => ({
   flex: 1,
-  backgroundColor: 'rgba(2, 62, 138, 0.35)',
+  backgroundColor: theme.colors.overlay,
   justifyContent: 'center',
   alignItems: 'center',
   padding: theme.spacing.lg,
-};
+}));
 
-const cardStyle: ViewStyle = {
+const cardStyle: ViewStyle = themed(() => ({
   width: '100%',
   maxWidth: 440, // on a wide screen the dialog stays a dialog instead of a banner across the monitor
   backgroundColor: theme.colors.surface,
   borderRadius: theme.borderRadius.large,
   padding: theme.spacing.xl,
   ...theme.shadows.prominent,
-};
+}));
 
-const dangerIconStyle: ViewStyle = {
+const dangerIconStyle: ViewStyle = themed(() => ({
   width: 52,
   height: 52,
   borderRadius: 26,
@@ -86,22 +87,22 @@ const dangerIconStyle: ViewStyle = {
   justifyContent: 'center',
   alignSelf: 'center',
   marginBottom: theme.spacing.md,
-};
+}));
 
-const titleStyle: TextStyle = {
+const titleStyle: TextStyle = themed(() => ({
   ...theme.textStyles.h2,
   fontSize: theme.typography.sizes.h3,
   lineHeight: theme.typography.sizes.h3 * 1.3,
   color: theme.colors.textPrimary,
   textAlign: 'center',
   marginBottom: theme.spacing.sm,
-};
+}));
 
-const messageStyle: TextStyle = {
+const messageStyle: TextStyle = themed(() => ({
   ...theme.textStyles.caption,
   color: theme.colors.textSecondary,
   textAlign: 'center',
   marginBottom: theme.spacing.lg,
-};
+}));
 
 const buttonsStyle: ViewStyle = { gap: theme.spacing.sm };

@@ -28,13 +28,13 @@ describe('layoutFor: the width decides the layout, on any platform', () => {
 });
 
 describe('side menu', () => {
-  it('lists the places, the inbox and the profile for a normal user', () => {
-    expect(navItemsFor(['USER']).map((i) => i.route)).toEqual(['Places', 'Notifications', 'Profile']);
+  it('lists the places, the tips, the inbox and the profile for a normal user', () => {
+    expect(navItemsFor(['USER']).map((i) => i.route)).toEqual(['Places', 'Tips', 'Notifications', 'Profile']);
   });
 
   it('administrators also get the metrics and the users, before the profile', () => {
     expect(navItemsFor(['USER', 'ADMIN']).map((i) => i.route)).toEqual([
-      'Places', 'Notifications', 'AdminMetrics', 'AdminUsers', 'Profile',
+      'Places', 'Tips', 'Notifications', 'AdminMetrics', 'AdminUsers', 'AdminTips', 'Profile',
     ]);
   });
 
@@ -44,6 +44,9 @@ describe('side menu', () => {
     expect(sectionOf('ChangePassword')).toBe('profile');
     expect(sectionOf('NotificationPreferences')).toBe('notifications');
     expect(sectionOf('AdminUsers')).toBe('adminUsers');
+    expect(sectionOf('PlaceTariff')).toBe('places');
+    expect(sectionOf('Tips')).toBe('tips');
+    expect(sectionOf('AdminTips')).toBe('adminTips');
     expect(sectionOf('Nope')).toBeNull();
     expect(sectionOf(undefined)).toBeNull();
   });

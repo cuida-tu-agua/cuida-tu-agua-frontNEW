@@ -10,10 +10,13 @@ import { NotificationPreferencesScreen } from '../screens/notifications/Notifica
 import { NotificationsScreen } from '../screens/notifications/NotificationsScreen';
 import { PlacesScreen } from '../screens/places/PlacesScreen';
 import { AdminMetricsScreen } from '../screens/admin/AdminMetricsScreen';
+import { AdminTipsScreen } from '../screens/admin/AdminTipsScreen';
 import { AdminUsersScreen } from '../screens/admin/AdminUsersScreen';
 import { ChangePasswordScreen } from '../screens/profile/ChangePasswordScreen';
 import { DeleteAccountScreen } from '../screens/profile/DeleteAccountScreen';
 import { ProfileScreen } from '../screens/profile/ProfileScreen';
+import { PlaceTariffScreen } from '../screens/tariffs/PlaceTariffScreen';
+import { TipsScreen } from '../screens/tips/TipsScreen';
 import { ValveHistoryScreen } from '../screens/valve/ValveHistoryScreen';
 import { theme } from '../styles/theme';
 import { MainStackParamList } from './types';
@@ -40,6 +43,9 @@ export const MainNavigator: React.FC = () => (
     <Stack.Screen name="DeviceWifiSetup" component={DeviceWifiSetupScreen} options={{ title: 'WiFi del medidor' }} />
     <Stack.Screen name="PlaceDashboard" component={PlaceDashboardScreen} options={{ title: 'Panel' }} />
     <Stack.Screen name="ValveHistory" component={ValveHistoryScreen} options={{ title: 'Historial de la válvula' }} />
+    <Stack.Screen name="PlaceTariff" component={PlaceTariffScreen} options={{ title: 'Tarifa del agua' }} />
+    <Stack.Screen name="Tips" component={TipsScreen} options={{ title: 'Consejos de ahorro' }} />
+    <Stack.Screen name="AdminTips" component={AdminTipsScreen} options={{ title: 'Consejos' }} />
     <Stack.Screen name="AdminMetrics" component={AdminMetricsScreen} options={{ title: 'Métricas' }} />
     <Stack.Screen name="AdminUsers" component={AdminUsersScreen} options={{ title: 'Usuarios' }} />
     <Stack.Screen name="Notifications" component={NotificationsScreen} options={{ title: 'Notificaciones' }} />

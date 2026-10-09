@@ -9,6 +9,7 @@ import {
   Easing,
 } from 'react-native';
 import { theme } from '../../styles/theme';
+import { themed } from '../../styles/themeRuntime';
 
 interface SuccessModalProps {
   visible: boolean;
@@ -17,14 +18,14 @@ interface SuccessModalProps {
   autoCloseDuration?: number;
 }
 
-const containerStyle: ViewStyle = {
+const containerStyle: ViewStyle = themed(() => ({
   flex: 1,
   justifyContent: 'center',
   alignItems: 'center',
-  backgroundColor: 'rgba(0, 0, 0, 0.4)',
-};
+  backgroundColor: theme.colors.overlay,
+}));
 
-const contentStyle: ViewStyle = {
+const contentStyle: ViewStyle = themed(() => ({
   backgroundColor: theme.colors.surface,
   borderRadius: theme.spacing.xl,
   padding: theme.spacing.xxl,
@@ -35,9 +36,9 @@ const contentStyle: ViewStyle = {
   shadowRadius: 12,
   elevation: 8,
   width: '85%',
-};
+}));
 
-const checkmarkContainerStyle: ViewStyle = {
+const checkmarkContainerStyle: ViewStyle = themed(() => ({
   width: 80,
   height: 80,
   borderRadius: 40,
@@ -45,27 +46,27 @@ const checkmarkContainerStyle: ViewStyle = {
   justifyContent: 'center',
   alignItems: 'center',
   marginBottom: theme.spacing.lg,
-};
+}));
 
-const checkmarkStyle: TextStyle = {
+const checkmarkStyle: TextStyle = themed(() => ({
   fontSize: 48,
   color: theme.colors.success,
   fontWeight: '600',
-};
+}));
 
-const titleStyle: TextStyle = {
+const titleStyle: TextStyle = themed(() => ({
   ...theme.textStyles.button,
   color: theme.colors.textPrimary,
   marginBottom: theme.spacing.md,
   textAlign: 'center',
-};
+}));
 
-const messageStyle: TextStyle = {
+const messageStyle: TextStyle = themed(() => ({
   ...theme.textStyles.body,
   color: theme.colors.textSecondary,
   textAlign: 'center',
   lineHeight: 22,
-};
+}));
 
 export const SuccessModal: React.FC<SuccessModalProps> = ({
   visible,

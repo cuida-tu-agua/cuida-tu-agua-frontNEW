@@ -10,6 +10,7 @@ import {
   TextInputProps,
 } from 'react-native';
 import { theme } from '../../styles/theme';
+import { themed } from '../../styles/themeRuntime';
 
 interface InputProps {
   label?: string;
@@ -34,23 +35,25 @@ interface InputProps {
   textContentType?: TextInputProps['textContentType'];
   returnKeyType?: TextInputProps['returnKeyType'];
   onSubmitEditing?: () => void;
+  /** Several lines (the body of a tip): the field grows from a minimum height instead of having a fixed one. */
+  multiline?: boolean;
 }
 
 const containerBase: ViewStyle = {
   marginBottom: theme.spacing.lg,
 };
 
-const labelBase: TextStyle = {
+const labelBase: TextStyle = themed(() => ({
   ...theme.textStyles.label,
   color: theme.colors.textPrimary,
   marginBottom: theme.spacing.sm,
-};
+}));
 
 const FIELD_HEIGHT = 54;
 const BORDER = 1;
 const BORDER_FOCUSED = 2;
 
-const fieldBaseStyle: ViewStyle = {
+const fieldBaseStyle: ViewStyle = themed(() => ({
   flexDirection: 'row',
   alignItems: 'center',
   height: FIELD_HEIGHT,
@@ -60,9 +63,9 @@ const fieldBaseStyle: ViewStyle = {
   borderColor: theme.colors.border,
   backgroundColor: theme.colors.surface,
   gap: theme.spacing.md,
-};
+}));
 
-const textInputStyle: TextStyle = {
+const textInputStyle: TextStyle = themed(() => ({
   height: '100%',
   fontFamily: theme.textStyles.body.fontFamily,
   fontSize: theme.typography.sizes.body,
@@ -74,7 +77,7 @@ const textInputStyle: TextStyle = {
   includeFontPadding: false, // Android: quita el espacio extra que empuja el texto hacia abajo
   // Web: the field already draws its own focus border; without this the browser adds its orange outline on top
   ...({ outlineStyle: 'none' } as unknown as TextStyle),
-};
+}));
 
 const textAreaStyle: ViewStyle = {
   flex: 1,
@@ -91,24 +94,35 @@ const placeholderWrapperStyle: ViewStyle = {
   justifyContent: 'center',
 };
 
-const placeholderTextStyle: TextStyle = {
+const placeholderTextStyle: TextStyle = themed(() => ({
   fontFamily: theme.textStyles.body.fontFamily,
   fontSize: theme.typography.sizes.body,
   color: theme.colors.textMuted,
   includeFontPadding: false,
-};
+}));
 
-const hintTextStyle: TextStyle = {
+const hintTextStyle: TextStyle = themed(() => ({
   ...theme.textStyles.caption,
   color: theme.colors.textMuted,
   marginTop: theme.spacing.sm,
-};
+}));
 
-const errorTextStyle: TextStyle = {
+const errorTextStyle: TextStyle = themed(() => ({
   ...theme.textStyles.caption,
   color: theme.colors.error,
   marginTop: theme.spacing.sm,
-};
+}));
+
+const multilineFieldStyle: ViewStyle = themed(() => ({
+  height: undefined,
+  minHeight: 128,
+  alignItems: 'flex-start',
+  paddingVertical: theme.spacing.md,
+}));
+
+const multilineAreaStyle: ViewStyle = { height: undefined, minHeight: 100, justifyContent: 'flex-start' };
+
+const multilineTextStyle: TextStyle = { height: undefined, minHeight: 100, textAlignVertical: 'top' };
 
 export const Input: React.FC<InputProps> = ({
   label,
@@ -132,11 +146,13 @@ export const Input: React.FC<InputProps> = ({
   textContentType,
   returnKeyType,
   onSubmitEditing,
+  multiline = false,
 }) => {
   const [isFocused, setIsFocused] = useState(false);
 
   const fieldStyle: StyleProp<ViewStyle> = [
     fieldBaseStyle,
+    multiline && multilineFieldStyle,
     isFocused && {
       borderColor: theme.colors.primary,
       borderWidth: BORDER_FOCUSED,
@@ -153,16 +169,17 @@ export const Input: React.FC<InputProps> = ({
       <View style={fieldStyle}>
         {leftIcon && <View pointerEvents="none">{leftIcon}</View>}
 
-        <View style={textAreaStyle}>
+        <View style={[textAreaStyle, multiline && multilineAreaStyle]}>
           {!value && !!placeholder && (
-            <View pointerEvents="none" style={placeholderWrapperStyle}>
+            <View pointerEvents="none" style={[placeholderWrapperStyle, multiline && { justifyContent: 'flex-start' }]}>
               <Text style={placeholderTextStyle} numberOfLines={1}>
                 {placeholder}
               </Text>
             </View>
           )}
           <TextInput
-            style={[textInputStyle, !editable && { color: theme.colors.textMuted }]}
+            style={[textInputStyle, multiline && multilineTextStyle, !editable && { color: theme.colors.textMuted }]}
+            multiline={multiline}
             accessibilityLabel={label ?? placeholder}
             selectionColor={theme.colors.primary}
             cursorColor={theme.colors.primary}

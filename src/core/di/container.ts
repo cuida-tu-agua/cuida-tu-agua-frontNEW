@@ -5,6 +5,8 @@ import { DeviceRepository } from '../../domain/devices/DeviceRepository';
 import { GeographyRepository } from '../../domain/geography/Geography';
 import { NotificationRepository } from '../../domain/notifications/NotificationRepository';
 import { PlaceRepository } from '../../domain/places/PlaceRepository';
+import { TariffRepository } from '../../domain/tariffs/TariffRepository';
+import { AdminTipRepository, TipRepository } from '../../domain/tips/TipRepository';
 import { ValveRepository } from '../../domain/valve/ValveRepository';
 import { HttpAdminRepository } from '../../infrastructure/repositories/HttpAdminRepository';
 import { HttpAuthService } from '../../infrastructure/repositories/HttpAuthService';
@@ -12,6 +14,8 @@ import { HttpConsumptionRepository } from '../../infrastructure/repositories/Htt
 import { HttpDeviceRepository } from '../../infrastructure/repositories/HttpDeviceRepository';
 import { HttpGeographyRepository } from '../../infrastructure/repositories/HttpGeographyRepository';
 import { HttpNotificationRepository } from '../../infrastructure/repositories/HttpNotificationRepository';
+import { HttpTariffRepository } from '../../infrastructure/repositories/HttpTariffRepository';
+import { HttpTipRepository } from '../../infrastructure/repositories/HttpTipRepository';
 import { HttpPlaceRepository } from '../../infrastructure/repositories/HttpPlaceRepository';
 import { HttpProfileService } from '../../infrastructure/repositories/HttpProfileService';
 import { HttpValveRepository } from '../../infrastructure/repositories/HttpValveRepository';
@@ -33,3 +37,7 @@ export const consumptionRepository: ConsumptionRepository = new HttpConsumptionR
 export const valveRepository: ValveRepository = new HttpValveRepository(valveApiClient, apiClient);
 export const notificationRepository: NotificationRepository = new HttpNotificationRepository(notificationsApiClient);
 export const adminRepository: AdminRepository = new HttpAdminRepository(apiClient);
+export const tariffRepository: TariffRepository = new HttpTariffRepository(placesApiClient);
+const tips = new HttpTipRepository(placesApiClient);
+export const tipRepository: TipRepository = tips;
+export const adminTipRepository: AdminTipRepository = tips;

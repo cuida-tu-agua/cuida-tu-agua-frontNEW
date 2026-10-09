@@ -14,6 +14,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Logo } from '../common/Logo';
 import { useLayout } from '../../layout/breakpoints';
 import { theme } from '../../styles/theme';
+import { themed } from '../../styles/themeRuntime';
 
 interface AuthLayoutProps {
   title: string;
@@ -68,7 +69,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ title, subtitle, onBack,
   );
 };
 
-const containerStyle: ViewStyle = { flex: 1, backgroundColor: theme.colors.background };
+const containerStyle: ViewStyle = themed(() => ({ flex: 1, backgroundColor: theme.colors.background }));
 
 const contentStyle: ViewStyle = {
   flexGrow: 1,
@@ -81,7 +82,7 @@ const contentStyle: ViewStyle = {
 const wideContentStyle: ViewStyle = { alignItems: 'center', justifyContent: 'center' };
 const formColumnStyle: ViewStyle = { width: '100%', maxWidth: 460 };
 
-const backStyle: ViewStyle = {
+const backStyle: ViewStyle = themed(() => ({
   width: 44,
   height: 44,
   borderRadius: 22,
@@ -90,27 +91,27 @@ const backStyle: ViewStyle = {
   backgroundColor: theme.colors.surface,
   borderWidth: 1,
   borderColor: theme.colors.border,
-};
+}));
 
 const headerStyle: ViewStyle = { alignItems: 'center', marginBottom: theme.spacing.xl };
 
-const titleStyle: TextStyle = {
+const titleStyle: TextStyle = themed(() => ({
   ...theme.textStyles.h2,
   color: theme.colors.textPrimary,
   marginTop: theme.spacing.md,
   marginBottom: theme.spacing.sm,
   textAlign: 'center',
-};
+}));
 
-const subtitleStyle: TextStyle = {
+const subtitleStyle: TextStyle = themed(() => ({
   ...theme.textStyles.caption,
   fontSize: 16,
   lineHeight: 24,
   color: theme.colors.textSecondary,
   textAlign: 'center',
-};
+}));
 
-const cardStyle: ViewStyle = {
+const cardStyle: ViewStyle = themed(() => ({
   marginBottom: theme.spacing.xl,
   backgroundColor: theme.colors.surface,
   paddingVertical: theme.spacing.xl,
@@ -123,7 +124,7 @@ const cardStyle: ViewStyle = {
   shadowOpacity: 0.3,
   shadowRadius: 5,
   elevation: 1,
-};
+}));
 
 export const AuthFooterLink: React.FC<{ text: string; link: string; onPress: () => void }> = ({
   text,
@@ -140,10 +141,10 @@ export const AuthFooterLink: React.FC<{ text: string; link: string; onPress: () 
 
 const footerStyle: ViewStyle = { flexDirection: 'row', justifyContent: 'center', flexWrap: 'wrap' };
 
-const footerTextStyle: TextStyle = { ...theme.textStyles.caption, color: theme.colors.textSecondary };
+const footerTextStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, color: theme.colors.textSecondary }));
 
-const footerLinkStyle: TextStyle = {
+const footerLinkStyle: TextStyle = themed(() => ({
   ...theme.textStyles.caption,
   color: theme.colors.primary,
   fontWeight: '800',
-};
+}));

@@ -16,6 +16,7 @@ import { Card } from '../../components/common/Card';
 import { useNotificationPreferences } from '../../hooks/useNotificationPreferences';
 import { MainStackParamList } from '../../navigation/types';
 import { theme } from '../../styles/theme';
+import { themed } from '../../styles/themeRuntime';
 
 type Props = NativeStackScreenProps<MainStackParamList, 'NotificationPreferences'>;
 
@@ -85,28 +86,28 @@ const LevelCard: React.FC<{
   </Card>
 );
 
-const screenStyle: ViewStyle = { flex: 1, backgroundColor: theme.colors.background };
+const screenStyle: ViewStyle = themed(() => ({ flex: 1, backgroundColor: theme.colors.background }));
 const contentStyle: ViewStyle = { padding: theme.spacing.lg, paddingBottom: theme.spacing.huge, gap: theme.spacing.lg };
-const centerStyle: ViewStyle = {
+const centerStyle: ViewStyle = themed(() => ({
   flex: 1,
   alignItems: 'center',
   justifyContent: 'center',
   padding: theme.spacing.xl,
   gap: theme.spacing.md,
   backgroundColor: theme.colors.background,
-};
-const introStyle: TextStyle = { ...theme.textStyles.caption, fontSize: 15, color: theme.colors.textSecondary };
+}));
+const introStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, fontSize: 15, color: theme.colors.textSecondary }));
 const gridStyle: ViewStyle = { flexDirection: 'row', flexWrap: 'wrap', gap: theme.spacing.lg };
 const cardStyle: ViewStyle = { flexGrow: 1, flexBasis: 300, gap: theme.spacing.sm };
-const levelTitleStyle: TextStyle = { ...theme.textStyles.h2, fontSize: 20, color: theme.colors.textPrimary };
-const levelHintStyle: TextStyle = { ...theme.textStyles.caption, color: theme.colors.textMuted, marginBottom: theme.spacing.sm };
-const rowStyle: ViewStyle = {
+const levelTitleStyle: TextStyle = themed(() => ({ ...theme.textStyles.h2, fontSize: 20, color: theme.colors.textPrimary }));
+const levelHintStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, color: theme.colors.textMuted, marginBottom: theme.spacing.sm }));
+const rowStyle: ViewStyle = themed(() => ({
   flexDirection: 'row',
   alignItems: 'center',
   gap: theme.spacing.md,
   paddingVertical: theme.spacing.sm,
   borderTopWidth: 1,
   borderTopColor: theme.colors.border,
-};
-const channelStyle: TextStyle = { ...theme.textStyles.caption, fontSize: 15, fontWeight: '600', color: theme.colors.textPrimary };
-const noteStyle: TextStyle = { ...theme.textStyles.label, color: theme.colors.textMuted };
+}));
+const channelStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, fontSize: 15, fontWeight: '600', color: theme.colors.textPrimary }));
+const noteStyle: TextStyle = themed(() => ({ ...theme.textStyles.label, color: theme.colors.textMuted }));

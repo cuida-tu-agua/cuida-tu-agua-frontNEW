@@ -29,6 +29,7 @@ import { PlaceCard } from '../../components/places/PlaceCard';
 import { useLayout } from '../../layout/breakpoints';
 import { MainStackParamList } from '../../navigation/types';
 import { theme } from '../../styles/theme';
+import { themed } from '../../styles/themeRuntime';
 
 type Props = NativeStackScreenProps<MainStackParamList, 'Places'>;
 
@@ -204,9 +205,9 @@ export const PlacesScreen: React.FC<Props> = ({ navigation, route }) => {
   );
 };
 
-const screenStyle: ViewStyle = { flex: 1, backgroundColor: theme.colors.background };
+const screenStyle: ViewStyle = themed(() => ({ flex: 1, backgroundColor: theme.colors.background }));
 
-const headerStyle: ViewStyle = {
+const headerStyle: ViewStyle = themed(() => ({
   flexDirection: 'row',
   alignItems: 'center',
   gap: theme.spacing.md,
@@ -215,15 +216,15 @@ const headerStyle: ViewStyle = {
   backgroundColor: theme.colors.surface,
   borderBottomWidth: 1,
   borderBottomColor: theme.colors.border,
-};
+}));
 
 const headerTextStyle: ViewStyle = { flex: 1 };
 
 const gridRowStyle: ViewStyle = { gap: theme.spacing.lg };
 
-const helloStyle: TextStyle = { ...theme.textStyles.h2, color: theme.colors.textPrimary };
+const helloStyle: TextStyle = themed(() => ({ ...theme.textStyles.h2, color: theme.colors.textPrimary }));
 
-const subtitleStyle: TextStyle = { ...theme.textStyles.caption, color: theme.colors.textSecondary, marginTop: 2 };
+const subtitleStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, color: theme.colors.textSecondary, marginTop: 2 }));
 
 const contentStyle: ViewStyle = { paddingHorizontal: theme.spacing.lg, paddingTop: theme.spacing.lg };
 
@@ -235,33 +236,33 @@ const centerStyle: ViewStyle = {
   gap: theme.spacing.md,
 };
 
-const mutedStyle: TextStyle = { ...theme.textStyles.caption, color: theme.colors.textMuted };
+const mutedStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, color: theme.colors.textMuted }));
 
-const sectionTitleStyle: TextStyle = {
+const sectionTitleStyle: TextStyle = themed(() => ({
   ...theme.textStyles.label,
   color: theme.colors.textMuted,
   textTransform: 'uppercase',
   marginBottom: theme.spacing.md,
-};
+}));
 
-const emptyIconStyle: ViewStyle = {
+const emptyIconStyle: ViewStyle = themed(() => ({
   width: 96,
   height: 96,
   borderRadius: 48,
   backgroundColor: theme.colors.infoBg,
   alignItems: 'center',
   justifyContent: 'center',
-};
+}));
 
-const emptyTitleStyle: TextStyle = { ...theme.textStyles.h2, color: theme.colors.textPrimary, textAlign: 'center' };
+const emptyTitleStyle: TextStyle = themed(() => ({ ...theme.textStyles.h2, color: theme.colors.textPrimary, textAlign: 'center' }));
 
-const emptyTextStyle: TextStyle = {
+const emptyTextStyle: TextStyle = themed(() => ({
   ...theme.textStyles.caption,
   fontSize: 16,
   lineHeight: 24,
   color: theme.colors.textSecondary,
   textAlign: 'center',
   marginBottom: theme.spacing.md,
-};
+}));
 
 const fullWidthStyle: ViewStyle = { alignSelf: 'stretch' };

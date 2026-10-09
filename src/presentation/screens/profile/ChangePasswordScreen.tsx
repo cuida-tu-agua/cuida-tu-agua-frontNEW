@@ -11,6 +11,7 @@ import { useForm } from '../../hooks/useForm';
 import { MainStackParamList } from '../../navigation/types';
 import { theme } from '../../styles/theme';
 import { validatePassword, validatePasswordConfirmation, validateRequired } from '../../utils/validation';
+import { themed } from '../../styles/themeRuntime';
 
 type Props = NativeStackScreenProps<MainStackParamList, 'ChangePassword'>;
 
@@ -90,5 +91,5 @@ export const ChangePasswordScreen: React.FC<Props> = ({ navigation }) => {
   );
 };
 
-const screenStyle: ViewStyle = { flex: 1, backgroundColor: theme.colors.background };
+const screenStyle: ViewStyle = themed(() => ({ flex: 1, backgroundColor: theme.colors.background }));
 const contentStyle: ViewStyle = { padding: theme.spacing.lg, paddingBottom: theme.spacing.huge };

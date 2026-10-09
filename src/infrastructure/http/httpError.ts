@@ -9,6 +9,11 @@ const DOMAIN_MESSAGES: Record<string, string> = {
   'city.not_found': 'La ciudad seleccionada no existe. Vuelve a elegirla.',
   'place.has_active_device': 'Este lugar tiene un medidor vinculado. Desvincúlalo antes de eliminar el lugar.',
   'service.unavailable': 'Un servicio necesario no está respondiendo. Inténtalo en unos minutos.',
+  // ms-places: tariffs and tips
+  'tariff.invalid': 'Revisa el valor de la tarifa.',
+  'tariff.catalog_unavailable': 'Tu ciudad no tiene tarifas precargadas para ese estrato. Escribe la de tu recibo.',
+  'tip.invalid': 'Revisa el título y el texto del consejo.',
+  'tip.not_found': 'Ese consejo ya no está disponible.',
   // ms-devices
   'device.invalid': 'Revisa el serial y el código de emparejamiento.',
   'device.pairing_failed': 'El serial o el código de emparejamiento no son correctos.',

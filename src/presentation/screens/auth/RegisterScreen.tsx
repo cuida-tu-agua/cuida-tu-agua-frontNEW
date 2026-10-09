@@ -20,6 +20,7 @@ import {
   validatePasswordConfirmation,
   validatePhone,
 } from '../../utils/validation';
+import { themed } from '../../styles/themeRuntime';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'Register'>;
 
@@ -204,6 +205,6 @@ const rowStyle: ViewStyle = { flexDirection: 'row', gap: theme.spacing.md };
 
 const halfStyle: ViewStyle = { flex: 1 };
 
-const termsTextStyle: TextStyle = { ...theme.textStyles.caption, color: theme.colors.textSecondary };
+const termsTextStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, color: theme.colors.textSecondary }));
 
-const termsLinkStyle: TextStyle = { color: theme.colors.primary, textDecorationLine: 'underline' };
+const termsLinkStyle: TextStyle = themed(() => ({ color: theme.colors.primary, textDecorationLine: 'underline' }));

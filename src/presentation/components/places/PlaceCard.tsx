@@ -3,6 +3,7 @@ import { ActivityIndicator, Pressable, Text, TextStyle, TouchableOpacity, View, 
 import { Ionicons } from '@expo/vector-icons';
 import { Place } from '../../../domain/places/Place';
 import { theme } from '../../styles/theme';
+import { themed } from '../../styles/themeRuntime';
 
 interface PlaceCardProps {
   place: Place;
@@ -82,7 +83,7 @@ export const PlaceCard: React.FC<PlaceCardProps> = ({ place, onSelect, onEdit, o
   );
 };
 
-const cardStyle: ViewStyle = {
+const cardStyle: ViewStyle = themed(() => ({
   flexDirection: 'row',
   alignItems: 'center',
   gap: theme.spacing.sm,
@@ -93,9 +94,9 @@ const cardStyle: ViewStyle = {
   borderColor: theme.colors.border,
   backgroundColor: theme.colors.surface,
   ...theme.shadows.subtle,
-};
+}));
 
-const selectedCardStyle: ViewStyle = { borderColor: theme.colors.primary, borderWidth: 2, paddingRight: theme.spacing.lg - 1 };
+const selectedCardStyle: ViewStyle = themed(() => ({ borderColor: theme.colors.primary, borderWidth: 2, paddingRight: theme.spacing.lg - 1 }));
 
 const selectAreaStyle: ViewStyle = {
   flex: 1,
@@ -105,30 +106,30 @@ const selectAreaStyle: ViewStyle = {
   padding: theme.spacing.lg,
 };
 
-const iconCircleStyle: ViewStyle = {
+const iconCircleStyle: ViewStyle = themed(() => ({
   width: 44,
   height: 44,
   borderRadius: 22,
   backgroundColor: theme.colors.infoBg,
   alignItems: 'center',
   justifyContent: 'center',
-};
+}));
 
 const bodyStyle: ViewStyle = { flex: 1, gap: 2 };
 
-const nameStyle: TextStyle = { ...theme.textStyles.button, fontSize: 17, lineHeight: 22, color: theme.colors.textPrimary };
+const nameStyle: TextStyle = themed(() => ({ ...theme.textStyles.button, fontSize: 17, lineHeight: 22, color: theme.colors.textPrimary }));
 
-const metaStyle: TextStyle = { ...theme.textStyles.caption, color: theme.colors.textMuted };
+const metaStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, color: theme.colors.textMuted }));
 
 const badgeStyle: ViewStyle = { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4 };
 
-const badgeTextStyle: TextStyle = { ...theme.textStyles.label, color: theme.colors.success };
+const badgeTextStyle: TextStyle = themed(() => ({ ...theme.textStyles.label, color: theme.colors.success }));
 
-const editButtonStyle: ViewStyle = {
+const editButtonStyle: ViewStyle = themed(() => ({
   width: 40,
   height: 40,
   borderRadius: 20,
   alignItems: 'center',
   justifyContent: 'center',
   backgroundColor: theme.colors.grayLight,
-};
+}));

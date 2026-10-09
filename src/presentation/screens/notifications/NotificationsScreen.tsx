@@ -11,6 +11,7 @@ import { NotificationItem } from '../../components/notifications/NotificationIte
 import { useNotifications } from '../../hooks/useNotifications';
 import { MainStackParamList } from '../../navigation/types';
 import { theme } from '../../styles/theme';
+import { themed } from '../../styles/themeRuntime';
 
 type Props = NativeStackScreenProps<MainStackParamList, 'Notifications'>;
 
@@ -108,16 +109,16 @@ export const NotificationsScreen: React.FC<Props> = ({ navigation }) => {
   );
 };
 
-const screenStyle: ViewStyle = { flex: 1, backgroundColor: theme.colors.background };
+const screenStyle: ViewStyle = themed(() => ({ flex: 1, backgroundColor: theme.colors.background }));
 const contentStyle: ViewStyle = { padding: theme.spacing.lg, flexGrow: 1 };
-const centerStyle: ViewStyle = {
+const centerStyle: ViewStyle = themed(() => ({
   flex: 1,
   alignItems: 'center',
   justifyContent: 'center',
   gap: theme.spacing.md,
   backgroundColor: theme.colors.background,
-};
-const mutedStyle: TextStyle = { ...theme.textStyles.caption, color: theme.colors.textMuted };
+}));
+const mutedStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, color: theme.colors.textMuted }));
 const toolbarStyle: ViewStyle = {
   flexDirection: 'row',
   flexWrap: 'wrap',
@@ -126,22 +127,22 @@ const toolbarStyle: ViewStyle = {
   gap: theme.spacing.sm,
   marginBottom: theme.spacing.md,
 };
-const countStyle: TextStyle = { ...theme.textStyles.h2, fontSize: 20, color: theme.colors.textPrimary };
+const countStyle: TextStyle = themed(() => ({ ...theme.textStyles.h2, fontSize: 20, color: theme.colors.textPrimary }));
 const actionsStyle: ViewStyle = { flexDirection: 'row', flexWrap: 'wrap', gap: theme.spacing.sm, maxWidth: '100%' };
 const emptyStyle: ViewStyle = { alignItems: 'center', gap: theme.spacing.md, paddingVertical: theme.spacing.huge };
-const emptyIconStyle: ViewStyle = {
+const emptyIconStyle: ViewStyle = themed(() => ({
   width: 88,
   height: 88,
   borderRadius: 44,
   backgroundColor: theme.colors.infoBg,
   alignItems: 'center',
   justifyContent: 'center',
-};
-const emptyTitleStyle: TextStyle = { ...theme.textStyles.h2, fontSize: 20, color: theme.colors.textPrimary, textAlign: 'center' };
-const emptyTextStyle: TextStyle = {
+}));
+const emptyTitleStyle: TextStyle = themed(() => ({ ...theme.textStyles.h2, fontSize: 20, color: theme.colors.textPrimary, textAlign: 'center' }));
+const emptyTextStyle: TextStyle = themed(() => ({
   ...theme.textStyles.caption,
   fontSize: 15,
   color: theme.colors.textSecondary,
   textAlign: 'center',
   maxWidth: 420,
-};
+}));

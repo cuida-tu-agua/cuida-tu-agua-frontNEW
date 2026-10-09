@@ -25,6 +25,7 @@ import { SuccessModal } from '../../components/common/SuccessModal';
 import { useForm } from '../../hooks/useForm';
 import { MainStackParamList } from '../../navigation/types';
 import { theme } from '../../styles/theme';
+import { themed } from '../../styles/themeRuntime';
 
 type Props = NativeStackScreenProps<MainStackParamList, 'LinkDevice'>;
 
@@ -148,7 +149,7 @@ export const LinkDeviceScreen: React.FC<Props> = ({ navigation, route }) => {
   );
 };
 
-const screenStyle: ViewStyle = { flex: 1, backgroundColor: theme.colors.background };
+const screenStyle: ViewStyle = themed(() => ({ flex: 1, backgroundColor: theme.colors.background }));
 
 const contentStyle: ViewStyle = {
   paddingHorizontal: theme.spacing.lg,
@@ -156,29 +157,29 @@ const contentStyle: ViewStyle = {
   paddingBottom: theme.spacing.huge,
 };
 
-const titleStyle: TextStyle = { ...theme.textStyles.h2, color: theme.colors.textPrimary, marginBottom: theme.spacing.lg };
+const titleStyle: TextStyle = themed(() => ({ ...theme.textStyles.h2, color: theme.colors.textPrimary, marginBottom: theme.spacing.lg }));
 
-const stepsStyle: ViewStyle = {
+const stepsStyle: ViewStyle = themed(() => ({
   backgroundColor: theme.colors.surfaceAlt,
   borderRadius: theme.borderRadius.medium,
   padding: theme.spacing.lg,
   gap: theme.spacing.md,
   marginBottom: theme.spacing.xl,
-};
+}));
 
-const stepsTitleStyle: TextStyle = { ...theme.textStyles.label, color: theme.colors.textPrimary, textTransform: 'uppercase' };
+const stepsTitleStyle: TextStyle = themed(() => ({ ...theme.textStyles.label, color: theme.colors.textPrimary, textTransform: 'uppercase' }));
 
 const stepRowStyle: ViewStyle = { flexDirection: 'row', alignItems: 'flex-start', gap: theme.spacing.md };
 
-const stepNumberStyle: ViewStyle = {
+const stepNumberStyle: ViewStyle = themed(() => ({
   width: 24,
   height: 24,
   borderRadius: 12,
   backgroundColor: theme.colors.primary,
   alignItems: 'center',
   justifyContent: 'center',
-};
+}));
 
-const stepNumberTextStyle: TextStyle = { ...theme.textStyles.label, color: theme.colors.textOnPrimary };
+const stepNumberTextStyle: TextStyle = themed(() => ({ ...theme.textStyles.label, color: theme.colors.textOnPrimary }));
 
-const stepTextStyle: TextStyle = { ...theme.textStyles.caption, color: theme.colors.textSecondary, flex: 1 };
+const stepTextStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, color: theme.colors.textSecondary, flex: 1 }));

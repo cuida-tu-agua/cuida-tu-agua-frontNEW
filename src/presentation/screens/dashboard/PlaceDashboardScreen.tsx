@@ -12,14 +12,17 @@ import { Button } from '../../components/common/Button';
 import { Card } from '../../components/common/Card';
 import { SuccessModal } from '../../components/common/SuccessModal';
 import { ConsumptionCard } from '../../components/consumption/ConsumptionCard';
+import { CostCard } from '../../components/tariffs/CostCard';
 import { CloseValveDialog } from '../../components/valve/CloseValveDialog';
 import { ValveCard } from '../../components/valve/ValveCard';
 import { useConsumption } from '../../hooks/useConsumption';
+import { usePlaceCost } from '../../hooks/usePlaceCost';
 import { usePlaceDevice } from '../../hooks/usePlaceDevice';
 import { useValve } from '../../hooks/useValve';
 import { useLayout } from '../../layout/breakpoints';
 import { MainStackParamList } from '../../navigation/types';
 import { theme } from '../../styles/theme';
+import { themed } from '../../styles/themeRuntime';
 
 type Props = NativeStackScreenProps<MainStackParamList, 'PlaceDashboard'>;
 
@@ -31,6 +34,7 @@ export const PlaceDashboardScreen: React.FC<Props> = ({ navigation, route }) => 
 
   const device = usePlaceDevice(placeId);
   const consumption = useConsumption(placeId, period);
+  const cost = usePlaceCost(placeId, period);
   const valve = useValve(placeId);
 
   const [closing, setClosing] = useState(false);
@@ -52,6 +56,7 @@ export const PlaceDashboardScreen: React.FC<Props> = ({ navigation, route }) => 
   const refreshAll = () => {
     device.reload();
     consumption.reload();
+    void cost.reload();
     valve.reload();
   };
 
@@ -130,7 +135,7 @@ export const PlaceDashboardScreen: React.FC<Props> = ({ navigation, route }) => 
       )}
 
       <View style={isCompact ? stackedStyle : splitStyle}>
-        <View style={isCompact ? undefined : mainColumnStyle}>
+        <View style={isCompact ? stackedStyle : mainColumnStyle}>
           <ConsumptionCard
             period={period}
             onPeriodChange={setPeriod}
@@ -138,6 +143,13 @@ export const PlaceDashboardScreen: React.FC<Props> = ({ navigation, route }) => 
             loading={consumption.loading}
             error={consumption.error}
             unit={unit}
+          />
+          <CostCard
+            period={period}
+            cost={cost.data}
+            loading={cost.loading}
+            error={cost.error}
+            onConfigure={() => navigation.navigate('PlaceTariff', { placeId, placeName })}
           />
         </View>
         <View style={isCompact ? stackedStyle : sideColumnStyle}>
@@ -189,21 +201,21 @@ export const PlaceDashboardScreen: React.FC<Props> = ({ navigation, route }) => 
   );
 };
 
-const screenStyle: ViewStyle = { flex: 1, backgroundColor: theme.colors.background };
+const screenStyle: ViewStyle = themed(() => ({ flex: 1, backgroundColor: theme.colors.background }));
 const contentStyle: ViewStyle = {
   paddingHorizontal: theme.spacing.lg,
   paddingTop: theme.spacing.lg,
   paddingBottom: theme.spacing.huge,
   gap: theme.spacing.lg,
 };
-const centeredStyle: ViewStyle = { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: theme.colors.background };
+const centeredStyle: ViewStyle = themed(() => ({ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: theme.colors.background }));
 const titleRowStyle: ViewStyle = { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: theme.spacing.md };
-const placeNameStyle: TextStyle = { ...theme.textStyles.h2, color: theme.colors.textPrimary, flexShrink: 1 };
-const mutedStyle: TextStyle = { ...theme.textStyles.caption, color: theme.colors.textMuted, textAlign: 'center' };
+const placeNameStyle: TextStyle = themed(() => ({ ...theme.textStyles.h2, color: theme.colors.textPrimary, flexShrink: 1 }));
+const mutedStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, color: theme.colors.textMuted, textAlign: 'center' }));
 /** Phone: one column. Tablet / desktop: the consumption on the left, the valve (and its notices) on the right. */
 const stackedStyle: ViewStyle = { gap: theme.spacing.lg };
 const splitStyle: ViewStyle = { flexDirection: 'row', alignItems: 'flex-start', gap: theme.spacing.lg };
-const mainColumnStyle: ViewStyle = { flex: 3, minWidth: 0 };
+const mainColumnStyle: ViewStyle = { flex: 3, minWidth: 0, gap: theme.spacing.lg };
 const sideColumnStyle: ViewStyle = { flex: 2, minWidth: 0, gap: theme.spacing.lg };
 const emptyCardStyle: ViewStyle = { alignItems: 'center', gap: theme.spacing.md, paddingVertical: theme.spacing.xl };
-const emptyTitleStyle: TextStyle = { ...theme.textStyles.h2, fontSize: 20, color: theme.colors.textPrimary, textAlign: 'center' };
+const emptyTitleStyle: TextStyle = themed(() => ({ ...theme.textStyles.h2, fontSize: 20, color: theme.colors.textPrimary, textAlign: 'center' }));

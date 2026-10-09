@@ -5,6 +5,7 @@ import { Device, DeviceStatus } from '../../../domain/devices/Device';
 import { DEVICE_STATUS_LABELS, formatLastReport } from '../../../domain/devices/deviceStatus';
 import { theme } from '../../styles/theme';
 import { Card } from '../common/Card';
+import { themed } from '../../styles/themeRuntime';
 
 interface DeviceStatusCardProps {
   device: Device;
@@ -13,11 +14,11 @@ interface DeviceStatusCardProps {
 }
 
 /** Colors of each status: green = OK, amber = check it, gray = still waiting. */
-const STATUS_STYLE: Record<DeviceStatus, { fg: string; bg: string; icon: keyof typeof Ionicons.glyphMap }> = {
+const STATUS_STYLE: Record<DeviceStatus, { fg: string; bg: string; icon: keyof typeof Ionicons.glyphMap }> = themed(() => ({
   CONNECTED: { fg: theme.colors.success, bg: theme.colors.successBg, icon: 'wifi' },
   DISCONNECTED: { fg: theme.colors.warning, bg: theme.colors.warningBg, icon: 'cloud-offline-outline' },
   NEVER_REPORTED: { fg: theme.colors.textMuted, bg: theme.colors.grayLight, icon: 'hourglass-outline' },
-};
+}));
 
 const formatDate = (iso: string) =>
   new Date(iso).toLocaleString('es-CO', { dateStyle: 'medium', timeStyle: 'short' });
@@ -79,11 +80,11 @@ const iconCircleStyle: ViewStyle = {
   justifyContent: 'center',
 };
 
-const serialStyle: TextStyle = {
+const serialStyle: TextStyle = themed(() => ({
   ...theme.textStyles.label, // serials are data: IBM Plex Mono
   fontSize: 14,
   color: theme.colors.textPrimary,
-};
+}));
 
 const badgeStyle: ViewStyle = {
   flexDirection: 'row',
@@ -96,17 +97,17 @@ const badgeStyle: ViewStyle = {
 
 const badgeTextStyle: TextStyle = { ...theme.textStyles.caption, fontWeight: '800' };
 
-const rowStyle: ViewStyle = {
+const rowStyle: ViewStyle = themed(() => ({
   flexDirection: 'row',
   justifyContent: 'space-between',
   gap: theme.spacing.md,
   paddingVertical: theme.spacing.sm,
   borderTopWidth: 1,
   borderTopColor: theme.colors.border,
-};
+}));
 
-const captionStyle: TextStyle = { ...theme.textStyles.caption, color: theme.colors.textMuted };
+const captionStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, color: theme.colors.textMuted }));
 
-const valueStyle: TextStyle = { ...theme.textStyles.caption, color: theme.colors.textPrimary, flexShrink: 1, textAlign: 'right' };
+const valueStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, color: theme.colors.textPrimary, flexShrink: 1, textAlign: 'right' }));
 
-const monoValueStyle: TextStyle = { ...theme.textStyles.label, color: theme.colors.textPrimary };
+const monoValueStyle: TextStyle = themed(() => ({ ...theme.textStyles.label, color: theme.colors.textPrimary }));

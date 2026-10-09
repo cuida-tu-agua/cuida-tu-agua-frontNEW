@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../../core/auth/AuthContext';
 import { isAdmin } from '../../../domain/admin/Admin';
 import { theme } from '../../styles/theme';
+import { themed } from '../../styles/themeRuntime';
 
 /**
  * The administration screens are only for the ADMIN role. The menu already hides them from everybody else, and the
@@ -23,13 +24,13 @@ export const RequireAdmin: React.FC<{ children: React.ReactNode }> = ({ children
   );
 };
 
-const centerStyle: ViewStyle = {
+const centerStyle: ViewStyle = themed(() => ({
   flex: 1,
   alignItems: 'center',
   justifyContent: 'center',
   gap: theme.spacing.md,
   padding: theme.spacing.xl,
   backgroundColor: theme.colors.background,
-};
-const titleStyle: TextStyle = { ...theme.textStyles.h2, fontSize: 20, color: theme.colors.textPrimary, textAlign: 'center' };
-const textStyle: TextStyle = { ...theme.textStyles.caption, color: theme.colors.textSecondary, textAlign: 'center' };
+}));
+const titleStyle: TextStyle = themed(() => ({ ...theme.textStyles.h2, fontSize: 20, color: theme.colors.textPrimary, textAlign: 'center' }));
+const textStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, color: theme.colors.textSecondary, textAlign: 'center' }));

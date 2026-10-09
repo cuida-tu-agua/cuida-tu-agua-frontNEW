@@ -13,6 +13,7 @@ import { formatCountdown, useCountdown } from '../../hooks/useCountdown';
 import { AuthStackParamList, LoginNotice } from '../../navigation/types';
 import { theme } from '../../styles/theme';
 import { normalizeEmail, validateEmail, validateRequired } from '../../utils/validation';
+import { themed } from '../../styles/themeRuntime';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'Login'>;
 
@@ -183,11 +184,11 @@ export const LoginScreen: React.FC<Props> = ({ navigation, route }) => {
   );
 };
 
-const forgotStyle: TextStyle = {
+const forgotStyle: TextStyle = themed(() => ({
   ...theme.textStyles.caption,
   color: theme.colors.primary,
   fontWeight: '600',
   textAlign: 'right',
   marginTop: -theme.spacing.sm,
   marginBottom: theme.spacing.xl,
-};
+}));

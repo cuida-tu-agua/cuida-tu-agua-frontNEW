@@ -1,6 +1,7 @@
 import React from 'react';
 import { Text, TextStyle, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { theme } from '../../styles/theme';
+import { themed } from '../../styles/themeRuntime';
 
 export interface SegmentOption<T extends string> {
   value: T;
@@ -20,18 +21,18 @@ const containerStyle: ViewStyle = {
   marginBottom: theme.spacing.lg,
 };
 
-const labelStyle: TextStyle = {
+const labelStyle: TextStyle = themed(() => ({
   ...theme.textStyles.label,
   color: theme.colors.textPrimary,
   marginBottom: theme.spacing.sm,
-};
+}));
 
 const rowStyle: ViewStyle = {
   flexDirection: 'row',
   gap: theme.spacing.sm,
 };
 
-const segmentBase: ViewStyle = {
+const segmentBase: ViewStyle = themed(() => ({
   flex: 1,
   minHeight: 48, // accessibility: touch target >= 48px
   paddingHorizontal: theme.spacing.sm,
@@ -41,30 +42,30 @@ const segmentBase: ViewStyle = {
   backgroundColor: theme.colors.surface,
   alignItems: 'center',
   justifyContent: 'center',
-};
+}));
 
-const segmentSelected: ViewStyle = {
+const segmentSelected: ViewStyle = themed(() => ({
   borderColor: theme.colors.primary,
   borderWidth: 2,
   backgroundColor: theme.colors.infoBg,
-};
+}));
 
-const segmentTextBase: TextStyle = {
+const segmentTextBase: TextStyle = themed(() => ({
   ...theme.textStyles.caption,
   color: theme.colors.textSecondary,
   textAlign: 'center',
-};
+}));
 
-const segmentTextSelected: TextStyle = {
+const segmentTextSelected: TextStyle = themed(() => ({
   color: theme.colors.textPrimary,
   fontWeight: '600',
-};
+}));
 
-const errorTextStyle: TextStyle = {
+const errorTextStyle: TextStyle = themed(() => ({
   ...theme.textStyles.caption,
   color: theme.colors.error,
   marginTop: theme.spacing.sm,
-};
+}));
 
 /** Horizontal group of mutually exclusive options (e.g. Residencial / Comercial). */
 export function SegmentedControl<T extends string>({

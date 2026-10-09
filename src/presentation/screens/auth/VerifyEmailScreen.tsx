@@ -11,6 +11,7 @@ import { formatCountdown, useCountdown } from '../../hooks/useCountdown';
 import { AuthStackParamList } from '../../navigation/types';
 import { theme } from '../../styles/theme';
 import { validateCode } from '../../utils/validation';
+import { themed } from '../../styles/themeRuntime';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'VerifyEmail'>;
 
@@ -125,11 +126,11 @@ export const VerifyEmailScreen: React.FC<Props> = ({ navigation, route }) => {
   );
 };
 
-const hintStyle: TextStyle = {
+const hintStyle: TextStyle = themed(() => ({
   ...theme.textStyles.caption,
   color: theme.colors.textMuted,
   textAlign: 'center',
   marginBottom: theme.spacing.xl,
-};
+}));
 
 const secondaryButtonStyle = { marginTop: theme.spacing.sm };

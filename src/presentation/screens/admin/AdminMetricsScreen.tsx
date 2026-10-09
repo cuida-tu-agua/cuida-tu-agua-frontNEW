@@ -10,6 +10,7 @@ import { RequireAdmin } from '../../components/admin/RequireAdmin';
 import { useAdminMetrics } from '../../hooks/useAdminMetrics';
 import { MainStackParamList } from '../../navigation/types';
 import { theme } from '../../styles/theme';
+import { themed } from '../../styles/themeRuntime';
 
 type Props = NativeStackScreenProps<MainStackParamList, 'AdminMetrics'>;
 
@@ -178,41 +179,41 @@ const StatCard: React.FC<{
   );
 };
 
-const screenStyle: ViewStyle = { flex: 1, backgroundColor: theme.colors.background };
+const screenStyle: ViewStyle = themed(() => ({ flex: 1, backgroundColor: theme.colors.background }));
 const contentStyle: ViewStyle = { padding: theme.spacing.lg, paddingBottom: theme.spacing.huge, gap: theme.spacing.lg };
-const centerStyle: ViewStyle = {
+const centerStyle: ViewStyle = themed(() => ({
   flex: 1,
   alignItems: 'center',
   justifyContent: 'center',
   padding: theme.spacing.xl,
   gap: theme.spacing.md,
   backgroundColor: theme.colors.background,
-};
+}));
 const titleRowStyle: ViewStyle = { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.md };
-const titleStyle: TextStyle = { ...theme.textStyles.h2, color: theme.colors.textPrimary };
-const mutedStyle: TextStyle = { ...theme.textStyles.caption, color: theme.colors.textMuted };
+const titleStyle: TextStyle = themed(() => ({ ...theme.textStyles.h2, color: theme.colors.textPrimary }));
+const mutedStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, color: theme.colors.textMuted }));
 const gridStyle: ViewStyle = { flexDirection: 'row', flexWrap: 'wrap', gap: theme.spacing.lg };
 const cardStyle: ViewStyle = { flexGrow: 1, flexBasis: 260, gap: theme.spacing.sm };
 const cardHeaderStyle: ViewStyle = { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.md };
-const iconStyle: ViewStyle = {
+const iconStyle: ViewStyle = themed(() => ({
   width: 40,
   height: 40,
   borderRadius: 20,
   backgroundColor: theme.colors.infoBg,
   alignItems: 'center',
   justifyContent: 'center',
-};
-const cardTitleStyle: TextStyle = { ...theme.textStyles.h2, fontSize: 18, color: theme.colors.textPrimary };
-const bigNumberStyle: TextStyle = { fontSize: 44, fontWeight: '800', color: theme.colors.textPrimary, lineHeight: 52 };
-const barStyle: ViewStyle = { height: 8, borderRadius: 4, backgroundColor: theme.colors.grayLight, overflow: 'hidden' };
-const barFillStyle: ViewStyle = { height: 8, borderRadius: 4, backgroundColor: theme.colors.success };
-const lineStyle: ViewStyle = {
+}));
+const cardTitleStyle: TextStyle = themed(() => ({ ...theme.textStyles.h2, fontSize: 18, color: theme.colors.textPrimary }));
+const bigNumberStyle: TextStyle = themed(() => ({ fontSize: 44, fontWeight: '800', color: theme.colors.textPrimary, lineHeight: 52 }));
+const barStyle: ViewStyle = themed(() => ({ height: 8, borderRadius: 4, backgroundColor: theme.colors.grayLight, overflow: 'hidden' }));
+const barFillStyle: ViewStyle = themed(() => ({ height: 8, borderRadius: 4, backgroundColor: theme.colors.success }));
+const lineStyle: ViewStyle = themed(() => ({
   flexDirection: 'row',
   justifyContent: 'space-between',
   paddingVertical: theme.spacing.xs,
   borderTopWidth: 1,
   borderTopColor: theme.colors.border,
-};
-const lineLabelStyle: TextStyle = { ...theme.textStyles.caption, color: theme.colors.textSecondary, flex: 1 };
-const lineValueStyle: TextStyle = { ...theme.textStyles.caption, fontWeight: '800', color: theme.colors.textPrimary };
+}));
+const lineLabelStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, color: theme.colors.textSecondary, flex: 1 }));
+const lineValueStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, fontWeight: '800', color: theme.colors.textPrimary }));
 const unavailableStyle: ViewStyle = { alignItems: 'center', gap: theme.spacing.sm, paddingVertical: theme.spacing.xl };

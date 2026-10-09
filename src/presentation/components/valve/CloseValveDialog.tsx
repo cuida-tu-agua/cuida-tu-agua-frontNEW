@@ -8,6 +8,7 @@ import { Banner } from '../common/Banner';
 import { Button } from '../common/Button';
 import { CodeInput } from '../common/CodeInput';
 import { ConfirmDialog } from '../common/ConfirmDialog';
+import { themed } from '../../styles/themeRuntime';
 
 interface CloseValveDialogProps {
   visible: boolean;
@@ -133,9 +134,9 @@ export const CloseValveDialog: React.FC<CloseValveDialogProps> = ({
   );
 };
 
-const hintStyle: TextStyle = {
+const hintStyle: TextStyle = themed(() => ({
   ...theme.textStyles.caption,
   color: theme.colors.textMuted,
   textAlign: 'center',
   marginBottom: theme.spacing.md,
-};
+}));
