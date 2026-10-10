@@ -5,7 +5,7 @@ import { MainStackParamList } from './types';
 
 type IconName = ComponentProps<typeof Ionicons>['name'];
 
-export type NavSection = 'places' | 'tips' | 'notifications' | 'adminMetrics' | 'adminUsers' | 'adminTips' | 'profile';
+export type NavSection = 'places' | 'tips' | 'notifications' | 'adminMetrics' | 'adminUsers' | 'adminDevices' | 'adminTips' | 'profile';
 
 export interface NavItem {
   section: NavSection;
@@ -26,6 +26,7 @@ const BASE_ITEMS: NavItem[] = [
 const ADMIN_ITEMS: NavItem[] = [
   { section: 'adminMetrics', label: 'Resumen', icon: 'stats-chart-outline', route: 'AdminMetrics' },
   { section: 'adminUsers', label: 'Usuarios', icon: 'people-outline', route: 'AdminUsers' },
+  { section: 'adminDevices', label: 'Medidores', icon: 'hardware-chip-outline', route: 'AdminDevices' },
   { section: 'adminTips', label: 'Recomendaciones', icon: 'bulb-outline', route: 'AdminTips' },
 ];
 
@@ -61,6 +62,9 @@ const SECTION_OF_ROUTE: Partial<Record<keyof MainStackParamList, NavSection>> = 
   ValveHistory: 'places',
   AdminMetrics: 'adminMetrics',
   AdminUsers: 'adminUsers',
+  AdminDevices: 'adminDevices',
+  AdminDeviceDetail: 'adminDevices',
+  AdminDeviceCreate: 'adminDevices',
   Notifications: 'notifications',
   NotificationPreferences: 'notifications',
   Profile: 'profile',

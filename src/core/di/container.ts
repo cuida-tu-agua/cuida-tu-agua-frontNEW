@@ -1,3 +1,4 @@
+import { AdminDeviceRepository } from '../../domain/admin/AdminDeviceRepository';
 import { AdminRepository } from '../../domain/admin/AdminRepository';
 import { AuthService, ProfileService } from '../../domain/services/AuthServices';
 import { ConsumptionRepository } from '../../domain/consumption/ConsumptionRepository';
@@ -9,6 +10,7 @@ import { PushRepository } from '../../domain/push/Push';
 import { TariffRepository } from '../../domain/tariffs/TariffRepository';
 import { AdminTipRepository, TipRepository } from '../../domain/tips/TipRepository';
 import { ValveRepository } from '../../domain/valve/ValveRepository';
+import { HttpAdminDeviceRepository } from '../../infrastructure/repositories/HttpAdminDeviceRepository';
 import { HttpAdminRepository } from '../../infrastructure/repositories/HttpAdminRepository';
 import { HttpAuthService } from '../../infrastructure/repositories/HttpAuthService';
 import { HttpConsumptionRepository } from '../../infrastructure/repositories/HttpConsumptionRepository';
@@ -44,6 +46,7 @@ export const notificationRepository: NotificationRepository = new HttpNotificati
 export const pushRepository: PushRepository = new HttpPushRepository(notificationsApiClient);
 export const pushService = new PushService(pushDevice, pushRepository, secureStorage);
 export const adminRepository: AdminRepository = new HttpAdminRepository(apiClient);
+export const adminDeviceRepository: AdminDeviceRepository = new HttpAdminDeviceRepository(devicesApiClient);
 export const tariffRepository: TariffRepository = new HttpTariffRepository(placesApiClient);
 const tips = new HttpTipRepository(placesApiClient);
 export const tipRepository: TipRepository = tips;

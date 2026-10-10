@@ -28,6 +28,9 @@ export type MainStackParamList = {
   AdminTips: undefined;
   AdminMetrics: undefined;
   AdminUsers: undefined;
+  AdminDevices: undefined;
+  AdminDeviceDetail: { deviceId: string; serialNumber?: string };
+  AdminDeviceCreate: undefined;
   Notifications: undefined;
   NotificationPreferences: undefined;
   Profile: undefined;

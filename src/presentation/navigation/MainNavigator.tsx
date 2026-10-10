@@ -10,6 +10,9 @@ import { EditPlaceScreen } from '../screens/places/EditPlaceScreen';
 import { NotificationPreferencesScreen } from '../screens/notifications/NotificationPreferencesScreen';
 import { NotificationsScreen } from '../screens/notifications/NotificationsScreen';
 import { PlacesScreen } from '../screens/places/PlacesScreen';
+import { AdminDeviceCreateScreen } from '../screens/admin/AdminDeviceCreateScreen';
+import { AdminDeviceDetailScreen } from '../screens/admin/AdminDeviceDetailScreen';
+import { AdminDevicesScreen } from '../screens/admin/AdminDevicesScreen';
 import { AdminMetricsScreen } from '../screens/admin/AdminMetricsScreen';
 import { AdminTipsScreen } from '../screens/admin/AdminTipsScreen';
 import { AdminUsersScreen } from '../screens/admin/AdminUsersScreen';
@@ -51,6 +54,9 @@ export const MainNavigator: React.FC = () => (
     <Stack.Screen name="AdminTips" component={AdminTipsScreen} options={{ title: 'Recomendaciones' }} />
     <Stack.Screen name="AdminMetrics" component={AdminMetricsScreen} options={{ title: 'Resumen' }} />
     <Stack.Screen name="AdminUsers" component={AdminUsersScreen} options={{ title: 'Usuarios' }} />
+    <Stack.Screen name="AdminDevices" component={AdminDevicesScreen} options={{ title: 'Medidores' }} />
+    <Stack.Screen name="AdminDeviceDetail" component={AdminDeviceDetailScreen} options={({ route }) => ({ title: route.params.serialNumber ?? 'Medidor' })} />
+    <Stack.Screen name="AdminDeviceCreate" component={AdminDeviceCreateScreen} options={{ title: 'Alta de fábrica' }} />
     <Stack.Screen name="Notifications" component={NotificationsScreen} options={{ title: 'Notificaciones' }} />
     <Stack.Screen
       name="NotificationPreferences"

@@ -126,6 +126,14 @@ export const ADMIN_ENDPOINTS = {
   METRICS: '/api/admin/metrics',
 };
 
+/** ms-device, administrator only: the meters of the whole platform. */
+export const ADMIN_DEVICE_ENDPOINTS = {
+  LIST: '/api/admin/devices',
+  ONE: (id: string) => `/api/admin/devices/${id}`,
+  CREDENTIALS: (id: string) => `/api/admin/devices/${id}/credentials`,
+  DECOMMISSION: (id: string) => `/api/admin/devices/${id}/decommission`,
+};
+
 /** ms-notification (HU-025, HU-034): the inbox of the user and the channels they chose for each urgency level. */
 export const NOTIFICATION_ENDPOINTS = {
   LIST: '/api/notifications',

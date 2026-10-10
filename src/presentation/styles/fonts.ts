@@ -69,9 +69,11 @@ const patch = (component: unknown) => {
     if (!React.isValidElement(element)) return element;
     const props = element.props as { style?: unknown };
     const flat = (StyleSheet.flatten(props.style as never) ?? {}) as { fontFamily?: string; fontWeight?: string | number };
-    return React.cloneElement(element as React.ReactElement<{ style?: unknown }>, {
-      style: [props.style, resolveFont(flat.fontFamily, flat.fontWeight)],
-    });
+    const font = resolveFont(flat.fontFamily, flat.fontWeight);
+    // A Text inside another Text is a bare DOM element on the web (a string type): the browser takes only a plain style
+    // object there, an array makes the page crash ("Failed to set an indexed property [0] on CSSStyleDeclaration")
+    const style = typeof element.type === 'string' ? { ...(StyleSheet.flatten(props.style as never) as object), ...font } : [props.style, font];
+    return React.cloneElement(element as React.ReactElement<{ style?: unknown }>, { style });
   };
 };
 
