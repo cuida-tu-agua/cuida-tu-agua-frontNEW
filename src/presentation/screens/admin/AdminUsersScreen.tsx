@@ -10,7 +10,9 @@ import {
   STATUS_LABELS,
   UserStatus,
   fullName,
+  isAdmin,
   rangeLabel,
+  roleLabel,
   userAction,
 } from '../../../domain/admin/Admin';
 import { RequireAdmin } from '../../components/admin/RequireAdmin';
@@ -125,6 +127,7 @@ const Users: React.FC = () => {
             <View style={[tableRowStyle, tableHeadStyle]}>
               <Text style={[headCellStyle, nameCol]}>Nombre</Text>
               <Text style={[headCellStyle, phoneCol]}>Teléfono</Text>
+              <Text style={[headCellStyle, roleCol]}>Rol</Text>
               <Text style={[headCellStyle, statusCol]}>Estado</Text>
               <Text style={[headCellStyle, dateCol]}>Registro</Text>
               <View style={actionCol} />
@@ -245,6 +248,11 @@ const UserRow: React.FC<{
         <Text style={cellMailStyle} numberOfLines={1}>{user.email}</Text>
       </View>
       <Text style={[cellStyle, phoneCol]} numberOfLines={1}>{user.phone ?? '—'}</Text>
+      <View style={roleCol}>
+        <View style={[rolePillStyle, isAdmin(user.roles) && rolePillAdminStyle]}>
+          <Text style={[rolePillTextStyle, isAdmin(user.roles) && rolePillAdminTextStyle]}>{roleLabel(user.roles)}</Text>
+        </View>
+      </View>
       <View style={statusCol}>{pill}</View>
       <Text style={[cellStyle, dateCol]}>{date}</Text>
       <View style={actionCol}>{button ?? <Text style={mutedStyle}>Tu cuenta</Text>}</View>
@@ -269,6 +277,11 @@ const tableBodyStyle: ViewStyle = themed(() => ({ minHeight: 60, borderTopWidth:
 const headCellStyle: TextStyle = themed(() => ({ ...theme.textStyles.label, color: theme.colors.textMuted, textTransform: 'uppercase' }));
 const nameCol: ViewStyle = { flex: 3, minWidth: 0 };
 const phoneCol: TextStyle & ViewStyle = { flex: 2 };
+const roleCol: ViewStyle = { flex: 2, alignItems: 'flex-start' };
+const rolePillStyle: ViewStyle = themed(() => ({ paddingHorizontal: theme.spacing.md, paddingVertical: 3, borderRadius: theme.borderRadius.full, backgroundColor: theme.colors.surfaceAlt }));
+const rolePillAdminStyle: ViewStyle = themed(() => ({ backgroundColor: theme.colors.infoBg }));
+const rolePillTextStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, fontSize: 13, fontWeight: '800', color: theme.colors.textSecondary }));
+const rolePillAdminTextStyle: TextStyle = themed(() => ({ color: theme.colors.textPrimary }));
 const cellMailStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, fontSize: 13, color: theme.colors.textMuted }));
 const statusCol: ViewStyle = { flex: 1.5, alignItems: 'flex-start' };
 const dateCol: TextStyle & ViewStyle = { flex: 1.5 };

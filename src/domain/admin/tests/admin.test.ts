@@ -1,4 +1,5 @@
-import { AdminUser, Page, isAdmin, percent, rangeLabel, unavailableLabels, userAction, fullName } from '../Admin';
+import {
+  roleLabel, AdminUser, Page, isAdmin, percent, rangeLabel, unavailableLabels, userAction, fullName } from '../Admin';
 
 const user = (overrides: Partial<AdminUser> = {}): AdminUser => ({
   id: 'u1',
@@ -6,6 +7,7 @@ const user = (overrides: Partial<AdminUser> = {}): AdminUser => ({
   lastName: 'Ruiz',
   email: 'ana@mail.com',
   phone: null,
+  roles: ['USER'],
   status: 'ACTIVE',
   createdAt: '2026-10-01T10:00:00Z',
   blockedAt: null,
@@ -68,5 +70,16 @@ describe('dashboard helpers (HU-062)', () => {
   it('full name drops the empty last name', () => {
     expect(fullName(user())).toBe('Ana Ruiz');
     expect(fullName(user({ lastName: '' }))).toBe('Ana');
+  });
+});
+
+describe('roleLabel (the Rol column)', () => {
+  it('an account with the ADMIN role is an administrator, even if it also has USER', () => {
+    expect(roleLabel(['USER', 'ADMIN'])).toBe('Administrador');
+    expect(roleLabel(['ADMIN'])).toBe('Administrador');
+  });
+
+  it.each([[['USER']], [[]], [undefined], [null]])('%p is a user', (roles) => {
+    expect(roleLabel(roles as string[] | undefined | null)).toBe('Usuario');
   });
 });

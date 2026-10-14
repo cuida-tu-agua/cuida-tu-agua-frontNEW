@@ -7,6 +7,8 @@ export interface AdminUser {
   lastName: string;
   email: string;
   phone: string | null;
+  /** USER and / or ADMIN (the "Rol" column of the panel). */
+  roles: string[];
   status: UserStatus;
   createdAt: string; // ISO 8601, UTC
   blockedAt: string | null;
@@ -63,6 +65,10 @@ export interface PlatformMetrics {
 }
 
 export const ADMIN_ROLE = 'ADMIN';
+
+/** What the Rol column says: an account that has the ADMIN role is an administrator, any other is a user. */
+export const roleLabel = (roles: readonly string[] | undefined | null): 'Administrador' | 'Usuario' =>
+  isAdmin(roles) ? 'Administrador' : 'Usuario';
 
 export const isAdmin = (roles: readonly string[] | undefined | null): boolean => !!roles && roles.includes(ADMIN_ROLE);
 
