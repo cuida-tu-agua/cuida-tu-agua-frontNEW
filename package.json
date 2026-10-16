@@ -72,6 +72,9 @@
   },
   "private": true,
   "jest": {
-    "preset": "jest-expo"
+    "preset": "jest-expo",
+    "moduleNameMapper": {
+      "^sywater-jsx/(.*)$": "<rootDir>/src/presentation/styles/jsx/$1"
+    }
   }
 }

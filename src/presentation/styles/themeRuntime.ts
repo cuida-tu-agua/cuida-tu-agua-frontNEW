@@ -1,3 +1,4 @@
+import { registerLiveValue } from './jsx/liveValues';
 import { ColorTokens, ThemeName, paletteFor } from './palettes';
 
 /**
@@ -10,6 +11,10 @@ import { ColorTokens, ThemeName, paletteFor } from './palettes';
  *
  * Changing the theme calls setThemeName(); the app then remounts its screens (ThemeBoundary), they read their styles
  * again and get the new colors.
+ *
+ * Both are Proxies, and a Proxy must never reach a native view: React Native freezes the props of native views in
+ * development and a Proxy cannot be frozen. Every Proxy made here is registered (registerLiveValue) so the JSX runtime
+ * of the app (./jsx/) hands React Native its current plain value instead.
  */
 
 let current: ThemeName = 'classic-light';
@@ -43,6 +48,7 @@ export const colors: ColorTokens = new Proxy({} as ColorTokens, {
       : undefined,
   set: () => false,
 });
+registerLiveValue(colors, currentPalette);
 
 /**
  * A style (or a table of styles / an array) that depends on the theme. The factory runs the first time the object is
@@ -67,17 +73,23 @@ export function themed<T extends object>(factory: () => T, variant: () => unknow
   // The target decides what Array.isArray() says; the traps forward everything else to the live value
   const target = (Array.isArray(read()) ? [] : {}) as T;
 
-  return new Proxy(target, {
+  const proxy = new Proxy(target, {
     get: (_t, key) => {
       const value = Reflect.get(read(), key);
       return typeof value === 'function' ? value.bind(read()) : value;
     },
     has: (_t, key) => key in read(),
-    ownKeys: () => Reflect.ownKeys(read()).filter((k) => !Array.isArray(target) || k !== 'length'),
-    getOwnPropertyDescriptor: (_t, key) => {
+    ownKeys: () => Reflect.ownKeys(read()),
+    getOwnPropertyDescriptor: (t, key) => {
       const descriptor = Reflect.getOwnPropertyDescriptor(read(), key);
-      return descriptor ? { ...descriptor, configurable: true } : undefined;
+      if (!descriptor) return undefined;
+      // A Proxy may only call a property non-configurable when its target has it that way: only "length" of an array,
+      // which the target has writable (so it is reported writable too, even if the live array was frozen)
+      const own = Reflect.getOwnPropertyDescriptor(t, key);
+      return own && !own.configurable ? { ...descriptor, configurable: false, writable: true } : { ...descriptor, configurable: true };
     },
     set: () => false,
   });
+  registerLiveValue(proxy, read);
+  return proxy;
 }
