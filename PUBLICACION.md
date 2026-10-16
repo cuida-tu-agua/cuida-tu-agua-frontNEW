@@ -5,11 +5,13 @@ Estado: **todo está parametrizado, pero todavía no hay dominio ni despliegue**
 ## 1. Qué hay que decidir primero
 | Decisión | Por qué importa |
 |---|---|
-| **Dominio de la web** (p. ej. `https://app.ejemplo.com`) | Es el *origen* que cada API debe permitir en CORS y el que usan los enlaces de los correos |
-| **Cómo se llega a las APIs** (p. ej. `https://api.ejemplo.com/iam`, `/places`… tras un proxy, o un subdominio por servicio) | Son las 6 variables `EXPO_PUBLIC_*` del front |
+| **Dominio de la web** (p. ej. `https://app.ejemplo.com`) | Es el *origen* que el gateway debe permitir en CORS (`GATEWAY_CORS_ALLOWED_ORIGINS`) y el que usan los enlaces de los correos |
+| **Cómo se llega a las APIs**: por el **API Gateway**, un solo dominio con un prefijo por servicio: `https://api.ejemplo.com/iam`, `/places`, `/devices`, `/consumption`, `/valve`, `/notifications` | Son las 6 variables `EXPO_PUBLIC_*` del front (p. ej. `EXPO_PUBLIC_PLACES_API_URL=https://api.ejemplo.com/places`). Los servicios no se publican directamente: solo el gateway |
 | **HTTPS en todo** | Los tokens viajan en cabeceras; en producción el navegador bloquea contenido mixto (web https → API http) |
 
 ## 2. CORS: qué se configura en cada servicio
+> **Con el API Gateway (producción):** el CORS se configura **solo** en el gateway, con `GATEWAY_CORS_ALLOWED_ORIGINS` (p. ej. `https://app.ejemplo.com`; varios separados por coma). El gateway quita la cabecera `Origin` antes de reenviar, así que los servicios no responden CORS y sus variables de la tabla de abajo pueden quedar **vacías**. La tabla solo aplica si se llama a los servicios directamente, sin gateway (desarrollo).
+
 Por defecto la lista de orígenes permitidos está **vacía en producción** (nadie puede llamar desde un navegador hasta que se configure). Los orígenes `localhost` solo existen en desarrollo.
 
 | Servicio | Variable de entorno (producción) | Ejemplo |
