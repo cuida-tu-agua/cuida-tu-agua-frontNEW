@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ActivityIndicator, ScrollView, Text, TextStyle, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useAuth } from '../../../core/auth/AuthContext';
 import { formatDate } from '../../../i18n/format';
@@ -46,6 +47,7 @@ export const AdminUsersScreen: React.FC<Props> = () => (
 );
 
 const Users: React.FC = () => {
+  const { t } = useTranslation();
   const { user: me } = useAuth();
   const { isCompact } = useLayout();
   const users = useAdminUsers();
@@ -83,12 +85,12 @@ const Users: React.FC = () => {
 
   return (
     <PageContainer gap={theme.spacing.md}>
-      <PageHeader webOnly={false} title="Usuarios" subtitle="Cuentas registradas. Nunca se muestran contraseñas ni datos sensibles." />
+      <PageHeader webOnly={false} title={t('adminUsers.title')} subtitle={t('adminUsers.subtitle')} />
 
       <View style={filtersStyle}>
         <Input
           style={searchStyle}
-          placeholder="Buscar por nombre o correo"
+          placeholder={t('adminUsers.searchPlaceholder')}
           value={users.search}
           onChangeText={users.setSearch}
           maxLength={SEARCH_MAX}
@@ -108,7 +110,7 @@ const Users: React.FC = () => {
         <Banner
           tone="error"
           message={users.error.message}
-          action={{ label: 'Reintentar', onPress: () => void users.reload() }}
+          action={{ label: t('adminCommon.retry'), onPress: () => void users.reload() }}
           onClose={users.dismissError}
         />
       )}
@@ -119,18 +121,18 @@ const Users: React.FC = () => {
         <View style={emptyStyle}>
           <Ionicons name="people-outline" size={44} color={theme.colors.textMuted} />
           <Text style={emptyTextStyle}>
-            {users.search || users.status !== 'ALL' ? 'No hay usuarios con ese filtro.' : 'Todavía no hay usuarios registrados.'}
+            {users.search || users.status !== 'ALL' ? t('adminUsers.emptyFiltered') : t('adminUsers.empty')}
           </Text>
         </View>
       ) : (
         <View style={[listStyle, users.loading && { opacity: 0.6 }]}>
           {!isCompact && (
             <View style={[tableRowStyle, tableHeadStyle]}>
-              <Text style={[headCellStyle, nameCol]}>Nombre</Text>
-              <Text style={[headCellStyle, phoneCol]}>Teléfono</Text>
-              <Text style={[headCellStyle, roleCol]}>Rol</Text>
-              <Text style={[headCellStyle, statusCol]}>Estado</Text>
-              <Text style={[headCellStyle, dateCol]}>Registro</Text>
+              <Text style={[headCellStyle, nameCol]}>{t('adminUsers.columns.name')}</Text>
+              <Text style={[headCellStyle, phoneCol]}>{t('adminUsers.columns.phone')}</Text>
+              <Text style={[headCellStyle, roleCol]}>{t('adminUsers.columns.role')}</Text>
+              <Text style={[headCellStyle, statusCol]}>{t('adminUsers.columns.status')}</Text>
+              <Text style={[headCellStyle, dateCol]}>{t('adminUsers.columns.registered')}</Text>
               <View style={actionCol} />
             </View>
           )}
@@ -152,17 +154,17 @@ const Users: React.FC = () => {
           <Text style={mutedStyle}>{rangeLabel(users.data)}</Text>
           <View style={pagerButtonsStyle}>
             <Button
-              label="Anterior"
+              label={t('adminCommon.previous')}
               size="small"
               variant="secondary"
               disabled={users.page <= 0 || users.loading}
               onPress={() => users.goTo(users.page - 1)}
             />
             <Text style={mutedStyle}>
-              Página {users.data.page + 1} de {Math.max(users.data.totalPages, 1)}
+              {t('adminCommon.pageOf', { page: users.data.page + 1, total: Math.max(users.data.totalPages, 1) })}
             </Text>
             <Button
-              label="Siguiente"
+              label={t('adminCommon.next')}
               size="small"
               variant="secondary"
               disabled={users.page + 1 >= users.data.totalPages || users.loading}
@@ -175,15 +177,15 @@ const Users: React.FC = () => {
       <ConfirmDialog
         visible={!!blocking}
         tone="danger"
-        title={`¿Bloquear a ${blocking ? fullName(blocking) : ''}?`}
-        message="Cerraremos todas sus sesiones al instante y no podrá volver a entrar hasta que lo desbloquees."
-        confirmLabel="Bloquear"
+        title={t('adminUsers.blockTitle', { name: blocking ? fullName(blocking) : '' })}
+        message={t('adminUsers.blockMessage')}
+        confirmLabel={t('adminUsers.block')}
         onConfirm={() => void confirmBlock()}
         onCancel={() => setBlocking(null)}
       >
         <Input
-          label="Motivo (opcional)"
-          placeholder="Ej.: uso indebido"
+          label={t('adminUsers.reasonLabel')}
+          placeholder={t('adminUsers.reasonPlaceholder')}
           value={reason}
           onChangeText={setReason}
           maxLength={200}
@@ -192,9 +194,9 @@ const Users: React.FC = () => {
 
       <ConfirmDialog
         visible={!!unblocking}
-        title={`¿Desbloquear a ${unblocking ? fullName(unblocking) : ''}?`}
-        message="Podrá iniciar sesión de nuevo."
-        confirmLabel="Desbloquear"
+        title={t('adminUsers.unblockTitle', { name: unblocking ? fullName(unblocking) : '' })}
+        message={t('adminUsers.unblockMessage')}
+        confirmLabel={t('adminUsers.unblock')}
         onConfirm={() => void confirmUnblock()}
         onCancel={() => setUnblocking(null)}
       />
@@ -209,11 +211,12 @@ const UserRow: React.FC<{
   busy: boolean;
   onAction: () => void;
 }> = ({ user, compact, action, busy, onAction }) => {
+  const { t } = useTranslation();
   const tone = STATUS_TONES[user.status];
   const date = formatDate(user.createdAt);
   const button = action && (
     <Button
-      label={action === 'block' ? 'Bloquear' : 'Desbloquear'}
+      label={action === 'block' ? t('adminUsers.block') : t('adminUsers.unblock')}
       size="small"
       variant={action === 'block' ? 'danger' : 'secondary'}
       loading={busy}
@@ -256,7 +259,7 @@ const UserRow: React.FC<{
       </View>
       <View style={statusCol}>{pill}</View>
       <Text style={[cellStyle, dateCol]}>{date}</Text>
-      <View style={actionCol}>{button ?? <Text style={mutedStyle}>Tu cuenta</Text>}</View>
+      <View style={actionCol}>{button ?? <Text style={mutedStyle}>{t('adminUsers.yourAccount')}</Text>}</View>
     </View>
   );
 };

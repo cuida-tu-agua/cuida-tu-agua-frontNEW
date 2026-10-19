@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import i18n from '../../i18n';
 import { adminRepository } from '../../core/di/container';
 import { AppError } from '../../domain/common/AppError';
 import { AdminUser, DEFAULT_PAGE_SIZE, Page, StatusFilter, fullName } from '../../domain/admin/Admin';
@@ -79,10 +80,10 @@ export const useAdminUsers = (repository: AdminRepository = adminRepository) => 
   };
 
   const block = (user: AdminUser, reason?: string) =>
-    act(user, () => repository.blockUser(user.id, reason), `Bloqueaste a ${fullName(user)}. Sus sesiones se cerraron.`);
+    act(user, () => repository.blockUser(user.id, reason), i18n.t('adminUsers.blocked', { name: fullName(user) }));
 
   const unblock = (user: AdminUser) =>
-    act(user, () => repository.unblockUser(user.id), `${fullName(user)} puede volver a entrar.`);
+    act(user, () => repository.unblockUser(user.id), i18n.t('adminUsers.unblocked', { name: fullName(user) }));
 
   return {
     search,
