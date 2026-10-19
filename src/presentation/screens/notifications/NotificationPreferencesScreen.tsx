@@ -19,11 +19,13 @@ import { useNotificationPreferences } from '../../hooks/useNotificationPreferenc
 import { MainStackParamList } from '../../navigation/types';
 import { theme } from '../../styles/theme';
 import { themed } from '../../styles/themeRuntime';
+import { useTranslation } from 'react-i18next';
 
 type Props = NativeStackScreenProps<MainStackParamList, 'NotificationPreferences'>;
 
 /** HU-034: for each urgency level the user chooses where the alert reaches them. Every switch saves by itself. */
 export const NotificationPreferencesScreen: React.FC<Props> = ({ navigation }) => {
+  const { t } = useTranslation();
   const prefs = useNotificationPreferences();
 
   if (!prefs.levels) {
@@ -32,7 +34,7 @@ export const NotificationPreferencesScreen: React.FC<Props> = ({ navigation }) =
         {prefs.error ? (
           <>
             <Banner tone="error" message={prefs.error.message} />
-            <Button label="Reintentar" onPress={() => void prefs.reload()} />
+            <Button label={t('common.retry')} onPress={() => void prefs.reload()} />
           </>
         ) : (
           <ActivityIndicator size="large" color={theme.colors.primary} />
@@ -44,13 +46,13 @@ export const NotificationPreferencesScreen: React.FC<Props> = ({ navigation }) =
   return (
     <PageContainer gap={theme.spacing.lg}>
       <PageHeader
-        back={{ label: 'Volver', onPress: () => navigation.goBack() }}
-        title="Preferencias de alertas"
-        subtitle="Elige por dónde quieres recibir cada tipo de alerta. Los cambios se guardan al instante y valen para las próximas alertas."
+        back={{ label: t('common.back'), onPress: () => navigation.goBack() }}
+        title={t('notifications.prefsTitle')}
+        subtitle={t('notifications.prefsIntro')}
       />
       {Platform.OS !== 'web' && (
         <Text style={introStyle}>
-          Elige por dónde quieres recibir cada tipo de alerta. Los cambios se guardan al instante y valen para las próximas alertas.
+          {t('notifications.prefsIntro')}
         </Text>
       )}
       {!!prefs.error && <Banner tone="error" message={prefs.error.message} onClose={prefs.dismissError} />}
@@ -71,32 +73,35 @@ const LevelCard: React.FC<{
   level: LevelPreference;
   saving: string | null;
   onToggle: (channel: NotificationChannel) => void;
-}> = ({ level, saving, onToggle }) => (
-  <Card variant="outlined" style={cardStyle}>
-    <Text style={levelTitleStyle}>{SEVERITY_LABELS[level.severity]}</Text>
-    <Text style={levelHintStyle}>{SEVERITY_HINTS[level.severity]}</Text>
+}> = ({ level, saving, onToggle }) => {
+  const { t } = useTranslation();
+  return (
+    <Card variant="outlined" style={cardStyle}>
+      <Text style={levelTitleStyle}>{SEVERITY_LABELS[level.severity]}</Text>
+      <Text style={levelHintStyle}>{SEVERITY_HINTS[level.severity]}</Text>
 
-    {CHANNELS.map((channel) => {
-      const lock = lockOf(level.severity, channel);
-      return (
-        <View key={channel} style={rowStyle}>
-          <View style={{ flex: 1 }}>
-            <Text style={channelStyle}>{CHANNEL_LABELS[channel]}</Text>
-            {lock === 'always' && <Text style={noteStyle}>Siempre activo</Text>}
-            {lock === 'soon' && <Text style={noteStyle}>Próximamente</Text>}
+      {CHANNELS.map((channel) => {
+        const lock = lockOf(level.severity, channel);
+        return (
+          <View key={channel} style={rowStyle}>
+            <View style={{ flex: 1 }}>
+              <Text style={channelStyle}>{CHANNEL_LABELS[channel]}</Text>
+              {lock === 'always' && <Text style={noteStyle}>{t('notifications.alwaysOn')}</Text>}
+              {lock === 'soon' && <Text style={noteStyle}>{t('notifications.comingSoon')}</Text>}
+            </View>
+            <Switch
+              value={lock === 'soon' ? false : level[channel]} // a channel that does not exist yet never looks on
+              onValueChange={() => onToggle(channel)}
+              disabled={!!lock || saving === `${level.severity}.${channel}`}
+              trackColor={{ false: theme.colors.grayMedium, true: theme.colors.primary }}
+              accessibilityLabel={t('notifications.switchA11y', { channel: CHANNEL_LABELS[channel], severity: SEVERITY_LABELS[level.severity].toLowerCase() })}
+            />
           </View>
-          <Switch
-            value={lock === 'soon' ? false : level[channel]} // a channel that does not exist yet never looks on
-            onValueChange={() => onToggle(channel)}
-            disabled={!!lock || saving === `${level.severity}.${channel}`}
-            trackColor={{ false: theme.colors.grayMedium, true: theme.colors.primary }}
-            accessibilityLabel={`${CHANNEL_LABELS[channel]} para alertas ${SEVERITY_LABELS[level.severity].toLowerCase()}`}
-          />
-        </View>
-      );
-    })}
-  </Card>
-);
+        );
+      })}
+    </Card>
+  );
+};
 
 const screenStyle: ViewStyle = themed(() => ({ flex: 1, backgroundColor: theme.colors.background }));
 const contentStyle: ViewStyle = { padding: theme.spacing.lg, paddingBottom: theme.spacing.huge, gap: theme.spacing.lg };
