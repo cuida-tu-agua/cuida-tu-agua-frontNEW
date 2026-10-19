@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { authService } from '../../../core/di/container';
 import { toAppError } from '../../../infrastructure/http/httpError';
@@ -12,6 +13,7 @@ import { normalizeIdentifier, validateIdentifier } from '../../utils/validation'
 type Props = NativeStackScreenProps<AuthStackParamList, 'ForgotPassword'>;
 
 export const ForgotPasswordScreen: React.FC<Props> = ({ navigation, route }) => {
+  const { t } = useTranslation();
   const [identifier, setIdentifier] = useState(route.params?.identifier ?? '');
   const [error, setError] = useState<string>();
   const [bannerMessage, setBannerMessage] = useState<string | null>(null);
@@ -50,15 +52,15 @@ export const ForgotPasswordScreen: React.FC<Props> = ({ navigation, route }) => 
 
   return (
     <AuthLayout
-      title="Recupera tu contraseña"
-      subtitle="Escribe el correo o el teléfono de tu cuenta. Te enviaremos un código al correo."
+      title={t('auth.forgot.title')}
+      subtitle={t('auth.forgot.subtitle')}
       onBack={() => navigation.goBack()}
     >
       {bannerMessage && <Banner tone="error" message={bannerMessage} onClose={() => setBannerMessage(null)} />}
 
       <Input
-        label="Correo o teléfono"
-        placeholder="tu@correo.com o 3001234567"
+        label={t('auth.forgot.identifierLabel')}
+        placeholder={t('auth.forgot.identifierPlaceholder')}
         value={identifier}
         onChangeText={(text) => {
           setIdentifier(text);
@@ -66,14 +68,14 @@ export const ForgotPasswordScreen: React.FC<Props> = ({ navigation, route }) => 
         }}
         onBlur={() => identifier && setError(validateIdentifier(identifier))}
         error={error}
-        hint="El código vence en 15 minutos y solo sirve una vez."
+        hint={t('auth.forgot.hint')}
         keyboardType="email-address"
         autoComplete="email"
         returnKeyType="send"
         onSubmitEditing={handleSubmit}
       />
 
-      <Button label="Enviar código" onPress={handleSubmit} loading={submitting} />
+      <Button label={t('auth.forgot.submit')} onPress={handleSubmit} loading={submitting} />
     </AuthLayout>
   );
 };
