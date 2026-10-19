@@ -22,7 +22,7 @@ import { MainStackParamList } from '../../navigation/types';
 import { theme } from '../../styles/theme';
 import { themed } from '../../styles/themeRuntime';
 import { useTranslation } from 'react-i18next';
-import { localeTag } from '../../../i18n/format';
+import { formatDate } from '../../../i18n/format';
 
 type Props = NativeStackScreenProps<MainStackParamList, 'PlaceTariff'>;
 
@@ -199,7 +199,7 @@ export const PlaceTariffScreen: React.FC<Props> = ({ navigation, route }) => {
                   {index === 0 ? tr('tariff.screen.inUseSuffix') : ''}
                 </Text>
                 <Text style={mutedStyle}>
-                  {tr('tariff.screen.since', { source: sourceLabel(tariff.source, tariff.stratum), date: new Date(tariff.validFrom).toLocaleDateString(localeTag()) })}
+                  {tr('tariff.screen.since', { source: sourceLabel(tariff.source, tariff.stratum), date: formatDate(tariff.validFrom) })}
                 </Text>
               </View>
             </View>

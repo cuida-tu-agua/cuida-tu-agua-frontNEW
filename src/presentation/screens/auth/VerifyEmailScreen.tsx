@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Text, TextStyle } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import i18n from '../../../i18n';
+import { formatDateTime } from '../../../i18n/format';
 import { authService } from '../../../core/di/container';
 import { toAppError } from '../../../infrastructure/http/httpError';
 import { AuthLayout } from '../../components/auth';
@@ -17,9 +17,7 @@ import { themed } from '../../styles/themeRuntime';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'VerifyEmail'>;
 
-// HU-077 will replace this with the shared locale-aware formatters
-const formatExpiry = (iso?: string) =>
-  iso ? new Date(iso).toLocaleString(i18n.language === 'en' ? 'en-US' : 'es-CO', { dateStyle: 'medium', timeStyle: 'short' }) : null;
+const formatExpiry = (iso?: string) => (iso ? formatDateTime(iso) : null);
 
 export const VerifyEmailScreen: React.FC<Props> = ({ navigation, route }) => {
   const { t } = useTranslation();

@@ -15,7 +15,7 @@ import { MainStackParamList } from '../../navigation/types';
 import { theme } from '../../styles/theme';
 import { themed } from '../../styles/themeRuntime';
 import { useTranslation } from 'react-i18next';
-import { localeTag } from '../../../i18n/format';
+import { formatDateTime } from '../../../i18n/format';
 
 type Props = NativeStackScreenProps<MainStackParamList, 'ValveHistory'>;
 
@@ -26,7 +26,7 @@ const STATUS_COLOR: Record<ValveCommandStatus, string> = themed(() => ({
   FAILED: theme.colors.error,
 }));
 
-const formatDate = (iso: string) => new Date(iso).toLocaleString(localeTag(), { dateStyle: 'medium', timeStyle: 'short' });
+const formatDate = (iso: string) => formatDateTime(iso);
 
 export const ValveHistoryScreen: React.FC<Props> = ({ navigation, route }) => {
   const { t } = useTranslation();

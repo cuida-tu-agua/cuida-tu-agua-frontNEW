@@ -7,7 +7,7 @@ import { theme } from '../../styles/theme';
 import { Card } from '../common/Card';
 import { themed } from '../../styles/themeRuntime';
 import { useTranslation } from 'react-i18next';
-import { localeTag } from '../../../i18n/format';
+import { formatDateTime } from '../../../i18n/format';
 
 interface DeviceStatusCardProps {
   device: Device;
@@ -23,7 +23,7 @@ const STATUS_STYLE: Record<DeviceStatus, { fg: string; bg: string; icon: keyof t
 }));
 
 const formatDate = (iso: string) =>
-  new Date(iso).toLocaleString(localeTag(), { dateStyle: 'medium', timeStyle: 'short' });
+  formatDateTime(iso);
 
 /** HU-013: status of the meter linked to a place. */
 export const DeviceStatusCard: React.FC<DeviceStatusCardProps> = ({ device, now }) => {

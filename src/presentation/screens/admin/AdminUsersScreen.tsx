@@ -3,6 +3,7 @@ import { ActivityIndicator, ScrollView, Text, TextStyle, TouchableOpacity, View,
 import { Ionicons } from '@expo/vector-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useAuth } from '../../../core/auth/AuthContext';
+import { formatDate } from '../../../i18n/format';
 import {
   AdminUser,
   SEARCH_MAX,
@@ -209,7 +210,7 @@ const UserRow: React.FC<{
   onAction: () => void;
 }> = ({ user, compact, action, busy, onAction }) => {
   const tone = STATUS_TONES[user.status];
-  const date = new Date(user.createdAt).toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' });
+  const date = formatDate(user.createdAt);
   const button = action && (
     <Button
       label={action === 'block' ? 'Bloquear' : 'Desbloquear'}
