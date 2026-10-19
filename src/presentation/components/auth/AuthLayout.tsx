@@ -9,6 +9,7 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Logo } from '../common/Logo';
@@ -26,6 +27,7 @@ interface AuthLayoutProps {
 }
 
 export const AuthLayout: React.FC<AuthLayoutProps> = ({ title, subtitle, onBack, footer, children }) => {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const { isCompact, isExpanded } = useLayout();
 
@@ -37,7 +39,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ title, subtitle, onBack,
         <ScrollView style={{ flex: 1 }} contentContainerStyle={splitFormScrollStyle} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
           <View style={splitFormStyle}>
             {onBack && (
-              <TouchableOpacity onPress={onBack} style={splitBackStyle} accessibilityRole="button" accessibilityLabel="Volver" hitSlop={12}>
+              <TouchableOpacity onPress={onBack} style={splitBackStyle} accessibilityRole="button" accessibilityLabel={t('common.back')} hitSlop={12}>
                 <Ionicons name="arrow-back" size={22} color={theme.colors.primary} />
               </TouchableOpacity>
             )}
@@ -70,7 +72,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ title, subtitle, onBack,
             onPress={onBack}
             style={backStyle}
             accessibilityRole="button"
-            accessibilityLabel="Volver"
+            accessibilityLabel={t('common.back')}
             hitSlop={12}
           >
             <Ionicons name="arrow-back" size={24} color={theme.colors.textPrimary} />
@@ -174,14 +176,15 @@ const footerLinkStyle: TextStyle = themed(() => ({
   fontWeight: '800',
 }));
 
-const FEATURES: { icon: keyof typeof Ionicons.glyphMap; title: string; text: string }[] = [
-  { icon: 'water-outline', title: 'Consumo en tiempo real', text: 'Mira cuántos litros usas hoy, esta semana y este mes.' },
-  { icon: 'notifications-outline', title: 'Alertas al instante', text: 'Te avisamos si la válvula se cierra o el medidor deja de reportar.' },
-  { icon: 'lock-closed-outline', title: 'Cierra el agua a distancia', text: 'Controla la válvula desde el celular o el computador.' },
+const FEATURES: { icon: keyof typeof Ionicons.glyphMap; key: 'realTime' | 'alerts' | 'remote' }[] = [
+  { icon: 'water-outline', key: 'realTime' },
+  { icon: 'notifications-outline', key: 'alerts' },
+  { icon: 'lock-closed-outline', key: 'remote' },
 ];
 
 /** Left side of the wide login: what the app is for. Brand color in the light themes, the raised surface in the dark ones. */
 const BrandPanel: React.FC = () => {
+  const { t } = useTranslation();
   const { dark } = useAppTheme();
   const ink = dark ? theme.colors.textPrimary : '#FFFFFF';
   const soft = dark ? theme.colors.textSecondary : 'rgba(255,255,255,0.88)';
@@ -194,25 +197,25 @@ const BrandPanel: React.FC = () => {
 
       <View style={panelBrandStyle}>
         <Logo type="isotipo" theme="light" size={44} mono={ink} />
-        <Text style={[panelBrandTextStyle, { color: ink }]}>Cuida Tu Agua</Text>
+        <Text style={[panelBrandTextStyle, { color: ink }]}>{t('common.appName')}</Text>
       </View>
 
       <View style={panelBodyStyle}>
-        <Text style={[panelHeadlineStyle, { color: ink }]}>El agua de tu hogar o negocio, bajo control.</Text>
+        <Text style={[panelHeadlineStyle, { color: ink }]}>{t('auth.layout.headline')}</Text>
         {FEATURES.map((feature) => (
-          <View key={feature.title} style={featureRowStyle}>
+          <View key={feature.key} style={featureRowStyle}>
             <View style={[featureIconStyle, { backgroundColor: tile }]}>
               <Ionicons name={feature.icon} size={22} color={ink} />
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={[featureTitleStyle, { color: ink }]}>{feature.title}</Text>
-              <Text style={[featureTextStyle, { color: soft }]}>{feature.text}</Text>
+              <Text style={[featureTitleStyle, { color: ink }]}>{t(`auth.layout.features.${feature.key}.title`)}</Text>
+              <Text style={[featureTextStyle, { color: soft }]}>{t(`auth.layout.features.${feature.key}.text`)}</Text>
             </View>
           </View>
         ))}
       </View>
 
-      <Text style={[panelFootStyle, { color: soft }]}>Proyecto SENA · Análisis y Desarrollo de Software</Text>
+      <Text style={[panelFootStyle, { color: soft }]}>{t('auth.layout.footer')}</Text>
     </View>
   );
 };
