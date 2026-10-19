@@ -20,7 +20,9 @@ import { profileService } from '../../../core/di/container';
 import { avatarUri } from '../../../config/api';
 import { User } from '../../../domain/entities/User';
 import { toAppError } from '../../../infrastructure/http/httpError';
+import { useTranslation } from 'react-i18next';
 import { AppearanceSection } from '../../components/theme/AppearanceSection';
+import { LanguageSection } from '../../components/language/LanguageSection';
 import { Avatar } from '../../components/common/Avatar';
 import { Banner, BannerTone } from '../../components/common/Banner';
 import { Button } from '../../components/common/Button';
@@ -45,6 +47,7 @@ const toFormValues = (user: User | null) => ({
 });
 
 export const ProfileScreen: React.FC<Props> = ({ navigation }) => {
+  const { t } = useTranslation();
   const { user, updateUser, logout } = useAuth();
   const form = useForm(toFormValues(user), {
     firstName: (v) => validateName(v, 'nombre'),
@@ -247,6 +250,9 @@ export const ProfileScreen: React.FC<Props> = ({ navigation }) => {
 
         <Text style={[sectionStyle, { marginTop: theme.spacing.xl }]}>Apariencia</Text>
         <AppearanceSection />
+
+        <Text style={[sectionStyle, { marginTop: theme.spacing.xl }]}>{t('language.title')}</Text>
+        <LanguageSection />
 
         <Text style={[sectionStyle, { marginTop: theme.spacing.xl }]}>Alertas</Text>
         <MenuRow

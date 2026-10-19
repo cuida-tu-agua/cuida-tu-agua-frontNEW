@@ -10,4 +10,9 @@ export const en: Translations = {
     back: 'Back',
     retry: 'Retry',
   },
+  language: {
+    title: 'Language',
+    label: 'App language',
+    hint: 'The change applies right away and is remembered on this device.',
+  },
 };

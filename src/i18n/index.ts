@@ -1,4 +1,4 @@
-import i18n from 'i18next';
+import i18n, { changeLanguage as i18nextChangeLanguage } from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import { getLocales } from 'expo-localization';
 import { DEFAULT_LANGUAGE, Language, SUPPORTED_LANGUAGES, resolveLanguage } from './languages';
@@ -17,6 +17,7 @@ const deviceLanguageCode = (): string | null => {
 export const initialLanguage = (): Language => resolveLanguage(deviceLanguageCode());
 
 if (!i18n.isInitialized) {
+  // eslint-disable-next-line import/no-named-as-default-member -- the named `use` is taken for a React hook by the linter
   i18n.use(initReactI18next).init({
     resources: {
       es: { translation: es },
@@ -32,7 +33,7 @@ if (!i18n.isInitialized) {
   });
 }
 
-export const changeLanguage = (language: Language) => i18n.changeLanguage(language);
+export const changeLanguage = (language: Language) => i18nextChangeLanguage(language);
 
 export { SUPPORTED_LANGUAGES, DEFAULT_LANGUAGE, resolveLanguage };
 export type { Language };
