@@ -10,6 +10,7 @@ import {
   VALVE_API_CONFIG,
 } from '../../config/api';
 import { AppError } from '../../domain/common/AppError';
+import i18n from '../../i18n';
 import { Session } from '../../domain/entities/Auth';
 import { toAppError } from '../../infrastructure/http/httpError';
 import { tokenManager } from '../auth/TokenManager';
@@ -36,7 +37,7 @@ export const refreshAccessToken = (): Promise<string> => {
 const renewSession = async (): Promise<string> => {
   const refreshToken = await tokenManager.getRefreshToken();
   if (!refreshToken) {
-    throw new AppError('unauthorized', 'Tu sesión expiró. Inicia sesión de nuevo.');
+    throw new AppError('unauthorized', i18n.t('errors.kind.unauthorized'));
   }
 
   try {
