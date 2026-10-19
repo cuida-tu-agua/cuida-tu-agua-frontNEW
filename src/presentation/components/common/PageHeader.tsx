@@ -1,6 +1,7 @@
 import React from 'react';
 import { Platform, Text, TextStyle, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import i18n from '../../../i18n';
 import { theme } from '../../styles/theme';
 import { themed } from '../../styles/themeRuntime';
 
@@ -29,7 +30,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({ title, caption, subtitle
   return (
     <View style={wrapStyle}>
       {web && !!back && (
-        <TouchableOpacity onPress={back.onPress} style={backStyle} accessibilityRole="link" accessibilityLabel={`Volver a ${back.label}`} hitSlop={8}>
+        <TouchableOpacity onPress={back.onPress} style={backStyle} accessibilityRole="link" accessibilityLabel={i18n.t('commonUi.backTo', { label: back.label })} hitSlop={8}>
           <Ionicons name="arrow-back" size={16} color={theme.colors.primary} />
           <Text style={backTextStyle}>{back.label}</Text>
         </TouchableOpacity>

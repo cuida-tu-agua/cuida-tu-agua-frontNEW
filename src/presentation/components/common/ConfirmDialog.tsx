@@ -1,6 +1,7 @@
 import React from 'react';
 import { Modal, Text, TextStyle, View, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import i18n from '../../../i18n';
 import { theme } from '../../styles/theme';
 import { Button } from './Button';
 import { themed } from '../../styles/themeRuntime';
@@ -24,7 +25,7 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   title,
   message,
   confirmLabel,
-  cancelLabel = 'Cancelar',
+  cancelLabel = i18n.t('common.cancel'),
   tone = 'default',
   loading = false,
   confirmDisabled = false,

@@ -8,6 +8,7 @@ import {
   Animated,
   Easing,
 } from 'react-native';
+import i18n from '../../../i18n';
 import { theme } from '../../styles/theme';
 import { themed } from '../../styles/themeRuntime';
 
@@ -123,7 +124,7 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
           <View style={checkmarkContainerStyle}>
             <Text style={checkmarkStyle}>✓</Text>
           </View>
-          <Text style={titleStyle}>¡Éxito!</Text>
+          <Text style={titleStyle}>{i18n.t('commonUi.success')}</Text>
           <Text style={messageStyle}>{message}</Text>
         </Animated.View>
       </View>
