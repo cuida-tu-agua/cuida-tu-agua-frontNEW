@@ -1,4 +1,5 @@
 import React from 'react';
+import './src/i18n'; // starts the translations before the first screen is drawn
 import { AppRegistry } from 'react-native';
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
