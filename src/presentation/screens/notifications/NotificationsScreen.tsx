@@ -46,8 +46,9 @@ export const NotificationsScreen: React.FC<Props> = ({ navigation }) => {
 
   const toolbar = (
     <View style={toolbarStyle}>
+      {/* When the list could not be loaded we know nothing: "you're all caught up" would be a lie */}
       <Text style={countStyle}>
-        {inbox.unread > 0 ? t('notifications.unread', { count: inbox.unread }) : t('notifications.allRead')}
+        {inbox.error && inbox.items.length === 0 ? '' : inbox.unread > 0 ? t('notifications.unread', { count: inbox.unread }) : t('notifications.allRead')}
       </Text>
       <View style={actionsStyle}>
         <Button
