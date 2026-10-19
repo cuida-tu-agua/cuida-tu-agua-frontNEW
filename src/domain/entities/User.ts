@@ -10,6 +10,11 @@ export interface User {
   createdAt: string; // ISO 8601, UTC
 }
 
+export interface SignInMethods {
+  password: boolean;
+  google: boolean;
+}
+
 export interface UpdateProfileInput {
   firstName: string;
   lastName: string;

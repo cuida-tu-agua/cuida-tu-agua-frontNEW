@@ -74,6 +74,10 @@ export const PROFILE_ENDPOINTS = {
   AVATAR: '/api/users/me/avatar',
   /** HU-020: ms-iam e-mails a 6-digit code to confirm a sensitive action (closing the valve). */
   ACTION_CODES: '/api/users/me/action-codes',
+  /** Which ways the account can sign in: password, Google or both. */
+  SIGN_IN_METHODS: '/api/users/me/sign-in-methods',
+  /** HU-004: Google's consent page to confirm the account before deleting it. */
+  GOOGLE_REAUTH: '/api/users/me/account/google-reauth',
 };
 
 export const PLACES_ENDPOINTS = {

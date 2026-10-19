@@ -28,7 +28,7 @@ export const GoogleSignInButton: React.FC<Props> = ({ onError }) => {
 
   const finish = async (result: GoogleResult | null) => {
     if (!result) return; // web: the page is going to Google
-    if ('cancelled' in result) return setBusy(false);
+    if ('cancelled' in result || 'reauth' in result) return setBusy(false); // a re-confirmation is not a sign-in
     if ('error' in result) {
       setBusy(false);
       if (result.error !== 'auth.google_cancelled') onError(messageForCode(result.error));

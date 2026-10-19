@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, Text, TextStyle, View, ViewStyle } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Ionicons } from '@expo/vector-icons';
+import { FontAwesome, Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../../core/auth/AuthContext';
+import { openGoogleFlow, takeWebGoogleResult } from '../../../core/auth/googleSignIn';
 import { profileService } from '../../../core/di/container';
-import { toAppError } from '../../../infrastructure/http/httpError';
+import { SignInMethods } from '../../../domain/entities/User';
+import { messageForCode, toAppError } from '../../../infrastructure/http/httpError';
 import { PasswordField } from '../../components/auth';
 import { Banner } from '../../components/common/Banner';
 import { Button } from '../../components/common/Button';
@@ -32,25 +34,62 @@ export const DeleteAccountScreen: React.FC<Props> = ({ navigation }) => {
   const [errors, setErrors] = useState<{ understood?: string; password?: string }>({});
   const [bannerMessage, setBannerMessage] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [methods, setMethods] = useState<SignInMethods | null>(null);
+  // HU-004: Google re-confirmation of the account (accounts created with Google have no password)
+  const [reauthCode, setReauthCode] = useState<string | null>(null);
+  // Web: the page comes back from Google with the result in the address (read once, then removed)
+  const [returning] = useState(takeWebGoogleResult);
+
+  useEffect(() => {
+    let active = true;
+    profileService
+      .signInMethods()
+      .then((value) => active && setMethods(value))
+      .catch((error) => active && setBannerMessage(toAppError(error).message));
+    if (returning && 'reauth' in returning) setReauthCode(returning.reauth);
+    if (returning && 'error' in returning) setBannerMessage(messageForCode(returning.error));
+    return () => {
+      active = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const confirmWithGoogle = async () => {
+    setBannerMessage(null);
+    try {
+      const result = await openGoogleFlow((redirect) => profileService.startGoogleReauth(redirect));
+      if (!result) return; // web: the page is going to Google
+      if ('reauth' in result) setReauthCode(result.reauth);
+      else if ('error' in result && result.error !== 'auth.google_cancelled') setBannerMessage(messageForCode(result.error));
+    } catch (error) {
+      setBannerMessage(toAppError(error).message);
+    }
+  };
 
   const handleDelete = async () => {
+    const needsPassword = methods?.password === true && !reauthCode;
     const next = {
       understood: understood ? undefined : 'Marca la casilla para confirmar.',
-      password: password ? undefined : 'Escribe tu contraseña para confirmar.',
+      password: needsPassword && !password ? 'Escribe tu contraseña para confirmar.' : undefined,
     };
     setErrors(next);
     if (next.understood || next.password) return;
+    if (!needsPassword && !reauthCode) {
+      setBannerMessage('Confirma la eliminación con tu cuenta de Google.');
+      return;
+    }
 
     setBannerMessage(null);
     setDeleting(true);
     try {
-      await profileService.deleteAccount(password);
+      await profileService.deleteAccount(reauthCode ? undefined : password, reauthCode ?? undefined);
       await endSession('deleted'); // the server already revoked every session
     } catch (error) {
       const appError = toAppError(error);
       if (appError.code === 'user.current_password_incorrect' || appError.code === 'auth.wrong_password') {
         setErrors({ password: 'La contraseña no es correcta.' });
       } else {
+        if (appError.code === 'auth.google_failed') setReauthCode(null); // the Google code was spent or expired
         setBannerMessage(appError.message);
       }
       setDeleting(false);
@@ -85,15 +124,28 @@ export const DeleteAccountScreen: React.FC<Props> = ({ navigation }) => {
           <Text style={checkboxTextStyle}>Entiendo que esta acción no se puede deshacer.</Text>
         </Checkbox>
 
-        <PasswordField
-          label="Tu contraseña"
-          value={password}
-          onChangeText={(t) => {
-            setPassword(t);
-            if (errors.password) setErrors((e) => ({ ...e, password: undefined }));
-          }}
-          error={errors.password}
-        />
+        {methods?.password && !reauthCode && (
+          <PasswordField
+            label="Tu contraseña"
+            value={password}
+            onChangeText={(t) => {
+              setPassword(t);
+              if (errors.password) setErrors((e) => ({ ...e, password: undefined }));
+            }}
+            error={errors.password}
+          />
+        )}
+
+        {methods?.google && !reauthCode && (
+          <Button
+            label="Confirmar con Google"
+            variant="secondary"
+            onPress={confirmWithGoogle}
+            disabled={deleting}
+            icon={<FontAwesome name="google" size={18} color={theme.colors.primary} />}
+          />
+        )}
+        {reauthCode && <Text style={checkboxTextStyle}>Identidad confirmada con Google.</Text>}
 
         <Button label="Eliminar mi cuenta" variant="danger" onPress={handleDelete} loading={deleting} />
         <Button label="No, volver" variant="ghost" onPress={() => navigation.goBack()} disabled={deleting} />

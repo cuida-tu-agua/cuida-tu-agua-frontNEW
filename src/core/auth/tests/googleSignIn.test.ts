@@ -7,6 +7,10 @@ describe('readGoogleResult (HU-004)', () => {
     expect(readGoogleResult('exp://192.168.1.20:8081/--/auth/google?x=1&google_code=zz')).toEqual({ code: 'zz' });
   });
 
+  it('reads the code that confirms the account before deleting it', () => {
+    expect(readGoogleResult('https://sy-water.tech/?google_reauth=re-1')).toEqual({ reauth: 're-1' });
+  });
+
   it('reads the error code', () => {
     expect(readGoogleResult('https://sy-water.tech/?google_error=auth.account_blocked')).toEqual({
       error: 'auth.account_blocked',

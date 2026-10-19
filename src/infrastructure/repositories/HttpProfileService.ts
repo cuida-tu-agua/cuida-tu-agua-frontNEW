@@ -1,6 +1,6 @@
 import { AxiosInstance } from 'axios';
 import { PROFILE_ENDPOINTS } from '../../config/api';
-import { AvatarFile, UpdateProfileInput, User } from '../../domain/entities/User';
+import { AvatarFile, SignInMethods, UpdateProfileInput, User } from '../../domain/entities/User';
 import { ProfileService } from '../../domain/services/AuthServices';
 import { toAppError } from '../http/httpError';
 
@@ -37,8 +37,19 @@ export class HttpProfileService implements ProfileService {
     return this.call(() => this.http.delete<User>(PROFILE_ENDPOINTS.AVATAR));
   }
 
-  async deleteAccount(password: string): Promise<void> {
-    await this.call(() => this.http.delete(PROFILE_ENDPOINTS.ME, { data: { password } }));
+  signInMethods(): Promise<SignInMethods> {
+    return this.call(() => this.http.get<SignInMethods>(PROFILE_ENDPOINTS.SIGN_IN_METHODS));
+  }
+
+  async startGoogleReauth(redirect: string): Promise<string> {
+    const { url } = await this.call(() =>
+      this.http.post<{ url: string }>(`${PROFILE_ENDPOINTS.GOOGLE_REAUTH}?redirect=${encodeURIComponent(redirect)}`),
+    );
+    return url;
+  }
+
+  async deleteAccount(password?: string, googleReauthCode?: string): Promise<void> {
+    await this.call(() => this.http.delete(PROFILE_ENDPOINTS.ME, { data: { password, googleReauthCode } }));
   }
 
   private async call<T>(request: () => Promise<{ data: T }>): Promise<T> {

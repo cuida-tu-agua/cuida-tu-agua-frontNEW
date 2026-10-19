@@ -8,12 +8,13 @@ import { API_CONFIG, AUTH_ENDPOINTS } from '../../config/api';
  *  1. The app opens  {ms-iam}/api/auth/google/start?redirect=<where to come back>
  *  2. ms-iam sends the person to Google; Google returns to ms-iam, which finds / links / creates the account
  *  3. ms-iam opens the app address with ?google_code=... (single use, 2 min) or ?google_error=<code>
+ *     When the account is re-confirmed before deleting it: ?google_reauth=... (single use, 2 min)
  *  4. The app trades google_code for its session (POST /api/auth/google/exchange)
  * The browser / phone never sees Google's tokens or the client secret.
  */
-export type GoogleResult = { code: string } | { error: string } | { cancelled: true };
+export type GoogleResult = { code: string } | { reauth: string } | { error: string } | { cancelled: true };
 
-const PARAMS = /[?&]google_(code|error)=([^&#]*)/;
+const PARAMS = /[?&]google_(code|error|reauth)=([^&#]*)/;
 
 /** "https://sy-water.tech/?google_code=abc" → { code: 'abc' }; an address without the parameters → null. */
 export const readGoogleResult = (url: string | null | undefined): GoogleResult | null => {
@@ -21,7 +22,8 @@ export const readGoogleResult = (url: string | null | undefined): GoogleResult |
   if (!match) return null;
   const value = decodeURIComponent(match[2].replace(/\+/g, ' '));
   if (!value) return null;
-  return match[1] === 'code' ? { code: value } : { error: value };
+  if (match[1] === 'code') return { code: value };
+  return match[1] === 'reauth' ? { reauth: value } : { error: value };
 };
 
 export const googleStartUrl = (redirect: string): string =>
@@ -31,14 +33,24 @@ export const googleStartUrl = (redirect: string): string =>
  * Web: the same tab goes to Google and the page loads again with the result (see takeWebGoogleResult), so this
  * returns null. Phone: an in-app browser opens and the result comes back here.
  */
-export const openGoogleSignIn = async (): Promise<GoogleResult | null> => {
+export const openGoogleSignIn = (): Promise<GoogleResult | null> =>
+  openGoogleFlow((redirect) => Promise.resolve(googleStartUrl(redirect)));
+
+/**
+ * Opens Google's consent page for the address `urlFor` builds from the return address (sign-in or re-confirmation).
+ * Web: the same tab goes to Google (null is returned, the result comes back on reload). Phone: the in-app browser
+ * returns the result.
+ */
+export const openGoogleFlow = async (
+  urlFor: (redirect: string) => Promise<string>,
+): Promise<GoogleResult | null> => {
   if (Platform.OS === 'web') {
     const { origin, pathname } = window.location;
-    window.location.assign(googleStartUrl(`${origin}${pathname}`));
+    window.location.assign(await urlFor(`${origin}${pathname}`));
     return null;
   }
   const redirect = Linking.createURL('auth/google'); // saveyourwater://auth/google (Expo Go: exp://<pc>:8081/--/auth/google)
-  const session = await WebBrowser.openAuthSessionAsync(googleStartUrl(redirect), redirect);
+  const session = await WebBrowser.openAuthSessionAsync(await urlFor(redirect), redirect);
   if (session.type !== 'success') return { cancelled: true };
   return readGoogleResult(session.url) ?? { cancelled: true };
 };
@@ -57,6 +69,7 @@ export const takeWebGoogleResult = (): GoogleResult | null => {
   const url = new URL(window.location.href);
   url.searchParams.delete('google_code');
   url.searchParams.delete('google_error');
+  url.searchParams.delete('google_reauth');
   window.history.replaceState(window.history.state, '', `${url.pathname}${url.search}${url.hash}`);
   justTaken = result;
   setTimeout(() => {
