@@ -9,7 +9,10 @@ import {
   ViewStyle,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import i18n from '../../../i18n';
+import { localeTag } from '../../../i18n/format';
 import { placeRepository } from '../../../core/di/container';
 import { AppError } from '../../../domain/common/AppError';
 import { Place } from '../../../domain/places/Place';
@@ -86,9 +89,10 @@ const metaStyle: TextStyle = themed(() => ({
 }));
 
 const formatDate = (iso: string) =>
-  new Date(iso).toLocaleString('es-CO', { dateStyle: 'medium', timeStyle: 'short' });
+  new Date(iso).toLocaleString(localeTag(), { dateStyle: 'medium', timeStyle: 'short' });
 
 export const EditPlaceScreen: React.FC<Props> = ({ navigation, route }) => {
+  const { t } = useTranslation();
   const { placeId } = route.params;
   const form = usePlaceForm();
   const { hydrate } = form;
@@ -115,7 +119,7 @@ export const EditPlaceScreen: React.FC<Props> = ({ navigation, route }) => {
       })
       .catch((error: unknown) => {
         if (active) {
-          setLoadError(error instanceof AppError ? error : new AppError('server', 'No se pudo cargar el lugar.'));
+          setLoadError(error instanceof AppError ? error : new AppError('server', i18n.t('places.edit.loadFailed')));
         }
       });
     return () => {
@@ -139,7 +143,7 @@ export const EditPlaceScreen: React.FC<Props> = ({ navigation, route }) => {
       setPlace(updated);
       setSaved(true); // opens the success modal
     } catch (error) {
-      const appError = error instanceof AppError ? error : new AppError('server', 'No se pudieron guardar los cambios.');
+      const appError = error instanceof AppError ? error : new AppError('server', i18n.t('places.edit.saveFailed'));
       if (appError.kind === 'validation') form.applyServerErrors(appError.fieldErrors);
       setSubmitError(appError.message);
     } finally {
@@ -158,9 +162,9 @@ export const EditPlaceScreen: React.FC<Props> = ({ navigation, route }) => {
     try {
       await placeRepository.remove(place.id);
       setConfirmingDelete(false);
-      navigation.popTo('Places', { notice: `Eliminaste "${place.name}".` });
+      navigation.popTo('Places', { notice: t('places.edit.deleted', { name: place.name }) });
     } catch (error) {
-      const appError = error instanceof AppError ? error : new AppError('server', 'No se pudo eliminar el lugar.');
+      const appError = error instanceof AppError ? error : new AppError('server', i18n.t('places.edit.deleteFailed'));
       setConfirmingDelete(false);
       setDeleteError(appError);
     } finally {
@@ -178,8 +182,8 @@ export const EditPlaceScreen: React.FC<Props> = ({ navigation, route }) => {
     return (
       <View style={centeredStyle}>
         <Text style={messageStyle}>{loadError.message}</Text>
-        {loadError.kind !== 'not_found' && <Button label="Reintentar" onPress={retry} />}
-        <Button label="Volver" variant="ghost" onPress={() => navigation.goBack()} />
+        {loadError.kind !== 'not_found' && <Button label={t('common.retry')} onPress={retry} />}
+        <Button label={t('common.back')} variant="ghost" onPress={() => navigation.goBack()} />
       </View>
     );
   }
@@ -188,7 +192,7 @@ export const EditPlaceScreen: React.FC<Props> = ({ navigation, route }) => {
     return (
       <View style={centeredStyle}>
         <ActivityIndicator size="large" color={theme.colors.primary} />
-        <Text style={messageStyle}>Cargando lugar...</Text>
+        <Text style={messageStyle}>{t('places.edit.loading')}</Text>
       </View>
     );
   }
@@ -200,15 +204,15 @@ export const EditPlaceScreen: React.FC<Props> = ({ navigation, route }) => {
     >
       <PageContainer narrow>
         <PageHeader
-          back={{ label: 'Volver', onPress: () => navigation.goBack() }}
-          title="Editar lugar"
-          subtitle={`Última modificación: ${formatDate(place.updatedAt)}`}
+          back={{ label: t('common.back'), onPress: () => navigation.goBack() }}
+          title={t('places.edit.title')}
+          subtitle={t('places.edit.lastModified', { date: formatDate(place.updatedAt) })}
         />
-        {Platform.OS !== 'web' && <Text style={metaStyle}>Última modificación: {formatDate(place.updatedAt)}</Text>}
+        {Platform.OS !== 'web' && <Text style={metaStyle}>{t('places.edit.lastModified', { date: formatDate(place.updatedAt) })}</Text>}
 
         <PlaceForm
           form={form}
-          submitLabel={form.isDirty ? 'Guardar cambios' : 'Sin cambios'}
+          submitLabel={form.isDirty ? t('places.edit.saveChanges') : t('places.edit.noChanges')}
           onSubmit={handleSubmit}
           submitting={submitting}
           submitError={submitError}
@@ -216,10 +220,10 @@ export const EditPlaceScreen: React.FC<Props> = ({ navigation, route }) => {
         />
 
         <View style={sectionStyle}>
-          <Text style={sectionTitleStyle}>Medidor</Text>
-          <Text style={dangerTextStyle}>Vincula el medidor de este lugar o revisa si está conectado.</Text>
+          <Text style={sectionTitleStyle}>{t('places.edit.meterTitle')}</Text>
+          <Text style={dangerTextStyle}>{t('places.edit.meterText')}</Text>
           <Button
-            label="Ver medidor"
+            label={t('places.edit.viewMeter')}
             variant="secondary"
             icon={<Ionicons name="speedometer-outline" size={20} color={theme.colors.textPrimary} />}
             onPress={goToDevice}
@@ -227,33 +231,32 @@ export const EditPlaceScreen: React.FC<Props> = ({ navigation, route }) => {
         </View>
 
         <View style={dangerZoneStyle}>
-          <Text style={dangerTitleStyle}>Zona de peligro</Text>
+          <Text style={dangerTitleStyle}>{t('places.edit.dangerTitle')}</Text>
           <Text style={dangerTextStyle}>
-            Si ya no usas este lugar puedes eliminarlo. Primero desvincula su medidor, si tiene uno.
+            {t('places.edit.dangerText')}
           </Text>
           {!!deleteError && (
             <Banner
               tone="error"
               message={deleteError.message}
               // HU-011: the place still has a meter → take the user straight to where it is unlinked
-              action={deleteError.code === 'place.has_active_device' ? { label: 'Ir al medidor', onPress: goToDevice } : undefined}
+              action={deleteError.code === 'place.has_active_device' ? { label: t('places.edit.goToMeter'), onPress: goToDevice } : undefined}
               onClose={() => setDeleteError(null)}
             />
           )}
-          <Button label="Eliminar lugar" variant="danger" onPress={() => setConfirmingDelete(true)} />
+          <Button label={t('places.edit.delete')} variant="danger" onPress={() => setConfirmingDelete(true)} />
         </View>
       </PageContainer>
 
       <ConfirmDialog
         visible={confirmingDelete}
         tone="danger"
-        title={`¿Eliminar "${place.name}"?`}
+        title={t('places.edit.confirmTitle', { name: place.name })}
         message={
-          'El lugar desaparecerá de tu lista y ya no podrás ver su historial de consumo en la app. ' +
-          (place.isDefault ? 'Como es tu lugar seleccionado, seleccionaremos otro de tus lugares.' : '')
+          t('places.edit.confirmBody') + (place.isDefault ? t('places.edit.confirmBodyDefault') : '')
         }
-        confirmLabel="Sí, eliminar lugar"
-        cancelLabel="No, conservarlo"
+        confirmLabel={t('places.edit.confirmYes')}
+        cancelLabel={t('places.edit.confirmNo')}
         loading={deleting}
         onConfirm={handleDelete}
         onCancel={() => setConfirmingDelete(false)}
@@ -261,7 +264,7 @@ export const EditPlaceScreen: React.FC<Props> = ({ navigation, route }) => {
 
       <SuccessModal
         visible={saved}
-        message="Los cambios del lugar se guardaron."
+        message={t('places.edit.saved')}
         onDismiss={handleSavedDismiss}
         autoCloseDuration={1500}
       />
