@@ -5,6 +5,7 @@ import { ConsumptionBucket, ConsumptionPeriod } from '../../../domain/consumptio
 import { bucketLabel, formatVolume, maxLiters, shouldLabel } from '../../../domain/consumption/consumptionFormat';
 import { MeasurementUnit } from '../../../domain/places/Place';
 import { theme } from '../../styles/theme';
+import { useTranslation } from 'react-i18next';
 
 interface ConsumptionChartProps {
   buckets: ConsumptionBucket[];
@@ -17,6 +18,7 @@ const LABEL_SPACE = 20;
 const TOP_SPACE = 16;
 
 export const ConsumptionChart: React.FC<ConsumptionChartProps> = ({ buckets, period, unit, height = 180 }) => {
+  const { t } = useTranslation();
   const [width, setWidth] = useState(0);
   const onLayout = (e: LayoutChangeEvent) => setWidth(Math.round(e.nativeEvent.layout.width));
 
@@ -31,7 +33,7 @@ export const ConsumptionChart: React.FC<ConsumptionChartProps> = ({ buckets, per
       onLayout={onLayout}
       style={{ height }}
       accessible
-      accessibilityLabel={`Gráfica de consumo. Mayor valor: ${formatVolume(max, unit)}.`}
+      accessibilityLabel={t('consumption.chartA11y', { max: formatVolume(max, unit) })}
     >
       {width > 0 && (
         <Svg width={width} height={height}>

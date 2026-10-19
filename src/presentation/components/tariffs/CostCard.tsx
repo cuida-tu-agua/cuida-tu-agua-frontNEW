@@ -10,6 +10,8 @@ import { themed } from '../../styles/themeRuntime';
 import { Banner } from '../common/Banner';
 import { Button } from '../common/Button';
 import { Card } from '../common/Card';
+import { useTranslation } from 'react-i18next';
+import { localeTag } from '../../../i18n/format';
 
 interface CostCardProps {
   period: ConsumptionPeriod;
@@ -25,6 +27,7 @@ interface CostCardProps {
  * does NOT show a zero: it invites the user to set one.
  */
 export const CostCard: React.FC<CostCardProps> = ({ period, cost, loading, error, onConfigure }) => {
+  const { t } = useTranslation();
   const shown = cost && cost.period === period ? cost : null; // never show last week's money under "Hoy"
 
   return (
@@ -33,31 +36,31 @@ export const CostCard: React.FC<CostCardProps> = ({ period, cost, loading, error
         <View style={iconStyle}>
           <Ionicons name="cash-outline" size={22} color={theme.colors.primary} />
         </View>
-        <Text style={titleStyle}>Costo del agua</Text>
+        <Text style={titleStyle}>{t('cost.title')}</Text>
         <View style={estimateStyle}>
           <Ionicons name="calculator-outline" size={14} color={theme.colors.textPrimary} />
-          <Text style={estimateTextStyle}>Estimado</Text>
+          <Text style={estimateTextStyle}>{t('cost.estimate')}</Text>
         </View>
       </View>
 
-      {!!error && <Banner tone="warning" message={`No pudimos calcular el costo. ${error.message}`} />}
+      {!!error && <Banner tone="warning" message={t('cost.failed', { reason: error.message })} />}
 
       {!shown ? (
-        <View style={centerStyle}>{loading ? <ActivityIndicator color={theme.colors.primary} /> : <Text style={mutedStyle}>Sin datos</Text>}</View>
+        <View style={centerStyle}>{loading ? <ActivityIndicator color={theme.colors.primary} /> : <Text style={mutedStyle}>{t('consumption.noData')}</Text>}</View>
       ) : !shown.hasTariff ? (
         <View style={inviteStyle}>
-          <Text style={inviteTitleStyle}>Aún no configuras tu tarifa</Text>
+          <Text style={inviteTitleStyle}>{t('cost.noTariffTitle')}</Text>
           <Text style={mutedStyle}>
             {shown.catalogAvailable
-              ? 'Tu ciudad tiene tarifas precargadas: elige tu estrato y calculamos cuánto llevas gastado. También puedes escribir el valor de tu recibo.'
-              : 'Escribe cuánto te cobran por metro cúbico en tu recibo y calculamos cuánto llevas gastado.'}
+              ? t('cost.inviteCatalog')
+              : t('cost.inviteManual')}
           </Text>
-          <Button label="Configurar tarifa" onPress={onConfigure} size="medium" />
+          <Button label={t('cost.configure')} onPress={onConfigure} size="medium" />
         </View>
       ) : (
         <>
           <Text style={captionStyle}>{PERIOD_TITLES[period]}</Text>
-          <Text style={totalStyle} accessibilityLabel={`Costo estimado: ${formatMoney(shown.total ?? 0, shown.currency)}`}>
+          <Text style={totalStyle} accessibilityLabel={t('cost.estimatedA11y', { amount: formatMoney(shown.total ?? 0, shown.currency) })}>
             {formatMoney(shown.total ?? 0, shown.currency)}
           </Text>
 
@@ -66,29 +69,33 @@ export const CostCard: React.FC<CostCardProps> = ({ period, cost, loading, error
             .map((tier) => (
               <View key={tier.name} style={lineStyle}>
                 <Text style={lineLabelStyle}>
-                  {tier.name} · {tier.cubicMeters.toLocaleString('es-CO', { maximumFractionDigits: 2 })} m³ × {formatMoney(tier.pricePerM3, shown.currency)}
+                  {t('cost.tierLine', {
+                    name: tier.name,
+                    m3: tier.cubicMeters.toLocaleString(localeTag(), { maximumFractionDigits: 2 }),
+                    price: formatMoney(tier.pricePerM3, shown.currency),
+                  })}
                 </Text>
                 <Text style={lineValueStyle}>{formatMoney(tier.cost, shown.currency)}</Text>
               </View>
             ))}
           {!!shown.fixedCharge && shown.fixedCharge > 0 && (
             <View style={lineStyle}>
-              <Text style={lineLabelStyle}>Cargo fijo del mes</Text>
+              <Text style={lineLabelStyle}>{t('cost.fixedMonth')}</Text>
               <Text style={lineValueStyle}>{formatMoney(shown.fixedCharge, shown.currency)}</Text>
             </View>
           )}
 
           {shown.tariff && (
-            <View style={sourceStyle} accessibilityLabel="Origen de la tarifa">
+            <View style={sourceStyle} accessibilityLabel={t('cost.sourceA11y')}>
               <Ionicons name={shown.tariff.source === 'CATALOG' ? 'location-outline' : 'create-outline'} size={16} color={theme.colors.textSecondary} />
               <Text style={sourceTextStyle}>
                 {sourceLabel(shown.tariff.source, shown.tariff.stratum)}
-                {shown.tariff.catalogUpdatedAt ? ` · actualizada el ${formatCatalogDate(shown.tariff.catalogUpdatedAt)}` : ''}
+                {shown.tariff.catalogUpdatedAt ? t('cost.updatedOn', { date: formatCatalogDate(shown.tariff.catalogUpdatedAt) }) : ''}
               </Text>
             </View>
           )}
           <Text style={disclaimerStyle}>{shown.disclaimer}</Text>
-          <Button label="Cambiar tarifa" onPress={onConfigure} variant="secondary" size="small" style={{ alignSelf: 'flex-start' }} />
+          <Button label={t('cost.change')} onPress={onConfigure} variant="secondary" size="small" style={{ alignSelf: 'flex-start' }} />
         </>
       )}
     </Card>
