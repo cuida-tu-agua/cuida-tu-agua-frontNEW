@@ -12,7 +12,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import i18n from '../../../i18n';
-import { localeTag } from '../../../i18n/format';
+import { formatDateTime } from '../../../i18n/format';
 import { placeRepository } from '../../../core/di/container';
 import { AppError } from '../../../domain/common/AppError';
 import { Place } from '../../../domain/places/Place';
@@ -89,7 +89,7 @@ const metaStyle: TextStyle = themed(() => ({
 }));
 
 const formatDate = (iso: string) =>
-  new Date(iso).toLocaleString(localeTag(), { dateStyle: 'medium', timeStyle: 'short' });
+  formatDateTime(iso);
 
 export const EditPlaceScreen: React.FC<Props> = ({ navigation, route }) => {
   const { t } = useTranslation();

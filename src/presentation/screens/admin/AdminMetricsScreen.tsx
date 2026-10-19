@@ -11,6 +11,7 @@ import { PageHeader } from '../../components/common/PageHeader';
 import { RequireAdmin } from '../../components/admin/RequireAdmin';
 import { useAdminMetrics } from '../../hooks/useAdminMetrics';
 import { MainStackParamList } from '../../navigation/types';
+import { formatTime } from '../../../i18n/format';
 import { theme } from '../../styles/theme';
 import { themed } from '../../styles/themeRuntime';
 
@@ -55,7 +56,7 @@ const Metrics: React.FC<{ onUsers: () => void }> = ({ onUsers }) => {
       <PageHeader
         webOnly={false}
         title="Resumen de la plataforma"
-        subtitle={`Datos actualizados a las ${new Date(metrics.generatedAt).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })}`}
+        subtitle={`Datos actualizados a las ${formatTime(metrics.generatedAt)}`}
         right={
           <Button
             label="Actualizar"

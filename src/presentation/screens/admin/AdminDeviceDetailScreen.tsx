@@ -12,6 +12,7 @@ import { Card } from '../../components/common/Card';
 import { ConfirmDialog } from '../../components/common/ConfirmDialog';
 import { PageContainer } from '../../components/common/PageContainer';
 import { PageHeader } from '../../components/common/PageHeader';
+import { formatDateTime } from '../../../i18n/format';
 import { useAdminDevice } from '../../hooks/useAdminDevice';
 import { MainStackParamList } from '../../navigation/types';
 import { theme } from '../../styles/theme';
@@ -20,7 +21,7 @@ import { themed } from '../../styles/themeRuntime';
 type Props = NativeStackScreenProps<MainStackParamList, 'AdminDeviceDetail'>;
 
 const when = (iso: string | null): string =>
-  iso ? new Date(iso).toLocaleString('es-CO', { day: 'numeric', month: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }) : '—';
+  iso ? formatDateTime(iso) : '—';
 
 export const AdminDeviceDetailScreen: React.FC<Props> = ({ navigation, route }) => (
   <RequireAdmin>

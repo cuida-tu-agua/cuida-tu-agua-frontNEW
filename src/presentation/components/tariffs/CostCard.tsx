@@ -11,7 +11,7 @@ import { Banner } from '../common/Banner';
 import { Button } from '../common/Button';
 import { Card } from '../common/Card';
 import { useTranslation } from 'react-i18next';
-import { localeTag } from '../../../i18n/format';
+import { formatNumber } from '../../../i18n/format';
 
 interface CostCardProps {
   period: ConsumptionPeriod;
@@ -71,7 +71,7 @@ export const CostCard: React.FC<CostCardProps> = ({ period, cost, loading, error
                 <Text style={lineLabelStyle}>
                   {t('cost.tierLine', {
                     name: tier.name,
-                    m3: tier.cubicMeters.toLocaleString(localeTag(), { maximumFractionDigits: 2 }),
+                    m3: formatNumber(tier.cubicMeters),
                     price: formatMoney(tier.pricePerM3, shown.currency),
                   })}
                 </Text>

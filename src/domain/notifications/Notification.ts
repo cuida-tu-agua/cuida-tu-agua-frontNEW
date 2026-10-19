@@ -1,5 +1,5 @@
 import i18n from '../../i18n';
-import { localeTag } from '../../i18n/format';
+import { formatDate } from '../../i18n/format';
 /** What ms-notification sends. Values are the SNAKE_CASE_UPPER strings of its JSON. */
 export type NotificationSeverity = 'INFO' | 'WARNING' | 'CRITICAL';
 
@@ -115,7 +115,7 @@ export const timeAgo = (iso: string, now: Date = new Date()): string => {
   const days = Math.round(hours / 24);
   if (days === 1) return i18n.t('notifications.timeAgo.yesterday');
   if (days < 7) return i18n.t('notifications.timeAgo.days', { count: days });
-  return then.toLocaleDateString(localeTag(), { day: 'numeric', month: 'short', year: 'numeric' });
+  return formatDate(then);
 };
 
 /** The notification with a read mark, for the optimistic update of the list. */
