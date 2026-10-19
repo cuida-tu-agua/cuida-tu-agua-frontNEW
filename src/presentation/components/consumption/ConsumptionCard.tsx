@@ -12,6 +12,7 @@ import { Card } from '../common/Card';
 import { SegmentedControl } from '../common/SegmentedControl';
 import { ConsumptionChart } from './ConsumptionChart';
 import { themed } from '../../styles/themeRuntime';
+import { useTranslation } from 'react-i18next';
 
 interface ConsumptionCardProps {
   period: ConsumptionPeriod;
@@ -25,6 +26,7 @@ interface ConsumptionCardProps {
 const PERIODS: ConsumptionPeriod[] = ['DAY', 'WEEK', 'MONTH'];
 
 export const ConsumptionCard: React.FC<ConsumptionCardProps> = ({ period, onPeriodChange, data, loading, error, unit }) => {
+  const { t } = useTranslation();
   const shown = data && data.period === period ? data : null; // never show last week's bars under "Hoy"
   const flowing = !!shown?.currentFlowLpm && shown.currentFlowLpm >= 0.05;
 
@@ -36,11 +38,11 @@ export const ConsumptionCard: React.FC<ConsumptionCardProps> = ({ period, onPeri
         onChange={onPeriodChange}
       />
 
-      {!!error && <Banner tone="warning" message={`No pudimos actualizar el consumo. ${error.message}`} />}
+      {!!error && <Banner tone="warning" message={t('consumption.updateFailed', { reason: error.message })} />}
 
       {!shown ? (
         <View style={centerStyle}>
-          {loading ? <ActivityIndicator color={theme.colors.primary} /> : <Text style={mutedStyle}>Sin datos</Text>}
+          {loading ? <ActivityIndicator color={theme.colors.primary} /> : <Text style={mutedStyle}>{t('consumption.noData')}</Text>}
         </View>
       ) : (
         <>
@@ -53,11 +55,11 @@ export const ConsumptionCard: React.FC<ConsumptionCardProps> = ({ period, onPeri
             <View style={[flowBadgeStyle, { backgroundColor: flowing ? theme.colors.infoBg : theme.colors.grayLight }]}>
               <Ionicons name="water" size={14} color={flowing ? theme.colors.info : theme.colors.textMuted} />
               <Text style={[flowTextStyle, { color: flowing ? theme.colors.info : theme.colors.textMuted }]}>
-                {flowing ? `Ahora: ${formatFlow(shown.currentFlowLpm)}` : formatFlow(shown.currentFlowLpm)}
+                {flowing ? t('consumption.flowNow', { flow: formatFlow(shown.currentFlowLpm) }) : formatFlow(shown.currentFlowLpm)}
               </Text>
             </View>
             <Text style={mutedStyle}>
-              {shown.lastReadingAt ? `Última lectura ${formatLastReport(shown.lastReadingAt)}` : 'Aún sin lecturas'}
+              {shown.lastReadingAt ? t('consumption.lastReading', { when: formatLastReport(shown.lastReadingAt) }) : t('consumption.noReadings')}
             </Text>
           </View>
 
@@ -67,7 +69,7 @@ export const ConsumptionCard: React.FC<ConsumptionCardProps> = ({ period, onPeri
             <View style={emptyStyle}>
               <Ionicons name="bar-chart-outline" size={32} color={theme.colors.grayMedium} />
               <Text style={mutedStyle}>
-                Todavía no hay lecturas en este periodo. Cuando pase agua por el medidor, verás el consumo aquí.
+                {t('consumption.emptyPeriod')}
               </Text>
             </View>
           )}
