@@ -1,5 +1,5 @@
 import i18n from '../../i18n';
-import { localeTag } from '../../i18n/format';
+import { localeTag, numberMarks } from '../../i18n/format';
 import { Currency } from '../places/Place';
 
 /** MANUAL = typed by the user from their bill (HU-054). CATALOG = preloaded for the city and stratum (HU-066). */
@@ -82,23 +82,24 @@ export const STRATA = [1, 2, 3, 4, 5, 6];
 export const MAX_UNIT_PRICE = 1_000_000;
 export const MAX_FIXED_CHARGE = 10_000_000;
 
-/** "$ 162.800" for pesos (no cents) and "US$ 12,50" for dollars in Spanish; "$ 162,800" and "US$ 12.50" in English. */
+/** "$ 162.800" for pesos (no cents) and "US$ 12,50" for dollars in Spanish and Portuguese, "$ 162,800" and "US$ 12.50" in English, "$ 162 800" and "US$ 12,50" in French. */
 export const formatMoney = (amount: number, currency: Currency): string => {
-  const english = localeTag().startsWith('en');
+  const { group, decimal } = numberMarks();
   const decimals = currency === 'COP' ? 0 : 2;
   const fixed = Math.abs(amount).toFixed(decimals);
   const [whole, fraction] = fixed.split('.');
-  const grouped = whole.replace(/\B(?=(\d{3})+(?!\d))/g, english ? ',' : '.');
+  const grouped = whole.replace(/\B(?=(\d{3})+(?!\d))/g, group);
   const sign = amount < 0 ? '-' : '';
   const prefix = currency === 'COP' ? '$' : 'US$';
-  return `${sign}${prefix} ${grouped}${fraction ? `${english ? '.' : ','}${fraction}` : ''}`;
+  return `${sign}${prefix} ${grouped}${fraction ? `${decimal}${fraction}` : ''}`;
 };
 
 /**
  * What the user typed in a price field -> number, or null when it is not a number.
- * Spanish: "5.234" is 5234 (dot = thousands, as on the bill) and "5234,5" is 5234.5 (comma = decimal).
+ * Spanish, Portuguese and French: "5.234" is 5234 (dot = thousands, as on the bill) and "5234,5" is 5234.5 (comma = decimal);
+ * spaces are ignored, so the French "5 234" works too.
  * English: "5,234" is 5234 (comma = thousands) and "5234.5" is 5234.5 (dot = decimal).
- * A lone mark followed by 1-2 digits is always the decimal mark in either language.
+ * A lone mark followed by 1-2 digits is always the decimal mark in every language.
  */
 export const parseMoneyInput = (text: string): number | null => {
   const clean = text.replace(/\s|\$|US/g, '');
