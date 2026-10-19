@@ -4,12 +4,13 @@ import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useFonts } from 'expo-font';
 import { AuthProvider } from './src/core/auth/AuthContext';
+import { linking } from './src/presentation/navigation/linking';
 import { navigationRef } from './src/presentation/navigation/navigationRef';
 import { RootNavigator } from './src/presentation/navigation/RootNavigator';
 import { SplashScreen } from './src/presentation/screens/SplashScreen';
 import { FONT_ASSETS } from './src/presentation/styles/fontAssets';
 import { installFontPatch } from './src/presentation/styles/fonts';
-import { ThemeBoundary, ThemeProvider, useAppTheme } from './src/presentation/theme/ThemeProvider';
+import { ThemeProvider, useAppTheme } from './src/presentation/theme/ThemeProvider';
 
 // Every Text of the app uses the brand fonts (Manrope / IBM Plex Mono), whatever weight each screen asks for
 installFontPatch();
@@ -24,6 +25,7 @@ const Root: React.FC<{ fontsReady: boolean }> = ({ fontsReady }) => {
   return (
     <NavigationContainer
       ref={navigationRef}
+      linking={linking}
       theme={{
         ...DefaultTheme,
         dark,
@@ -37,9 +39,8 @@ const Root: React.FC<{ fontsReady: boolean }> = ({ fontsReady }) => {
         },
       }}
     >
-      <ThemeBoundary>
-        <RootNavigator />
-      </ThemeBoundary>
+      {/* No remount on a theme change: Root re-renders with the new palette, so the screens keep their scroll and state */}
+      <RootNavigator />
     </NavigationContainer>
   );
 };

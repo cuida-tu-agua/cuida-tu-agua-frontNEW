@@ -42,7 +42,7 @@ export const NotificationPreferencesScreen: React.FC<Props> = ({ navigation }) =
   }
 
   return (
-    <PageContainer medium gap={theme.spacing.lg}>
+    <PageContainer gap={theme.spacing.lg}>
       <PageHeader
         back={{ label: 'Volver', onPress: () => navigation.goBack() }}
         title="Preferencias de alertas"
@@ -55,10 +55,13 @@ export const NotificationPreferencesScreen: React.FC<Props> = ({ navigation }) =
       )}
       {!!prefs.error && <Banner tone="error" message={prefs.error.message} onClose={prefs.dismissError} />}
 
-      <View style={gridStyle}>
-        {prefs.levels.map((level) => (
-          <LevelCard key={level.severity} level={level} saving={prefs.saving} onToggle={(c) => void prefs.toggle(level.severity, c)} />
-        ))}
+      {/* the title stays on the left; the cards are centered in a 880 px column */}
+      <View style={centeredColumnStyle}>
+        <View style={gridStyle}>
+          {prefs.levels.map((level) => (
+            <LevelCard key={level.severity} level={level} saving={prefs.saving} onToggle={(c) => void prefs.toggle(level.severity, c)} />
+          ))}
+        </View>
       </View>
     </PageContainer>
   );
@@ -106,14 +109,17 @@ const centerStyle: ViewStyle = themed(() => ({
   backgroundColor: theme.colors.background,
 }));
 const introStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, fontSize: 15, color: theme.colors.textSecondary }));
+const centeredColumnStyle: ViewStyle = { width: '100%', maxWidth: 880, alignSelf: 'center' };
 const gridStyle: ViewStyle = { flexDirection: 'row', flexWrap: 'wrap', gap: theme.spacing.lg };
 const cardStyle: ViewStyle = { flexGrow: 1, flexBasis: 300, gap: theme.spacing.sm };
 const levelTitleStyle: TextStyle = themed(() => ({ ...theme.textStyles.h2, fontSize: 20, color: theme.colors.textPrimary }));
 const levelHintStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, color: theme.colors.textMuted, marginBottom: theme.spacing.sm }));
+// Same height for every row (a row with a note like "Siempre activo" is taller otherwise and the cards' lines stop matching)
 const rowStyle: ViewStyle = themed(() => ({
   flexDirection: 'row',
   alignItems: 'center',
   gap: theme.spacing.md,
+  minHeight: 68,
   paddingVertical: theme.spacing.sm,
   borderTopWidth: 1,
   borderTopColor: theme.colors.border,

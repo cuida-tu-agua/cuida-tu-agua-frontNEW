@@ -81,6 +81,9 @@ const labelStyle: TextStyle = themed(() => ({
 
 const smallLabelStyle: TextStyle = { fontSize: 14, letterSpacing: 0.7 };
 
+/** Web only: the desktop label (18 px, extra bold) is too big for the buttons of a page; a 15 px semibold reads better. */
+const webLabelStyle: TextStyle = Platform.OS === 'web' ? { fontSize: 15, fontWeight: '700', letterSpacing: 0.6 } : {};
+
 export const Button: React.FC<ButtonProps> = ({
   label,
   onPress,
@@ -129,7 +132,7 @@ export const Button: React.FC<ButtonProps> = ({
               ) : (
                 <View style={styles.iconWrapper}>{icon}</View>
               ))}
-            <Text style={[labelStyle, size === 'small' && smallLabelStyle, { color }]}>{label}</Text>
+            <Text style={[labelStyle, webLabelStyle, size === 'small' && smallLabelStyle, { color }]}>{label}</Text>
           </View>
         );
       }}

@@ -37,7 +37,7 @@ const STEPS: { icon: keyof typeof Ionicons.glyphMap; text: string }[] = [
 ];
 
 export const DeviceWifiSetupScreen: React.FC<Props> = ({ navigation, route }) => {
-  const { placeId, placeName, next } = route.params;
+  const { placeId, placeName = 'Mi lugar', next } = route.params;
   const [openError, setOpenError] = useState(false);
 
   const openSetupPage = async () => {

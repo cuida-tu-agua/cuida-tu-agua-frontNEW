@@ -24,6 +24,7 @@ import { TipsScreen } from '../screens/tips/TipsScreen';
 import { ValveHistoryScreen } from '../screens/valve/ValveHistoryScreen';
 import { theme } from '../styles/theme';
 import { MainStackParamList } from './types';
+import { themeAware } from '../theme/ThemeProvider';
 
 const Stack = createNativeStackNavigator<MainStackParamList>();
 
@@ -41,30 +42,30 @@ export const MainNavigator: React.FC = () => (
       headerBackTitle: 'Atrás',
     }}
   >
-    <Stack.Screen name="Places" component={PlacesScreen} options={{ headerShown: false }} />
-    <Stack.Screen name="CreatePlace" component={CreatePlaceScreen} options={{ title: 'Registrar lugar' }} />
-    <Stack.Screen name="EditPlace" component={EditPlaceScreen} options={{ title: 'Editar lugar' }} />
-    <Stack.Screen name="PlaceDevice" component={PlaceDeviceScreen} options={{ title: 'Medidor' }} />
-    <Stack.Screen name="LinkDevice" component={LinkDeviceScreen} options={{ title: 'Vincular medidor' }} />
-    <Stack.Screen name="DeviceWifiSetup" component={DeviceWifiSetupScreen} options={{ title: 'WiFi del medidor' }} />
-    <Stack.Screen name="PlaceDashboard" component={PlaceDashboardScreen} options={{ title: 'Panel' }} />
-    <Stack.Screen name="ValveHistory" component={ValveHistoryScreen} options={{ title: 'Historial de la válvula' }} />
-    <Stack.Screen name="PlaceTariff" component={PlaceTariffScreen} options={{ title: 'Tarifa del agua' }} />
-    <Stack.Screen name="Tips" component={TipsScreen} options={{ title: 'Consejos de ahorro' }} />
-    <Stack.Screen name="AdminTips" component={AdminTipsScreen} options={{ title: 'Recomendaciones' }} />
-    <Stack.Screen name="AdminMetrics" component={AdminMetricsScreen} options={{ title: 'Resumen' }} />
-    <Stack.Screen name="AdminUsers" component={AdminUsersScreen} options={{ title: 'Usuarios' }} />
-    <Stack.Screen name="AdminDevices" component={AdminDevicesScreen} options={{ title: 'Medidores' }} />
-    <Stack.Screen name="AdminDeviceDetail" component={AdminDeviceDetailScreen} options={({ route }) => ({ title: route.params.serialNumber ?? 'Medidor' })} />
-    <Stack.Screen name="AdminDeviceCreate" component={AdminDeviceCreateScreen} options={{ title: 'Alta de fábrica' }} />
-    <Stack.Screen name="Notifications" component={NotificationsScreen} options={{ title: 'Notificaciones' }} />
+    <Stack.Screen name="Places" component={themeAware(PlacesScreen)} options={{ headerShown: false }} />
+    <Stack.Screen name="CreatePlace" component={themeAware(CreatePlaceScreen)} options={{ title: 'Registrar lugar' }} />
+    <Stack.Screen name="EditPlace" component={themeAware(EditPlaceScreen)} options={{ title: 'Editar lugar' }} />
+    <Stack.Screen name="PlaceDevice" component={themeAware(PlaceDeviceScreen)} options={{ title: 'Medidor' }} />
+    <Stack.Screen name="LinkDevice" component={themeAware(LinkDeviceScreen)} options={{ title: 'Vincular medidor' }} />
+    <Stack.Screen name="DeviceWifiSetup" component={themeAware(DeviceWifiSetupScreen)} options={{ title: 'WiFi del medidor' }} />
+    <Stack.Screen name="PlaceDashboard" component={themeAware(PlaceDashboardScreen)} options={{ title: 'Panel' }} />
+    <Stack.Screen name="ValveHistory" component={themeAware(ValveHistoryScreen)} options={{ title: 'Historial de la válvula' }} />
+    <Stack.Screen name="PlaceTariff" component={themeAware(PlaceTariffScreen)} options={{ title: 'Tarifa del agua' }} />
+    <Stack.Screen name="Tips" component={themeAware(TipsScreen)} options={{ title: 'Consejos de ahorro' }} />
+    <Stack.Screen name="AdminTips" component={themeAware(AdminTipsScreen)} options={{ title: 'Recomendaciones' }} />
+    <Stack.Screen name="AdminMetrics" component={themeAware(AdminMetricsScreen)} options={{ title: 'Resumen' }} />
+    <Stack.Screen name="AdminUsers" component={themeAware(AdminUsersScreen)} options={{ title: 'Usuarios' }} />
+    <Stack.Screen name="AdminDevices" component={themeAware(AdminDevicesScreen)} options={{ title: 'Medidores' }} />
+    <Stack.Screen name="AdminDeviceDetail" component={themeAware(AdminDeviceDetailScreen)} options={({ route }) => ({ title: route.params.serialNumber ?? 'Medidor' })} />
+    <Stack.Screen name="AdminDeviceCreate" component={themeAware(AdminDeviceCreateScreen)} options={{ title: 'Alta de fábrica' }} />
+    <Stack.Screen name="Notifications" component={themeAware(NotificationsScreen)} options={{ title: 'Notificaciones' }} />
     <Stack.Screen
       name="NotificationPreferences"
-      component={NotificationPreferencesScreen}
+      component={themeAware(NotificationPreferencesScreen)}
       options={{ title: 'Preferencias de notificaciones' }}
     />
-    <Stack.Screen name="Profile" component={ProfileScreen} options={{ title: 'Mi perfil' }} />
-    <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} options={{ title: 'Cambiar contraseña' }} />
-    <Stack.Screen name="DeleteAccount" component={DeleteAccountScreen} options={{ title: 'Eliminar cuenta' }} />
+    <Stack.Screen name="Profile" component={themeAware(ProfileScreen)} options={{ title: 'Mi perfil' }} />
+    <Stack.Screen name="ChangePassword" component={themeAware(ChangePasswordScreen)} options={{ title: 'Cambiar contraseña' }} />
+    <Stack.Screen name="DeleteAccount" component={themeAware(DeleteAccountScreen)} options={{ title: 'Eliminar cuenta' }} />
   </Stack.Navigator>
 );

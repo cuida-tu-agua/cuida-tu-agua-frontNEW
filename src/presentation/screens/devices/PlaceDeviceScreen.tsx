@@ -20,7 +20,7 @@ import { themed } from '../../styles/themeRuntime';
 type Props = NativeStackScreenProps<MainStackParamList, 'PlaceDevice'>;
 
 export const PlaceDeviceScreen: React.FC<Props> = ({ navigation, route }) => {
-  const { placeId, placeName } = route.params;
+  const { placeId, placeName = 'Mi lugar' } = route.params;
   const { loaded, device, error, checkedAt, reload, unlink } = usePlaceDevice(placeId);
 
   const [confirming, setConfirming] = useState(false);

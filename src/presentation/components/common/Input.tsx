@@ -7,8 +7,7 @@ import {
   TextStyle,
   StyleProp,
   TouchableOpacity,
-  TextInputProps,
-} from 'react-native';
+  TextInputProps, Platform } from 'react-native';
 import { theme } from '../../styles/theme';
 import { themed } from '../../styles/themeRuntime';
 
@@ -166,11 +165,11 @@ export const Input: React.FC<InputProps> = ({
     <View style={[containerBase, style]}>
       {label && <Text style={labelBase}>{label}</Text>}
 
-      <View style={fieldStyle}>
+      <View style={fieldStyle} testID="field-bar">
         {leftIcon && <View pointerEvents="none">{leftIcon}</View>}
 
         <View style={[textAreaStyle, multiline && multilineAreaStyle]}>
-          {!value && !!placeholder && (
+          {Platform.OS !== 'web' && !value && !!placeholder && (
             <View pointerEvents="none" style={[placeholderWrapperStyle, multiline && { justifyContent: 'flex-start' }]}>
               <Text style={placeholderTextStyle} numberOfLines={1}>
                 {placeholder}
@@ -181,6 +180,8 @@ export const Input: React.FC<InputProps> = ({
             style={[textInputStyle, multiline && multilineTextStyle, !editable && { color: theme.colors.textMuted }]}
             multiline={multiline}
             accessibilityLabel={label ?? placeholder}
+            placeholder={Platform.OS === 'web' ? placeholder : undefined}
+            placeholderTextColor={theme.colors.textMuted}
             selectionColor={theme.colors.primary}
             cursorColor={theme.colors.primary}
             value={value}

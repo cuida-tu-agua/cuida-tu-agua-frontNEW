@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, ViewStyle } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, View, ViewStyle } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { profileService } from '../../../core/di/container';
 import { toAppError } from '../../../infrastructure/http/httpError';
@@ -53,8 +53,10 @@ export const ChangePasswordScreen: React.FC<Props> = ({ navigation }) => {
 
   return (
     <KeyboardAvoidingView style={screenStyle} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <PageContainer narrow>
+      <PageContainer>
         <PageHeader back={{ label: 'Volver', onPress: () => navigation.goBack() }} title="Cambiar contraseña" />
+        {/* the title stays on the left; the form is centered in a 720 px column */}
+        <View style={formColumnStyle}>
         {bannerMessage && <Banner tone="error" message={bannerMessage} onClose={() => setBannerMessage(null)} />}
 
         <PasswordField
@@ -82,6 +84,7 @@ export const ChangePasswordScreen: React.FC<Props> = ({ navigation }) => {
         />
 
         <Button label="Cambiar contraseña" onPress={save} loading={saving} />
+        </View>
       </PageContainer>
 
       <SuccessModal
@@ -94,5 +97,6 @@ export const ChangePasswordScreen: React.FC<Props> = ({ navigation }) => {
   );
 };
 
+const formColumnStyle: ViewStyle = { width: '100%', maxWidth: 720, alignSelf: 'center' };
 const screenStyle: ViewStyle = themed(() => ({ flex: 1, backgroundColor: theme.colors.background }));
 const contentStyle: ViewStyle = { padding: theme.spacing.lg, paddingBottom: theme.spacing.huge };

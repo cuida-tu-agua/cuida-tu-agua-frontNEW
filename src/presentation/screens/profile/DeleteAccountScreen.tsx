@@ -98,8 +98,10 @@ export const DeleteAccountScreen: React.FC<Props> = ({ navigation }) => {
 
   return (
     <KeyboardAvoidingView style={screenStyle} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <PageContainer narrow gap={theme.spacing.xs}>
+      <PageContainer gap={theme.spacing.md}>
         <PageHeader back={{ label: 'Volver', onPress: () => navigation.goBack() }} title="Eliminar cuenta" />
+        {/* the title stays on the left; the warning and the form are centered in a 720 px column */}
+        <View style={formColumnStyle}>
         <View style={warningCardStyle}>
           <Ionicons name="warning" size={32} color={theme.colors.error} />
           <Text style={warningTitleStyle}>Vas a eliminar tu cuenta</Text>
@@ -149,11 +151,13 @@ export const DeleteAccountScreen: React.FC<Props> = ({ navigation }) => {
 
         <Button label="Eliminar mi cuenta" variant="danger" onPress={handleDelete} loading={deleting} />
         <Button label="No, volver" variant="ghost" onPress={() => navigation.goBack()} disabled={deleting} />
+        </View>
       </PageContainer>
     </KeyboardAvoidingView>
   );
 };
 
+const formColumnStyle: ViewStyle = { width: '100%', maxWidth: 720, alignSelf: 'center', gap: theme.spacing.md };
 const screenStyle: ViewStyle = themed(() => ({ flex: 1, backgroundColor: theme.colors.background }));
 const contentStyle: ViewStyle = { padding: theme.spacing.lg, paddingBottom: theme.spacing.huge, gap: theme.spacing.xs };
 

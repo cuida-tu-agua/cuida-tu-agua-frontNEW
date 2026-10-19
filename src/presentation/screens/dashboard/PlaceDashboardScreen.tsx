@@ -30,7 +30,7 @@ import { themed } from '../../styles/themeRuntime';
 type Props = NativeStackScreenProps<MainStackParamList, 'PlaceDashboard'>;
 
 export const PlaceDashboardScreen: React.FC<Props> = ({ navigation, route }) => {
-  const { placeId, placeName } = route.params;
+  const { placeId, placeName = 'Mi lugar' } = route.params;
   const { isCompact } = useLayout();
   const [period, setPeriod] = useState<ConsumptionPeriod>('DAY');
   const [unit, setUnit] = useState<MeasurementUnit>('LITERS');

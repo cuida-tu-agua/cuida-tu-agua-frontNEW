@@ -7,6 +7,7 @@ import { ResetPasswordScreen } from '../screens/auth/ResetPasswordScreen';
 import { VerifyEmailScreen } from '../screens/auth/VerifyEmailScreen';
 import { theme } from '../styles/theme';
 import { AuthStackParamList } from './types';
+import { themeAware } from '../theme/ThemeProvider';
 
 const Stack = createNativeStackNavigator<AuthStackParamList>();
 
@@ -19,10 +20,10 @@ export const AuthNavigator: React.FC = () => (
       contentStyle: { backgroundColor: theme.colors.background },
     }}
   >
-    <Stack.Screen name="Login" component={LoginScreen} />
-    <Stack.Screen name="Register" component={RegisterScreen} />
-    <Stack.Screen name="VerifyEmail" component={VerifyEmailScreen} />
-    <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
-    <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
+    <Stack.Screen name="Login" component={themeAware(LoginScreen)} />
+    <Stack.Screen name="Register" component={themeAware(RegisterScreen)} />
+    <Stack.Screen name="VerifyEmail" component={themeAware(VerifyEmailScreen)} />
+    <Stack.Screen name="ForgotPassword" component={themeAware(ForgotPasswordScreen)} />
+    <Stack.Screen name="ResetPassword" component={themeAware(ResetPasswordScreen)} />
   </Stack.Navigator>
 );

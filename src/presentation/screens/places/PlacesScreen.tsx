@@ -28,6 +28,7 @@ import { NotificationBell } from '../../components/notifications/NotificationBel
 import { Button } from '../../components/common/Button';
 import { PageHeader } from '../../components/common/PageHeader';
 import { PlaceCard } from '../../components/places/PlaceCard';
+import { listContentStyle } from '../../components/common/PageContainer';
 import { useLayout } from '../../layout/breakpoints';
 import { MainStackParamList } from '../../navigation/types';
 import { theme } from '../../styles/theme';
@@ -96,6 +97,8 @@ export const PlacesScreen: React.FC<Props> = ({ navigation, route }) => {
   };
 
   const isWeb = Platform.OS === 'web';
+  // Web: the header, the empty state and the list share one centered column, the same width as Notificaciones
+  const webColumn = isWeb ? listContentStyle() : undefined;
   const welcome = places && places.length > 0 ? 'Elige el lugar que quieres monitorear o abre su panel para ver el consumo y la válvula.' : 'Empecemos a cuidar el agua.';
 
   // Web: the Figma page header inside the content (the menu already has the bell and the profile). Phone: the bar with bell + avatar.
@@ -148,7 +151,7 @@ export const PlacesScreen: React.FC<Props> = ({ navigation, route }) => {
     return (
       <View style={screenStyle}>
         {header}
-        {isWeb && <View style={webPageStyle}>{webHeader}</View>}
+        {isWeb && <View style={webColumn}>{webHeader}</View>}
         <View style={centerStyle}>
           {loadError ? (
             <>
@@ -167,23 +170,39 @@ export const PlacesScreen: React.FC<Props> = ({ navigation, route }) => {
   }
 
   if (places.length === 0) {
+    const emptyContent = (
+      <>
+        <View style={emptyIconStyle}>
+          <Ionicons name="water-outline" size={isWeb ? 34 : 48} color={theme.colors.primary} />
+        </View>
+        <Text style={emptyTitleStyle}>Aún no tienes lugares</Text>
+        <Text style={emptyTextStyle}>
+          Registra tu casa, tu local o tu finca. Después podrás vincular un medidor y ver cuánta agua consumes.
+        </Text>
+        <Button
+          label="Registrar mi primer lugar"
+          size={isWeb ? 'medium' : 'large'}
+          onPress={() => navigation.navigate('CreatePlace')}
+          style={isWeb ? undefined : fullWidthStyle}
+        />
+      </>
+    );
+
     return (
       <View style={screenStyle}>
         {header}
-        <View style={[contentStyle, isWeb && webPageStyle]}>
-          {isWeb && webHeader}
-          {banners}
-        </View>
-        <View style={[centerStyle, isWeb && emptyCardStyle]}>
-          <View style={emptyIconStyle}>
-            <Ionicons name="water-outline" size={48} color={theme.colors.primary} />
+        {isWeb ? (
+          <View style={[contentStyle, webColumn]}>
+            {webHeader}
+            {banners}
+            <View style={emptyCardStyle}>{emptyContent}</View>
           </View>
-          <Text style={emptyTitleStyle}>Aún no tienes lugares</Text>
-          <Text style={emptyTextStyle}>
-            Registra tu casa, tu local o tu finca. Después podrás vincular un medidor y ver cuánta agua consumes.
-          </Text>
-          <Button label="Registrar mi primer lugar" onPress={() => navigation.navigate('CreatePlace')} style={fullWidthStyle} />
-        </View>
+        ) : (
+          <>
+            <View style={contentStyle}>{banners}</View>
+            <View style={centerStyle}>{emptyContent}</View>
+          </>
+        )}
       </View>
     );
   }
@@ -197,7 +216,7 @@ export const PlacesScreen: React.FC<Props> = ({ navigation, route }) => {
         columnWrapperStyle={columns > 1 ? gridRowStyle : undefined}
         data={places}
         keyExtractor={(place) => place.id}
-        contentContainerStyle={[contentStyle, isWeb && { paddingTop: theme.spacing.xl }, { paddingBottom: insets.bottom + theme.spacing.xl }]}
+        contentContainerStyle={[contentStyle, listContentStyle(), { paddingBottom: insets.bottom + theme.spacing.xl }]}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} tintColor={theme.colors.primary} />}
         accessibilityRole="radiogroup"
         ListHeaderComponent={
@@ -255,13 +274,14 @@ const headerTextStyle: ViewStyle = { flex: 1 };
 
 const gridRowStyle: ViewStyle = { gap: theme.spacing.lg };
 
-const webPageStyle: ViewStyle = { paddingHorizontal: theme.spacing.lg, paddingTop: theme.spacing.xl };
 const webCountStyle: TextStyle = themed(() => ({ ...theme.textStyles.h3, fontSize: 19, fontWeight: '800', color: theme.colors.textPrimary, marginBottom: theme.spacing.md }));
+// Web empty state: a card as wide as the page column (it starts on the same left edge as the title) with its content centered inside
 const emptyCardStyle: ViewStyle = themed(() => ({
-  flex: 0,
-  alignSelf: 'stretch',
-  marginHorizontal: theme.spacing.lg,
-  paddingVertical: theme.spacing.huge,
+  width: '100%',
+  alignItems: 'center',
+  gap: theme.spacing.md,
+  paddingHorizontal: theme.spacing.xl,
+  paddingVertical: theme.spacing.xxl,
   borderRadius: theme.borderRadius.large,
   borderWidth: 1,
   borderColor: theme.colors.border,
@@ -292,23 +312,29 @@ const sectionTitleStyle: TextStyle = themed(() => ({
 }));
 
 const emptyIconStyle: ViewStyle = themed(() => ({
-  width: 96,
-  height: 96,
-  borderRadius: 48,
+  width: 72,
+  height: 72,
+  borderRadius: 36,
   backgroundColor: theme.colors.infoBg,
   alignItems: 'center',
   justifyContent: 'center',
 }));
 
-const emptyTitleStyle: TextStyle = themed(() => ({ ...theme.textStyles.h2, color: theme.colors.textPrimary, textAlign: 'center' }));
+const emptyTitleStyle: TextStyle = themed(() => ({
+  ...theme.textStyles.h3,
+  fontSize: 22,
+  fontWeight: '800',
+  lineHeight: 28,
+  color: theme.colors.textPrimary,
+  textAlign: 'center',
+}));
 
 const emptyTextStyle: TextStyle = themed(() => ({
   ...theme.textStyles.caption,
-  fontSize: 16,
-  lineHeight: 24,
+  fontSize: 15,
+  lineHeight: 23,
   color: theme.colors.textSecondary,
   textAlign: 'center',
-  marginBottom: theme.spacing.md,
 }));
 
 const fullWidthStyle: ViewStyle = { alignSelf: 'stretch' };

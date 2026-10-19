@@ -29,7 +29,7 @@ type Props = NativeStackScreenProps<MainStackParamList, 'PlaceTariff'>;
  * stratum (preloaded) or type the price of the bill. Both are kept in a history; the app always says which one is in use.
  */
 export const PlaceTariffScreen: React.FC<Props> = ({ navigation, route }) => {
-  const { placeId, placeName } = route.params;
+  const { placeId, placeName = 'Mi lugar' } = route.params;
   const t = usePlaceTariffs(placeId);
 
   const [picked, setPicked] = useState<number | null>(null);

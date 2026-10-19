@@ -9,8 +9,8 @@ import { ColorTokens, ThemeName, paletteFor } from './palettes';
  *  - `colors`: an object whose properties are read from the CURRENT palette each time they are accessed.
  *  - `themed(factory)`: a style object that re-runs its factory the first time it is read after the theme changed.
  *
- * Changing the theme calls setThemeName(); the app then remounts its screens (ThemeBoundary), they read their styles
- * again and get the new colors.
+ * Changing the theme calls setThemeName(); the app then re-renders (ThemeProvider and Root) and the screens read their
+ * styles again and get the new colors, without remounting, so the scroll position is kept.
  *
  * Both are Proxies, and a Proxy must never reach a native view: React Native freezes the props of native views in
  * development and a Proxy cannot be frozen. Every Proxy made here is registered (registerLiveValue) so the JSX runtime

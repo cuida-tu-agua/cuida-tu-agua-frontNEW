@@ -172,8 +172,9 @@ export const ProfileScreen: React.FC<Props> = ({ navigation }) => {
 
   return (
     <KeyboardAvoidingView style={screenStyle} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <PageContainer narrow>
+      <PageContainer>
         <PageHeader title="Mi perfil" />
+        <View style={formColumnStyle}>
         <View style={avatarBlockStyle}>
           <View>
             <Avatar uri={avatarUri(user.avatarUrl)} firstName={user.firstName} lastName={user.lastName} size={112} />
@@ -263,6 +264,7 @@ export const ProfileScreen: React.FC<Props> = ({ navigation }) => {
           danger
           onPress={() => navigation.navigate('DeleteAccount')}
         />
+        </View>
       </PageContainer>
 
       <ConfirmDialog
@@ -296,6 +298,8 @@ const screenStyle: ViewStyle = themed(() => ({ flex: 1, backgroundColor: theme.c
 const contentStyle: ViewStyle = { padding: theme.spacing.lg, paddingBottom: theme.spacing.huge };
 
 const avatarBlockStyle: ViewStyle = { alignItems: 'center', gap: theme.spacing.md, marginBottom: theme.spacing.xl };
+// Web: the form is a centered column of 720 px under the page title (which stays on the left)
+const formColumnStyle: ViewStyle = { width: '100%', maxWidth: 720, alignSelf: 'center' };
 
 const avatarOverlayStyle: ViewStyle = themed(() => ({
   position: 'absolute',

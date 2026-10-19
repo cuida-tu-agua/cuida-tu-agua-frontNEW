@@ -55,5 +55,5 @@ const rowStyle: ViewStyle = { flexDirection: 'row', flexWrap: 'wrap', alignItems
 const textBlockStyle: ViewStyle = { flexGrow: 1, flexShrink: 1, flexBasis: 280, gap: 2 };
 const rightStyle: ViewStyle = { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.sm, flexWrap: 'wrap' };
 const captionStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, fontWeight: '600', color: theme.colors.textMuted }));
-const titleStyle: TextStyle = themed(() => ({ ...theme.textStyles.h1, color: theme.colors.textPrimary }));
+const titleStyle: TextStyle = themed(() => ({ ...theme.textStyles.h2, color: theme.colors.textPrimary }));
 const subtitleStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, fontSize: 15, color: theme.colors.textSecondary }));

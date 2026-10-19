@@ -6,7 +6,7 @@ import { isAdmin } from '../../domain/admin/Admin';
 import { Logo } from '../components/common/Logo';
 import { UnreadBadge } from '../components/notifications/NotificationBell';
 import { useUnreadCount } from '../hooks/useUnreadCount';
-import { CONTENT_MAX_WIDTH, RAIL_WIDTH, SIDEBAR_WIDTH, shellModeFor, useLayout } from '../layout/breakpoints';
+import { RAIL_WIDTH, SIDEBAR_WIDTH, shellModeFor, useLayout } from '../layout/breakpoints';
 import { theme } from '../styles/theme';
 import { themed } from '../styles/themeRuntime';
 import { NavItem, NavSection, isAdminSection, navItemsFor, sectionOf, USER_DOOR } from './navItems';
@@ -237,7 +237,8 @@ const rootStyle: ViewStyle = themed(() => ({ flex: 1, flexDirection: 'row', back
 const topRootStyle: ViewStyle = themed(() => ({ flex: 1, backgroundColor: theme.colors.background }));
 
 const contentOuterStyle: ViewStyle = themed(() => ({ flex: 1, alignItems: 'center', backgroundColor: theme.colors.background }));
-const contentColumnStyle: ViewStyle = { flex: 1, width: '100%', maxWidth: CONTENT_MAX_WIDTH, alignSelf: 'center' };
+// Not capped: each page centers its own column (PageContainer, listContentStyle) so the scroll bar stays on the edge
+const contentColumnStyle: ViewStyle = { flex: 1, width: '100%' };
 
 const menuStyle: ViewStyle = themed(() => ({
   backgroundColor: theme.colors.surface,

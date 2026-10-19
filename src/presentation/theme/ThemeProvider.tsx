@@ -16,6 +16,7 @@ export interface ThemePreference {
 export const DEFAULT_PREFERENCE: ThemePreference = { style: 'classic', mode: 'system' };
 
 const STORAGE_KEY = 'theme.preference';
+const AUTOFILL_STYLE_ID = 'theme-autofill';
 
 /** A stored value that is not one of the options (an old version, a damaged entry) falls back to the default. */
 export const parsePreference = (raw: string | null): ThemePreference => {
@@ -90,7 +91,21 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     document.documentElement.style.backgroundColor = palette.background;
     document.documentElement.style.colorScheme = isDark(name) ? 'dark' : 'light';
     document.body.style.backgroundColor = palette.background;
-  }, [name, palette.background]);
+    // When the browser fills a field (saved password, suggestion), the input and the whole bar of the field (icons
+    // and eye included, marked with testID "field-bar") take the same color, in every theme.
+    document.documentElement.style.setProperty('--field-autofill', palette.infoBg);
+    document.documentElement.style.setProperty('--field-text', palette.textPrimary);
+    if (!document.getElementById(AUTOFILL_STYLE_ID)) {
+      const style = document.createElement('style');
+      style.id = AUTOFILL_STYLE_ID;
+      style.textContent =
+        'input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus{' +
+        '-webkit-box-shadow:0 0 0 1000px var(--field-autofill) inset !important;' +
+        '-webkit-text-fill-color:var(--field-text) !important;transition:background-color 9999s ease-in-out 0s;}' +
+        '[data-testid="field-bar"]:has(input:-webkit-autofill){background-color:var(--field-autofill) !important;}';
+      document.head.appendChild(style);
+    }
+  }, [name, palette.background, palette.infoBg, palette.textPrimary]);
 
   const value = useMemo<ThemeContextValue>(
     () => ({ preference, name, palette, dark: isDark(name), ready, setStyle, setMode }),
@@ -111,12 +126,21 @@ export const useAppTheme = (): ThemeContextValue => {
   return context;
 };
 
+const themeAwareCache = new WeakMap<object, React.FC<any>>();
+
 /**
- * Remounts its children when the theme changes. The styles of the screens are recalculated when they are read; this
- * makes every mounted screen read them again, so the new colors show at once. (Navigation state is not touched: the
- * boundary lives INSIDE the navigation container, so the user stays on the same screen.)
+ * A screen that re-renders when the theme changes. React Navigation does not re-render its screens on a context change,
+ * so each screen subscribes to the theme here. The wrapper is cached per screen: the same component type on every
+ * render, so nothing remounts (the scroll and the form data stay).
  */
-export const ThemeBoundary: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { name } = useAppTheme();
-  return <React.Fragment key={name}>{children}</React.Fragment>;
+export const themeAware = <P extends object>(Component: React.ComponentType<P>): React.FC<P> => {
+  const cached = themeAwareCache.get(Component);
+  if (cached) return cached as React.FC<P>;
+  const Wrapped: React.FC<P> = (props) => {
+    useAppTheme(); // the subscription: a new theme value renders this screen again
+    return <Component {...props} />;
+  };
+  Wrapped.displayName = `themeAware(${Component.displayName ?? Component.name})`;
+  themeAwareCache.set(Component, Wrapped);
+  return Wrapped;
 };

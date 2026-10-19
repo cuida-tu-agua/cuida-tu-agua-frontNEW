@@ -39,7 +39,7 @@ const STEPS = [
 
 /** HU-012: link a meter to the place (serial + pairing code printed on the box). */
 export const LinkDeviceScreen: React.FC<Props> = ({ navigation, route }) => {
-  const { placeId, placeName } = route.params;
+  const { placeId, placeName = 'Mi lugar' } = route.params;
 
   // Same rules as the domain (and as DeviceSecrets in ms-devices)
   const form = useForm(EMPTY_LINK_DEVICE_FORM, {

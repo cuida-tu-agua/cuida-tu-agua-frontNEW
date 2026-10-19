@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, ViewStyle, TextStyle } from 'react-native';
+import Svg, { Circle, Path } from 'react-native-svg';
 import { theme } from '../../styles/theme';
-import { UIcon } from './UIcon';
 import { passwordRules } from '../../../domain/auth/passwordPolicy';
 import { themed } from '../../styles/themeRuntime';
 
@@ -10,6 +10,31 @@ interface PasswordStrengthMeterProps {
 }
 
 const SEGMENTS = 4;
+
+/**
+ * One check mark for the whole meter: a filled circle with a check when the rule is met, an outlined circle when
+ * not. Both share the same box and stroke, so the states look the same size (the Flaticon glyphs do not: their
+ * check is drawn smaller inside its box).
+ */
+const RuleIcon: React.FC<{ met: boolean; color: string; size: number }> = ({ met, color, size }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" style={{ flexShrink: 0 }}>
+    {met ? (
+      <>
+        <Circle cx="12" cy="12" r="12" fill={color} />
+        <Path
+          d="M6.8 12.4l3.4 3.4 7-7.4"
+          stroke={theme.colors.textOnPrimary}
+          strokeWidth={2.6}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+        />
+      </>
+    ) : (
+      <Circle cx="12" cy="12" r="10.5" stroke={color} strokeWidth={2} fill="none" />
+    )}
+  </Svg>
+);
 
 const LEVELS = themed(() => [
   { label: '', color: theme.colors.grayMedium },
@@ -45,7 +70,7 @@ export const PasswordStrengthMeter: React.FC<PasswordStrengthMeterProps> = ({ pa
 
         <View style={levelLabelRowStyle}>
           {!!level.label && <Text style={[levelTextStyle, { color: level.color }]}>{level.label}</Text>}
-          {score >= 3 && <UIcon name="check" size={14} color={level.color} />}
+          {score >= 3 && <RuleIcon met size={14} color={level.color} />}
         </View>
       </View>
 
@@ -57,9 +82,9 @@ export const PasswordStrengthMeter: React.FC<PasswordStrengthMeterProps> = ({ pa
             accessibilityLabel={`${rule.label}: ${rule.met ? 'cumple' : 'falta'}`}
             style={[chipStyle, { backgroundColor: rule.met ? theme.colors.infoBg : theme.colors.grayLight }]}
           >
-            <UIcon
-              name={rule.met ? 'check' : 'circle'}
-              size={11}
+            <RuleIcon
+              met={rule.met}
+              size={17}
               color={rule.met ? theme.colors.primaryActive : theme.colors.textMuted}
             />
             <Text style={[chipTextStyle, { color: rule.met ? theme.colors.textPrimary : theme.colors.textMuted }]}>
@@ -116,7 +141,10 @@ const chipsRowStyle: ViewStyle = {
 };
 
 const chipStyle: ViewStyle = {
-  flex: 1, 
+  // two chips per row: four in one row cannot fit "Mayúscula" on a phone
+  flexBasis: '48%',
+  flexGrow: 1,
+  minWidth: 0,
   flexDirection: 'row',
   alignItems: 'center',
   gap: 5,
@@ -127,5 +155,5 @@ const chipStyle: ViewStyle = {
 
 const chipTextStyle: TextStyle = {
   ...theme.textStyles.label,
-  
+  flexShrink: 1,
 };
