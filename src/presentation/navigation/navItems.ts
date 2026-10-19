@@ -1,5 +1,6 @@
 import type { ComponentProps } from 'react';
 import type { Ionicons } from '@expo/vector-icons';
+import i18n from '../../i18n';
 import { isAdmin } from '../../domain/admin/Admin';
 import { MainStackParamList } from './types';
 
@@ -16,20 +17,21 @@ export interface NavItem {
 }
 
 const BASE_ITEMS: NavItem[] = [
-  { section: 'places', label: 'Mis lugares', icon: 'home-outline', route: 'Places' },
-  { section: 'notifications', label: 'Notificaciones', icon: 'notifications-outline', route: 'Notifications' },
-  { section: 'tips', label: 'Consejos favoritos', icon: 'heart-outline', route: 'Tips' },
-  { section: 'profile', label: 'Mi perfil', icon: 'person-circle-outline', route: 'Profile' },
+  { section: 'places', get label() { return i18n.t('nav.places'); }, icon: 'home-outline', route: 'Places' },
+  { section: 'notifications', get label() { return i18n.t('nav.notifications'); }, icon: 'notifications-outline', route: 'Notifications' },
+  { section: 'tips', get label() { return i18n.t('nav.tips'); }, icon: 'heart-outline', route: 'Tips' },
+  { section: 'profile', get label() { return i18n.t('nav.profile'); }, icon: 'person-circle-outline', route: 'Profile' },
 ];
 
 /** Administration (E14): only the ADMIN role sees it. The servers refuse these calls to anybody else anyway. */
 const ADMIN_ITEMS: NavItem[] = [
-  { section: 'adminMetrics', label: 'Resumen', icon: 'stats-chart-outline', route: 'AdminMetrics' },
-  { section: 'adminUsers', label: 'Usuarios', icon: 'people-outline', route: 'AdminUsers' },
-  { section: 'adminDevices', label: 'Medidores', icon: 'hardware-chip-outline', route: 'AdminDevices' },
-  { section: 'adminTips', label: 'Recomendaciones', icon: 'bulb-outline', route: 'AdminTips' },
+  { section: 'adminMetrics', get label() { return i18n.t('nav.adminSummary'); }, icon: 'stats-chart-outline', route: 'AdminMetrics' },
+  { section: 'adminUsers', get label() { return i18n.t('nav.adminUsers'); }, icon: 'people-outline', route: 'AdminUsers' },
+  { section: 'adminDevices', get label() { return i18n.t('nav.adminDevices'); }, icon: 'hardware-chip-outline', route: 'AdminDevices' },
+  { section: 'adminTips', get label() { return i18n.t('nav.adminTips'); }, icon: 'bulb-outline', route: 'AdminTips' },
 ];
 
+/** `label` is a getter on every item, so the text follows the language active when it is read. */
 /** The menu of a person using their places: places, inbox, favorite tips, profile. */
 export const userNavItems = (): NavItem[] => [...BASE_ITEMS];
 
@@ -37,8 +39,8 @@ export const userNavItems = (): NavItem[] => [...BASE_ITEMS];
 export const adminNavItems = (): NavItem[] => [...ADMIN_ITEMS];
 
 /** Door between the two areas: an administrator sees it in the user menu, and the admin menu has the way back. */
-export const ADMIN_DOOR: NavItem = { section: 'adminMetrics', label: 'Administración', icon: 'shield-checkmark-outline', route: 'AdminMetrics' };
-export const USER_DOOR: NavItem = { section: 'places', label: 'Ir a mis lugares', icon: 'home-outline', route: 'Places' };
+export const ADMIN_DOOR: NavItem = { section: 'adminMetrics', get label() { return i18n.t('nav.adminDoor'); }, icon: 'shield-checkmark-outline', route: 'AdminMetrics' };
+export const USER_DOOR: NavItem = { section: 'places', get label() { return i18n.t('nav.userDoor'); }, icon: 'home-outline', route: 'Places' };
 
 export const isAdminSection = (section: NavSection | null): boolean => !!section && section.startsWith('admin');
 

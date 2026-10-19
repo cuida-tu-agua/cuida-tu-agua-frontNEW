@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, ViewStyle, TextStyle } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import Svg, { Circle, Path } from 'react-native-svg';
 import { theme } from '../../styles/theme';
 import { passwordRules } from '../../../domain/auth/passwordPolicy';
@@ -37,23 +38,25 @@ const RuleIcon: React.FC<{ met: boolean; color: string; size: number }> = ({ met
 );
 
 const LEVELS = themed(() => [
-  { label: '', color: theme.colors.grayMedium },
-  { label: 'Débil', color: theme.colors.error },
-  { label: 'Regular', color: theme.colors.warning },
-  { label: 'Fuerte', color: theme.colors.primaryActive },
-  { label: 'Muy fuerte', color: theme.colors.success },
+  { key: null, color: theme.colors.grayMedium },
+  { key: 'weak', color: theme.colors.error },
+  { key: 'fair', color: theme.colors.warning },
+  { key: 'strong', color: theme.colors.primaryActive },
+  { key: 'veryStrong', color: theme.colors.success },
 ]);
 
 export const PasswordStrengthMeter: React.FC<PasswordStrengthMeterProps> = ({ password }) => {
+  const { t } = useTranslation();
   const rules = passwordRules(password);
   const score = password ? rules.filter((r) => r.met).length : 0;
   const level = LEVELS[score];
+  const levelLabel = level.key ? t(`password.strength.${level.key}`) : '';
 
   return (
     <View
       style={containerStyle}
       accessible
-      accessibilityLabel={`Seguridad de la contraseña: ${level.label || 'sin evaluar'}`}
+      accessibilityLabel={t('password.strength.a11y', { level: levelLabel || t('password.strength.notEvaluated') })}
     >
       <View style={headerRowStyle}>
         <View style={segmentsRowStyle}>
@@ -69,7 +72,7 @@ export const PasswordStrengthMeter: React.FC<PasswordStrengthMeterProps> = ({ pa
         </View>
 
         <View style={levelLabelRowStyle}>
-          {!!level.label && <Text style={[levelTextStyle, { color: level.color }]}>{level.label}</Text>}
+          {!!levelLabel && <Text style={[levelTextStyle, { color: level.color }]}>{levelLabel}</Text>}
           {score >= 3 && <RuleIcon met size={14} color={level.color} />}
         </View>
       </View>
@@ -79,7 +82,7 @@ export const PasswordStrengthMeter: React.FC<PasswordStrengthMeterProps> = ({ pa
           <View
             key={rule.id}
             accessible
-            accessibilityLabel={`${rule.label}: ${rule.met ? 'cumple' : 'falta'}`}
+            accessibilityLabel={t(rule.met ? 'password.strength.ruleMet' : 'password.strength.ruleMissing', { rule: rule.label })}
             style={[chipStyle, { backgroundColor: rule.met ? theme.colors.infoBg : theme.colors.grayLight }]}
           >
             <RuleIcon

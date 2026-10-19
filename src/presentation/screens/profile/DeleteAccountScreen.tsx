@@ -16,18 +16,14 @@ import { Checkbox } from '../../components/common/Checkbox';
 import { MainStackParamList } from '../../navigation/types';
 import { theme } from '../../styles/theme';
 import { themed } from '../../styles/themeRuntime';
+import { useTranslation } from 'react-i18next';
 
 type Props = NativeStackScreenProps<MainStackParamList, 'DeleteAccount'>;
 
-const CONSEQUENCES = [
-  'Borraremos tu nombre, teléfono y foto.',
-  'Se cerrará tu sesión en todos tus dispositivos.',
-  'Tus medidores quedarán desvinculados.',
-  'Las personas con acceso a tus lugares lo perderán.',
-  'No se puede deshacer: tendrías que crear una cuenta nueva.',
-];
+const CONSEQUENCES = ['data', 'sessions', 'devices', 'access', 'final'] as const;
 
 export const DeleteAccountScreen: React.FC<Props> = ({ navigation }) => {
+  const { t } = useTranslation();
   const { endSession } = useAuth();
   const [understood, setUnderstood] = useState(false);
   const [password, setPassword] = useState('');
@@ -69,13 +65,13 @@ export const DeleteAccountScreen: React.FC<Props> = ({ navigation }) => {
   const handleDelete = async () => {
     const needsPassword = methods?.password === true && !reauthCode;
     const next = {
-      understood: understood ? undefined : 'Marca la casilla para confirmar.',
-      password: needsPassword && !password ? 'Escribe tu contraseña para confirmar.' : undefined,
+      understood: understood ? undefined : t('deleteAccount.understoodRequired'),
+      password: needsPassword && !password ? t('deleteAccount.passwordRequired') : undefined,
     };
     setErrors(next);
     if (next.understood || next.password) return;
     if (!needsPassword && !reauthCode) {
-      setBannerMessage('Confirma la eliminación con tu cuenta de Google.');
+      setBannerMessage(t('deleteAccount.needGoogle'));
       return;
     }
 
@@ -87,7 +83,7 @@ export const DeleteAccountScreen: React.FC<Props> = ({ navigation }) => {
     } catch (error) {
       const appError = toAppError(error);
       if (appError.code === 'user.current_password_incorrect' || appError.code === 'auth.wrong_password') {
-        setErrors({ password: 'La contraseña no es correcta.' });
+        setErrors({ password: t('deleteAccount.wrongPassword') });
       } else {
         if (appError.code === 'auth.google_failed') setReauthCode(null); // the Google code was spent or expired
         setBannerMessage(appError.message);
@@ -99,16 +95,16 @@ export const DeleteAccountScreen: React.FC<Props> = ({ navigation }) => {
   return (
     <KeyboardAvoidingView style={screenStyle} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <PageContainer gap={theme.spacing.md}>
-        <PageHeader back={{ label: 'Volver', onPress: () => navigation.goBack() }} title="Eliminar cuenta" />
+        <PageHeader back={{ label: t('common.back'), onPress: () => navigation.goBack() }} title={t('deleteAccount.title')} />
         {/* the title stays on the left; the warning and the form are centered in a 720 px column */}
         <View style={formColumnStyle}>
         <View style={warningCardStyle}>
           <Ionicons name="warning" size={32} color={theme.colors.error} />
-          <Text style={warningTitleStyle}>Vas a eliminar tu cuenta</Text>
+          <Text style={warningTitleStyle}>{t('deleteAccount.warningTitle')}</Text>
           {CONSEQUENCES.map((line) => (
             <View key={line} style={bulletRowStyle}>
               <Ionicons name="close-circle" size={18} color={theme.colors.error} />
-              <Text style={bulletTextStyle}>{line}</Text>
+              <Text style={bulletTextStyle}>{t(`deleteAccount.consequences.${line}`)}</Text>
             </View>
           ))}
         </View>
@@ -123,12 +119,12 @@ export const DeleteAccountScreen: React.FC<Props> = ({ navigation }) => {
           }}
           error={errors.understood}
         >
-          <Text style={checkboxTextStyle}>Entiendo que esta acción no se puede deshacer.</Text>
+          <Text style={checkboxTextStyle}>{t('deleteAccount.understood')}</Text>
         </Checkbox>
 
         {methods?.password && !reauthCode && (
           <PasswordField
-            label="Tu contraseña"
+            label={t('deleteAccount.passwordLabel')}
             value={password}
             onChangeText={(t) => {
               setPassword(t);
@@ -140,17 +136,17 @@ export const DeleteAccountScreen: React.FC<Props> = ({ navigation }) => {
 
         {methods?.google && !reauthCode && (
           <Button
-            label="Confirmar con Google"
+            label={t('deleteAccount.confirmWithGoogle')}
             variant="secondary"
             onPress={confirmWithGoogle}
             disabled={deleting}
             icon={<FontAwesome name="google" size={18} color={theme.colors.primary} />}
           />
         )}
-        {reauthCode && <Text style={checkboxTextStyle}>Identidad confirmada con Google.</Text>}
+        {reauthCode && <Text style={checkboxTextStyle}>{t('deleteAccount.googleConfirmed')}</Text>}
 
-        <Button label="Eliminar mi cuenta" variant="danger" onPress={handleDelete} loading={deleting} />
-        <Button label="No, volver" variant="ghost" onPress={() => navigation.goBack()} disabled={deleting} />
+        <Button label={t('deleteAccount.submit')} variant="danger" onPress={handleDelete} loading={deleting} />
+        <Button label={t('deleteAccount.cancel')} variant="ghost" onPress={() => navigation.goBack()} disabled={deleting} />
         </View>
       </PageContainer>
     </KeyboardAvoidingView>

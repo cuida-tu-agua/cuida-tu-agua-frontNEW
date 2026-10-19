@@ -1,50 +1,37 @@
-# Welcome to your Expo app 👋
+# Cuida Tu Agua: mobile and web app
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+React Native (Expo) app, one project for web and mobile, for the Cuida Tu Agua water meter platform:
+consumption and cost per place, meter linking, valve control, notifications, saving tips and an administration panel.
+It talks to the five services of the platform (ms-iam, ms-places, ms-device, ms-consumption, ms-valve).
 
-## Get started
+SENA project, Software Analysis and Development.
 
-1. Install dependencies
-
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+## Run it
 
 ```bash
-npm run reset-project
+npm install
+npm run web      # http://localhost:19006
+npm start        # Expo, to open it on a phone or an emulator
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+The services must be running. Each address comes from an `EXPO_PUBLIC_*` variable (copy `.env.example` to `.env`); without it the app works the address out by itself (on the web, the host of the page; on a phone in development, the PC running Expo) with the port of each service (3001 to 3005).
 
-## Learn more
+## Useful commands
 
-To learn more about developing your project with Expo, look at the following resources:
+| Command | What it does |
+|---------|--------------|
+| `npx tsc --noEmit` | Type check |
+| `npx jest` | Unit tests (`npm test` also reports coverage) |
+| `npm run lint` | ESLint |
+| `npm run build:web` | Web build |
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+## Languages
 
-## Join the community
+The app is available in Spanish (default), English, French and Portuguese (Brazil). The user chooses it in
+Profile → Language. How it works and how to add a text or a language: [`docs/i18n.md`](docs/i18n.md).
+The user stories of the translation work are in [`docs/i18n-user-stories.md`](docs/i18n-user-stories.md).
 
-Join our community of developers creating universal apps.
+## More documents
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- [`PUSH.md`](PUSH.md): push notifications on a phone.
+- [`PUBLICACION.md`](PUBLICACION.md): publishing the app.

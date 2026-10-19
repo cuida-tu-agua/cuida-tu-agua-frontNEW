@@ -6,6 +6,8 @@ import { DEVICE_STATUS_LABELS, formatLastReport } from '../../../domain/devices/
 import { theme } from '../../styles/theme';
 import { Card } from '../common/Card';
 import { themed } from '../../styles/themeRuntime';
+import { useTranslation } from 'react-i18next';
+import { formatDateTime } from '../../../i18n/format';
 
 interface DeviceStatusCardProps {
   device: Device;
@@ -21,10 +23,11 @@ const STATUS_STYLE: Record<DeviceStatus, { fg: string; bg: string; icon: keyof t
 }));
 
 const formatDate = (iso: string) =>
-  new Date(iso).toLocaleString('es-CO', { dateStyle: 'medium', timeStyle: 'short' });
+  formatDateTime(iso);
 
 /** HU-013: status of the meter linked to a place. */
 export const DeviceStatusCard: React.FC<DeviceStatusCardProps> = ({ device, now }) => {
+  const { t } = useTranslation();
   const look = STATUS_STYLE[device.status];
   const label = DEVICE_STATUS_LABELS[device.status];
 
@@ -35,7 +38,7 @@ export const DeviceStatusCard: React.FC<DeviceStatusCardProps> = ({ device, now 
           <Ionicons name="speedometer-outline" size={22} color={look.fg} />
         </View>
         <View style={{ flex: 1 }}>
-          <Text style={captionStyle}>Medidor</Text>
+          <Text style={captionStyle}>{t('deviceScreens.card.meter')}</Text>
           <Text style={serialStyle} numberOfLines={1}>
             {device.serialNumber}
           </Text>
@@ -43,17 +46,17 @@ export const DeviceStatusCard: React.FC<DeviceStatusCardProps> = ({ device, now 
         <View
           style={[badgeStyle, { backgroundColor: look.bg }]}
           accessible
-          accessibilityLabel={`Estado: ${label}`}
+          accessibilityLabel={t('deviceScreens.card.statusA11y', { status: label })}
         >
           <Ionicons name={look.icon} size={14} color={look.fg} />
           <Text style={[badgeTextStyle, { color: look.fg }]}>{label}</Text>
         </View>
       </View>
 
-      <Row label="Último reporte" value={formatLastReport(device.lastReportAt, now)} />
-      <Row label="Vinculado desde" value={formatDate(device.linkedAt)} />
-      <Row label="Se marca desconectado tras" value={`${device.inactivityThresholdMinutes} min sin reportar`} />
-      {!!device.firmwareVersion && <Row label="Firmware" value={device.firmwareVersion} mono />}
+      <Row label={t('deviceScreens.card.lastReport')} value={formatLastReport(device.lastReportAt, now)} />
+      <Row label={t('deviceScreens.card.linkedSince')} value={formatDate(device.linkedAt)} />
+      <Row label={t('deviceScreens.card.inactivity')} value={t('deviceScreens.card.inactivityValue', { minutes: device.inactivityThresholdMinutes })} />
+      {!!device.firmwareVersion && <Row label={t('deviceScreens.card.firmware')} value={device.firmwareVersion} mono />}
     </Card>
   );
 };

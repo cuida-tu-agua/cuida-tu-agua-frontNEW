@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Text, TextStyle, View, ViewStyle } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import i18n from '../../../i18n';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { FactoryDevice, MAX_BATCH, normalizeSerial, parseCount } from '../../../domain/admin/AdminDevices';
 import { adminDeviceRepository } from '../../../core/di/container';
@@ -22,8 +24,18 @@ type Props = NativeStackScreenProps<MainStackParamList, 'AdminDeviceCreate'>;
 type Mode = 'NEXT' | 'SPECIFIC';
 
 const MODES: { value: Mode; label: string }[] = [
-  { value: 'NEXT', label: 'Los siguientes seriales libres' },
-  { value: 'SPECIFIC', label: 'Un serial específico' },
+  {
+    value: 'NEXT',
+    get label() {
+      return i18n.t('adminCreate.modeNext');
+    },
+  },
+  {
+    value: 'SPECIFIC',
+    get label() {
+      return i18n.t('adminCreate.modeSpecific');
+    },
+  },
 ];
 
 /** Factory registration. The credentials that come back replace the form and are shown ONCE. */
@@ -34,6 +46,7 @@ export const AdminDeviceCreateScreen: React.FC<Props> = ({ navigation }) => (
 );
 
 const Create: React.FC<{ onBack: () => void }> = ({ onBack }) => {
+  const { t } = useTranslation();
   const [mode, setMode] = useState<Mode>('NEXT');
   const [count, setCount] = useState('1');
   const [serial, setSerial] = useState('');
@@ -53,7 +66,7 @@ const Create: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       input = { count: parsed.count };
     } else {
       const normalized = normalizeSerial(serial);
-      if (!normalized) return setFieldError('El serial tiene de 4 a 32 letras, números o guiones. Ej.: SW-ESP32-000100.');
+      if (!normalized) return setFieldError(t('adminCreate.serialInvalid'));
       input = { serialNumber: normalized };
     }
 
@@ -69,20 +82,20 @@ const Create: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
   return (
     <PageContainer narrow={!created} gap={theme.spacing.lg}>
-      <PageHeader webOnly={false} back={{ label: 'Medidores', onPress: onBack }} title="Alta de fábrica" subtitle="Registra medidores nuevos y obtén sus credenciales." />
+      <PageHeader webOnly={false} back={{ label: t('adminCreate.backLabel'), onPress: onBack }} title={t('adminCreate.title')} subtitle={t('adminCreate.subtitle')} />
 
       {created ? (
         <CredentialsSheet devices={created} onFinish={onBack} />
       ) : (
         <Card variant="outlined" style={{ gap: theme.spacing.md }}>
-          <Text style={titleStyle}>¿Cuántos medidores?</Text>
+          <Text style={titleStyle}>{t('adminCreate.howMany')}</Text>
           {!!error && <Banner tone="error" message={error} onClose={() => setError(null)} />}
 
           <SegmentedControl options={MODES} value={mode} onChange={setMode} disabled={saving} />
 
           {mode === 'NEXT' ? (
             <Input
-              label={`Cantidad (1 a ${MAX_BATCH})`}
+              label={t('adminCreate.quantity', { max: MAX_BATCH })}
               value={count}
               onChangeText={setCount}
               keyboardType="numeric"
@@ -92,7 +105,7 @@ const Create: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             />
           ) : (
             <Input
-              label="Serial"
+              label={t('adminCreate.serial')}
               placeholder="SW-ESP32-000100"
               value={serial}
               onChangeText={setSerial}
@@ -103,11 +116,11 @@ const Create: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             />
           )}
 
-          <Text style={hintStyle}>Se generan el token del firmware y el código de emparejamiento. Solo se muestran una vez: en la base de datos queda su huella (hash).</Text>
+          <Text style={hintStyle}>{t('adminCreate.hint')}</Text>
 
           <View style={buttonsStyle}>
-            <Button label="Cancelar" variant="secondary" size="medium" onPress={onBack} disabled={saving} />
-            <Button label="Registrar" size="medium" onPress={() => void submit()} loading={saving} />
+            <Button label={t('adminCreate.cancel')} variant="secondary" size="medium" onPress={onBack} disabled={saving} />
+            <Button label={t('adminCreate.register')} size="medium" onPress={() => void submit()} loading={saving} />
           </View>
         </Card>
       )}

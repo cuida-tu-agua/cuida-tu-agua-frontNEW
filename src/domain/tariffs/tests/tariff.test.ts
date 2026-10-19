@@ -1,3 +1,4 @@
+import { changeLanguage } from '../../../i18n';
 import { formatCatalogDate, formatMoney, parseMoneyInput, sourceLabel, validateManualTariff } from '../Tariff';
 
 describe('formatMoney', () => {
@@ -35,6 +36,31 @@ describe('parseMoneyInput: how people write a price', () => {
 
   it.each(['', 'abc', '12a', '1.2.3', '5,2,1', '--5'])('"%s" is not a number', (text) => {
     expect(parseMoneyInput(text)).toBeNull();
+  });
+});
+
+describe('parseMoneyInput in English (HU-077)', () => {
+  beforeEach(async () => { await changeLanguage('en'); });
+
+  it.each([
+    ['5234', 5234],
+    ['5,234', 5234],            // a comma followed by exactly 3 digits groups thousands
+    ['1,234,567', 1234567],
+    ['5234.5', 5234.5],         // a dot is the decimal mark
+    ['5,234.50', 5234.5],
+    ['5234,5', 5234.5],         // a lone comma with 1-2 digits is read as a decimal mark
+    ['US$ 12.50', 12.5],
+  ])('%s -> %s', (text, expected) => {
+    expect(parseMoneyInput(text)).toBe(expected);
+  });
+
+  it.each(['', 'abc', '1.2.3', '1,2,3.4.5'])('"%s" is not a number', (text) => {
+    expect(parseMoneyInput(text)).toBeNull();
+  });
+
+  it('formatMoney and parseMoneyInput agree', () => {
+    expect(parseMoneyInput(formatMoney(162800, 'COP'))).toBe(162800);
+    expect(parseMoneyInput(formatMoney(12.5, 'USD'))).toBe(12.5);
   });
 });
 
@@ -81,5 +107,21 @@ describe('where the tariff comes from (HU-069)', () => {
     expect(formatCatalogDate('2026-01-01')).toBe('1 de enero de 2026');
     expect(formatCatalogDate('2026-10-09')).toBe('9 de octubre de 2026');
     expect(formatCatalogDate('no es fecha')).toBe('no es fecha');
+  });
+});
+
+describe('money in French (HU-080)', () => {
+  beforeEach(async () => { await changeLanguage('fr'); });
+
+  it('groups thousands with a no-break space and uses a decimal comma', () => {
+    expect(formatMoney(162800, 'COP')).toBe('$ 162 800');
+    expect(formatMoney(12.5, 'USD')).toBe('US$ 12,50');
+  });
+
+  it('reads the price the way a French speaker writes it', () => {
+    expect(parseMoneyInput('5 234,50')).toBe(5234.5);
+    expect(parseMoneyInput('5 234')).toBe(5234);
+    expect(parseMoneyInput('12,5')).toBe(12.5);
+    expect(parseMoneyInput(formatMoney(162800, 'COP'))).toBe(162800);
   });
 });

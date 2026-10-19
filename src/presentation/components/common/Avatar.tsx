@@ -1,6 +1,7 @@
 import React from 'react';
 import { Text, TextStyle, View, ViewStyle } from 'react-native';
 import { Image } from 'expo-image';
+import i18n from '../../../i18n';
 import { theme } from '../../styles/theme';
 import { themed } from '../../styles/themeRuntime';
 
@@ -15,12 +16,12 @@ export const Avatar: React.FC<AvatarProps> = ({ uri, firstName, lastName, size =
   const shape = { width: size, height: size, borderRadius: size / 2 };
 
   if (uri) {
-    return <Image source={{ uri }} style={shape} contentFit="cover" accessibilityLabel="Foto de perfil" />;
+    return <Image source={{ uri }} style={shape} contentFit="cover" accessibilityLabel={i18n.t('commonUi.profilePhoto')} />;
   }
 
   const initials = `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
   return (
-    <View style={[circleStyle, shape]} accessibilityLabel={`Iniciales ${initials}`}>
+    <View style={[circleStyle, shape]} accessibilityLabel={i18n.t('commonUi.initials', { initials })}>
       <Text style={[initialsStyle, { fontSize: size * 0.38 }]}>{initials}</Text>
     </View>
   );

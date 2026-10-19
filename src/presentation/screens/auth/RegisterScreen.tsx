@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Text, TextStyle, View, ViewStyle } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { authService } from '../../../core/di/container';
 import { toAppError } from '../../../infrastructure/http/httpError';
@@ -35,14 +36,15 @@ const INITIAL = {
 };
 
 export const RegisterScreen: React.FC<Props> = ({ navigation }) => {
+  const { t } = useTranslation();
   const form = useForm(INITIAL, {
-    firstName: (v) => validateName(v, 'nombre'),
-    lastName: (v) => validateName(v, 'apellido'),
+    firstName: (v) => validateName(v, 'firstName'),
+    lastName: (v) => validateName(v, 'lastName'),
     email: validateEmail,
     phone: validatePhone,
     password: validatePassword,
     confirmPassword: (v, all) => validatePasswordConfirmation(all.password, v),
-    acceptTerms: (v) => (v ? undefined : 'Debes aceptar los términos para crear la cuenta.'),
+    acceptTerms: (v) => (v ? undefined : t('auth.register.termsRequired')),
   });
   const { values, errors, setValue, blur } = form;
 
@@ -57,7 +59,7 @@ export const RegisterScreen: React.FC<Props> = ({ navigation }) => {
     if (submitting) return;
     setBanner(null);
     if (!form.validateAll()) {
-      setBanner({ tone: 'error', message: 'Revisa los campos marcados en rojo.' });
+      setBanner({ tone: 'error', message: t('auth.register.reviewFields') });
       return;
     }
 
@@ -84,9 +86,9 @@ export const RegisterScreen: React.FC<Props> = ({ navigation }) => {
       if (appError.code === 'auth.email_already_registered') {
         setBanner({
           tone: 'info',
-          message: 'Ya existe una cuenta con este correo. Inicia sesión o recupera tu contraseña.',
+          message: t('auth.register.emailExists'),
           action: {
-            label: 'Ir a iniciar sesión',
+            label: t('auth.register.goToLogin'),
             onPress: () => navigation.reset({ index: 0, routes: [{ name: 'Login', params: { email } }] }),
           },
         });
@@ -99,17 +101,17 @@ export const RegisterScreen: React.FC<Props> = ({ navigation }) => {
 
   return (
     <AuthLayout
-      title="Crea tu cuenta"
-      subtitle="Mide y cuida el agua de tu casa o negocio"
+      title={t('auth.register.title')}
+      subtitle={t('auth.register.subtitle')}
       onBack={() => navigation.goBack()}
-      footer={<AuthFooterLink text="¿Ya tienes cuenta?" link="Inicia sesión" onPress={() => navigation.popTo('Login')} />}
+      footer={<AuthFooterLink text={t('auth.register.haveAccount')} link={t('auth.register.signIn')} onPress={() => navigation.popTo('Login')} />}
     >
       {banner && <Banner {...banner} onClose={() => setBanner(null)} />}
 
       <View style={rowStyle}>
         <Input
-          label="Nombres"
-          placeholder="Juan Diego"
+          label={t('auth.register.firstNameLabel')}
+          placeholder={t('auth.register.firstNamePlaceholder')}
           value={values.firstName}
           onChangeText={(t) => setValue('firstName', t)}
           onBlur={() => blur('firstName')}
@@ -121,8 +123,8 @@ export const RegisterScreen: React.FC<Props> = ({ navigation }) => {
           style={halfStyle}
         />
         <Input
-          label="Apellidos"
-          placeholder="Ome Figueroa"
+          label={t('auth.register.lastNameLabel')}
+          placeholder={t('auth.register.lastNamePlaceholder')}
           value={values.lastName}
           onChangeText={(t) => setValue('lastName', t)}
           onBlur={() => blur('lastName')}
@@ -136,13 +138,13 @@ export const RegisterScreen: React.FC<Props> = ({ navigation }) => {
       </View>
 
       <Input
-        label="Correo"
-        placeholder="tu@correo.com"
+        label={t('auth.emailLabel')}
+        placeholder={t('auth.emailPlaceholder')}
         value={values.email}
         onChangeText={(t) => setValue('email', t)}
         onBlur={() => blur('email')}
         error={errors.email}
-        hint="Te enviaremos un código para verificarlo."
+        hint={t('auth.register.emailHint')}
         keyboardType="email-address"
         autoComplete="email"
         textContentType="emailAddress"
@@ -151,13 +153,13 @@ export const RegisterScreen: React.FC<Props> = ({ navigation }) => {
       />
 
       <Input
-        label="Teléfono (opcional)"
-        placeholder="300 123 4567"
+        label={t('auth.register.phoneLabel')}
+        placeholder={t('auth.register.phonePlaceholder')}
         value={values.phone}
         onChangeText={(t) => setValue('phone', t)}
         onBlur={() => blur('phone')}
         error={errors.phone}
-        hint="Sirve para recuperar tu cuenta si olvidas la contraseña."
+        hint={t('auth.register.phoneHint')}
         keyboardType="phone-pad"
         autoComplete="tel"
         textContentType="telephoneNumber"
@@ -165,9 +167,9 @@ export const RegisterScreen: React.FC<Props> = ({ navigation }) => {
       />
 
       <PasswordField
-        label="Contraseña"
+        label={t('auth.passwordLabel')}
         purpose="new"
-        placeholder="Crea una contraseña segura"
+        placeholder={t('auth.register.passwordPlaceholder')}
         value={values.password}
         onChangeText={(t) => setValue('password', t)}
         onBlur={() => blur('password')}
@@ -176,9 +178,9 @@ export const RegisterScreen: React.FC<Props> = ({ navigation }) => {
       <PasswordStrengthMeter password={values.password} />
 
       <PasswordField
-        label="Confirmar contraseña"
+        label={t('auth.register.confirmLabel')}
         purpose="new"
-        placeholder="Repite la contraseña"
+        placeholder={t('auth.register.confirmPlaceholder')}
         value={values.confirmPassword}
         onChangeText={(t) => setValue('confirmPassword', t)}
         onBlur={() => blur('confirmPassword')}
@@ -191,12 +193,15 @@ export const RegisterScreen: React.FC<Props> = ({ navigation }) => {
         error={errors.acceptTerms}
       >
         <Text style={termsTextStyle}>
-          Acepto los <Text style={termsLinkStyle}>términos y condiciones</Text> y la{' '}
-          <Text style={termsLinkStyle}>política de tratamiento de datos</Text>.
+          {t('auth.register.termsPrefix')}
+          <Text style={termsLinkStyle}>{t('auth.register.termsLink')}</Text>
+          {t('auth.register.termsMiddle')}
+          <Text style={termsLinkStyle}>{t('auth.register.privacyLink')}</Text>
+          {t('auth.register.termsSuffix')}
         </Text>
       </Checkbox>
 
-      <Button label="Crear cuenta" onPress={handleSubmit} loading={submitting} />
+      <Button label={t('auth.register.submit')} onPress={handleSubmit} loading={submitting} />
 
       <GoogleSignInButton onError={(message) => setBanner({ tone: 'error', message })} />
     </AuthLayout>

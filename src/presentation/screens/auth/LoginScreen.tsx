@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Text, TextStyle } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useAuth } from '../../../core/auth/AuthContext';
 import { authService } from '../../../core/di/container';
@@ -10,7 +11,7 @@ import { Banner, BannerTone } from '../../components/common/Banner';
 import { Button } from '../../components/common/Button';
 import { Input } from '../../components/common/Input';
 import { formatCountdown, useCountdown } from '../../hooks/useCountdown';
-import { AuthStackParamList, LoginNotice } from '../../navigation/types';
+import { AuthStackParamList } from '../../navigation/types';
 import { theme } from '../../styles/theme';
 import { normalizeEmail, validateEmail, validateRequired } from '../../utils/validation';
 import { themed } from '../../styles/themeRuntime';
@@ -24,16 +25,8 @@ interface BannerState {
   action?: { label: string; onPress: () => void };
 }
 
-const NOTICES: Record<LoginNotice, BannerState> = {
-  verified: { tone: 'success', title: '¡Correo verificado!', message: 'Tu cuenta está lista. Inicia sesión para continuar.' },
-  password_reset: {
-    tone: 'success',
-    title: 'Contraseña actualizada',
-    message: 'Por seguridad cerramos tus otras sesiones. Inicia sesión con tu nueva contraseña.',
-  },
-};
-
 export const LoginScreen: React.FC<Props> = ({ navigation, route }) => {
+  const { t } = useTranslation();
   const { login, signedOutReason, clearSignedOutReason } = useAuth();
   const lock = useCountdown();
 
@@ -42,10 +35,14 @@ export const LoginScreen: React.FC<Props> = ({ navigation, route }) => {
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const [submitting, setSubmitting] = useState(false);
   const [banner, setBanner] = useState<BannerState | null>(() => {
-    if (route.params?.notice) return NOTICES[route.params.notice];
-    if (signedOutReason === 'expired') return { tone: 'info', message: 'Tu sesión expiró. Inicia sesión de nuevo.' };
+    const notice = route.params?.notice;
+    if (notice === 'verified') return { tone: 'success', title: t('auth.login.verified.title'), message: t('auth.login.verified.message') };
+    if (notice === 'password_reset') {
+      return { tone: 'success', title: t('auth.login.passwordReset.title'), message: t('auth.login.passwordReset.message') };
+    }
+    if (signedOutReason === 'expired') return { tone: 'info', message: t('auth.login.sessionExpired') };
     if (signedOutReason === 'deleted') {
-      return { tone: 'info', title: 'Cuenta eliminada', message: 'Eliminamos tu cuenta y cerramos todas tus sesiones.' };
+      return { tone: 'info', title: t('auth.login.accountDeleted.title'), message: t('auth.login.accountDeleted.message') };
     }
     return null;
   });
@@ -77,8 +74,8 @@ export const LoginScreen: React.FC<Props> = ({ navigation, route }) => {
         if (left !== undefined && left <= 2) {
           setBanner({
             tone: 'warning',
-            message: `Si fallas ${left === 1 ? 'una vez más' : `${left} veces más`}, bloquearemos tu cuenta 15 minutos por seguridad.`,
-            action: { label: '¿Olvidaste tu contraseña?', onPress: () => navigation.navigate('ForgotPassword', { identifier: email }) },
+            message: left === 1 ? t('auth.login.lastAttemptOne') : t('auth.login.lastAttemptMany', { count: left }),
+            action: { label: t('auth.login.forgot'), onPress: () => navigation.navigate('ForgotPassword', { identifier: email }) },
           });
         }
         return;
@@ -87,17 +84,17 @@ export const LoginScreen: React.FC<Props> = ({ navigation, route }) => {
         if (error.details.lockedUntil) lock.startUntil(error.details.lockedUntil);
         setBanner({
           tone: 'error',
-          title: 'Cuenta bloqueada temporalmente',
-          message: 'Hubo 5 intentos fallidos seguidos. Espera a que termine el contador o restablece tu contraseña.',
-          action: { label: 'Restablecer contraseña', onPress: () => navigation.navigate('ForgotPassword', { identifier: email }) },
+          title: t('auth.login.locked.title'),
+          message: t('auth.login.locked.message'),
+          action: { label: t('auth.login.locked.action'), onPress: () => navigation.navigate('ForgotPassword', { identifier: email }) },
         });
         return;
       case 'auth.account_not_verified':
         setBanner({
           tone: 'warning',
-          title: 'Falta verificar tu correo',
-          message: 'Te enviaremos un código de 6 dígitos para confirmar que el correo es tuyo.',
-          action: { label: 'Enviarme el código', onPress: goToVerification },
+          title: t('auth.login.notVerified.title'),
+          message: t('auth.login.notVerified.message'),
+          action: { label: t('auth.login.notVerified.action'), onPress: goToVerification },
         });
         return;
       default:
@@ -112,7 +109,7 @@ export const LoginScreen: React.FC<Props> = ({ navigation, route }) => {
     if (submitting || locked) return; // the keyboard "go" key skips the button's disabled state
     const nextErrors = {
       email: validateEmail(email),
-      password: validateRequired(password, 'Escribe tu contraseña.'),
+      password: validateRequired(password, t('auth.login.passwordRequired')),
     };
     setErrors(nextErrors);
     if (nextErrors.email || nextErrors.password) return;
@@ -130,15 +127,15 @@ export const LoginScreen: React.FC<Props> = ({ navigation, route }) => {
 
   return (
     <AuthLayout
-      title="Bienvenido de vuelta"
-      subtitle="Inicia sesión para ver el consumo de tus lugares"
-      footer={<AuthFooterLink text="¿No tienes cuenta?" link="Regístrate" onPress={() => navigation.navigate('Register')} />}
+      title={t('auth.login.title')}
+      subtitle={t('auth.login.subtitle')}
+      footer={<AuthFooterLink text={t('auth.login.noAccount')} link={t('auth.login.signUp')} onPress={() => navigation.navigate('Register')} />}
     >
       {banner && <Banner {...banner} onClose={() => setBanner(null)} />}
 
       <Input
-        label="Correo"
-        placeholder="tu@correo.com"
+        label={t('auth.emailLabel')}
+        placeholder={t('auth.emailPlaceholder')}
         value={email}
         onChangeText={(text) => {
           setEmail(text);
@@ -154,7 +151,7 @@ export const LoginScreen: React.FC<Props> = ({ navigation, route }) => {
       />
 
       <PasswordField
-        label="Contraseña"
+        label={t('auth.passwordLabel')}
         value={password}
         onChangeText={(text) => {
           setPassword(text);
@@ -171,11 +168,11 @@ export const LoginScreen: React.FC<Props> = ({ navigation, route }) => {
         accessibilityRole="link"
         suppressHighlighting
       >
-        ¿Olvidaste tu contraseña?
+        {t('auth.login.forgot')}
       </Text>
 
       <Button
-        label={locked ? `Intenta de nuevo en ${formatCountdown(lock.secondsLeft)}` : 'Iniciar sesión'}
+        label={locked ? t('auth.login.retryIn', { time: formatCountdown(lock.secondsLeft) }) : t('auth.login.submit')}
         onPress={handleSubmit}
         loading={submitting}
         disabled={locked}

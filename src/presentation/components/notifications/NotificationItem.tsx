@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { AppNotification, NotificationSeverity, NotificationType, timeAgo } from '../../../domain/notifications/Notification';
 import { theme } from '../../styles/theme';
 import { themed } from '../../styles/themeRuntime';
+import { useTranslation } from 'react-i18next';
 
 const TYPE_ICONS: Record<NotificationType, keyof typeof Ionicons.glyphMap> = {
   DEVICE_LINKED: 'link-outline',
@@ -13,10 +14,10 @@ const TYPE_ICONS: Record<NotificationType, keyof typeof Ionicons.glyphMap> = {
   SYSTEM_ANNOUNCEMENT: 'megaphone-outline',
 };
 
-const SEVERITY_COLORS: Record<NotificationSeverity, { fg: string; bg: string; label: string }> = themed(() => ({
-  CRITICAL: { fg: theme.colors.error, bg: theme.colors.errorBg, label: 'Crítica' },
-  WARNING: { fg: theme.colors.warning, bg: theme.colors.warningBg, label: 'Importante' },
-  INFO: { fg: theme.colors.info, bg: theme.colors.infoBg, label: 'Informativa' },
+const SEVERITY_COLORS: Record<NotificationSeverity, { fg: string; bg: string }> = themed(() => ({
+  CRITICAL: { fg: theme.colors.error, bg: theme.colors.errorBg },
+  WARNING: { fg: theme.colors.warning, bg: theme.colors.warningBg },
+  INFO: { fg: theme.colors.info, bg: theme.colors.infoBg },
 }));
 
 interface NotificationItemProps {
@@ -27,7 +28,8 @@ interface NotificationItemProps {
 
 /** One line of the inbox. Unread ones are bold with a dot; the colour tells how urgent it is. */
 export const NotificationItem: React.FC<NotificationItemProps> = ({ item, onPress, now }) => {
-  const tone = SEVERITY_COLORS[item.severity];
+  const { t } = useTranslation();
+  const tone = { ...SEVERITY_COLORS[item.severity], label: t(`notifications.severityOne.${item.severity}`) };
   const when = timeAgo(item.createdAt, now);
 
   return (
@@ -35,7 +37,7 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({ item, onPres
       onPress={onPress}
       style={[rowStyle, !item.isRead && unreadRowStyle]}
       accessibilityRole="button"
-      accessibilityLabel={`${item.isRead ? '' : 'Sin leer. '}${tone.label}. ${item.title}. ${when}`}
+      accessibilityLabel={`${item.isRead ? '' : t('notifications.itemUnread')}${tone.label}. ${item.title}. ${when}`}
     >
       <View style={[iconStyle, { backgroundColor: tone.bg }]}>
         <Ionicons name={TYPE_ICONS[item.type] ?? 'notifications-outline'} size={22} color={tone.fg} />

@@ -7,7 +7,9 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import i18n from '../../../i18n';
 import { placeRepository } from '../../../core/di/container';
 import { AppError } from '../../../domain/common/AppError';
 import { Place } from '../../../domain/places/Place';
@@ -33,6 +35,7 @@ const introStyle: TextStyle = themed(() => ({
 }));
 
 export const CreatePlaceScreen: React.FC<Props> = ({ navigation }) => {
+  const { t } = useTranslation();
   const form = usePlaceForm();
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -47,7 +50,7 @@ export const CreatePlaceScreen: React.FC<Props> = ({ navigation }) => {
       const place = await placeRepository.create(toCreatePlaceInput(form.values));
       setCreated(place); // opens the success modal
     } catch (error) {
-      const appError = error instanceof AppError ? error : new AppError('server', 'No se pudo registrar el lugar.');
+      const appError = error instanceof AppError ? error : new AppError('server', i18n.t('places.create.failed'));
       if (appError.kind === 'validation') form.applyServerErrors(appError.fieldErrors);
       setSubmitError(appError.message);
     } finally {
@@ -67,21 +70,21 @@ export const CreatePlaceScreen: React.FC<Props> = ({ navigation }) => {
     >
       <PageContainer>
         <PageHeader
-          back={{ label: 'Volver', onPress: () => navigation.goBack() }}
-          title="Registrar lugar"
-          subtitle="Registra cada sitio donde quieras medir el agua: tu casa, tu local o tu bodega."
+          back={{ label: t('common.back'), onPress: () => navigation.goBack() }}
+          title={t('places.create.title')}
+          subtitle={t('places.create.intro')}
         />
         {/* the title stays on the left; the form is centered in a 720 px column */}
         <View style={formColumnStyle}>
         {Platform.OS !== 'web' && (
           <Text style={introStyle}>
-            Registra cada sitio donde quieras medir el agua: tu casa, tu local o tu bodega.
+            {t('places.create.intro')}
           </Text>
         )}
 
         <PlaceForm
           form={form}
-          submitLabel="Registrar lugar"
+          submitLabel={t('places.create.title')}
           onSubmit={handleSubmit}
           submitting={submitting}
           submitError={submitError}
@@ -93,8 +96,8 @@ export const CreatePlaceScreen: React.FC<Props> = ({ navigation }) => {
         visible={!!created}
         message={
           created?.isDefault
-            ? `"${created.name}" quedó registrado y ya está seleccionado.`
-            : `"${created?.name ?? ''}" quedó registrado.`
+            ? t('places.create.savedSelected', { name: created.name })
+            : t('places.create.saved', { name: created?.name ?? '' })
         }
         onDismiss={handleSuccessDismiss}
         autoCloseDuration={2000}

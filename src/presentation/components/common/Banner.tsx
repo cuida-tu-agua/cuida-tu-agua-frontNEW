@@ -1,6 +1,7 @@
 import React from 'react';
 import { Text, TextStyle, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import i18n from '../../../i18n';
 import { theme } from '../../styles/theme';
 import { themed } from '../../styles/themeRuntime';
 
@@ -42,7 +43,7 @@ export const Banner: React.FC<BannerProps> = ({ tone, message, title, action, on
         )}
       </View>
       {onClose && (
-        <TouchableOpacity onPress={onClose} accessibilityLabel="Cerrar mensaje" hitSlop={12}>
+        <TouchableOpacity onPress={onClose} accessibilityLabel={i18n.t('commonUi.closeMessage')} hitSlop={12}>
           <Ionicons name="close" size={20} color={theme.colors.textMuted} />
         </TouchableOpacity>
       )}

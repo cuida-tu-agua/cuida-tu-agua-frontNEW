@@ -1,8 +1,10 @@
 import React from 'react';
 import { Platform, Pressable, Text, TextStyle, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { Place } from '../../../domain/places/Place';
 import { Button } from '../common/Button';
+import { placeTypeLabel } from './placeLabels';
 import { theme } from '../../styles/theme';
 import { themed } from '../../styles/themeRuntime';
 
@@ -25,8 +27,9 @@ const locationOf = (place: Place): string =>
 
 /** Web (Figma "Mis lugares"): icon, name, place, type and the buttons. Tapping the card opens its panel. */
 const WebCard: React.FC<PlaceCardProps> = ({ place, onEdit, onOpenPanel }) => {
+  const { t } = useTranslation();
   const location = locationOf(place);
-  const typeLabel = place.type === 'COMMERCIAL' ? 'Comercial' : 'Residencial';
+  const typeLabel = placeTypeLabel(place.type);
 
   return (
     <Pressable
@@ -34,7 +37,7 @@ const WebCard: React.FC<PlaceCardProps> = ({ place, onEdit, onOpenPanel }) => {
       disabled={!onOpenPanel}
       style={({ pressed }) => [webCardStyle, pressed && !!onOpenPanel && { opacity: 0.92 }]}
       accessibilityRole="button"
-      accessibilityLabel={`Abrir el panel de ${place.name}`}
+      accessibilityLabel={t('places.card.openPanel', { name: place.name })}
     >
       <View style={iconCircleStyle}>
         <Ionicons name={place.type === 'COMMERCIAL' ? 'storefront-outline' : 'home-outline'} size={22} color={theme.colors.primary} />
@@ -53,7 +56,7 @@ const WebCard: React.FC<PlaceCardProps> = ({ place, onEdit, onOpenPanel }) => {
       <View style={webButtonsStyle}>
         {!!onOpenPanel && (
           <Button
-            label="Ver panel"
+            label={t('places.card.viewPanel')}
             size="small"
             onPress={onOpenPanel}
             style={{ flex: 1 }}
@@ -61,7 +64,7 @@ const WebCard: React.FC<PlaceCardProps> = ({ place, onEdit, onOpenPanel }) => {
           />
         )}
         <Button
-          label="Editar"
+          label={t('places.card.edit')}
           size="small"
           variant="secondary"
           onPress={onEdit}
@@ -74,6 +77,7 @@ const WebCard: React.FC<PlaceCardProps> = ({ place, onEdit, onOpenPanel }) => {
 
 /** Phone (Figma mobile list): one row. Tapping it opens the panel; the edit button is on the right. */
 const RowCard: React.FC<PlaceCardProps> = ({ place, onEdit, onOpenPanel }) => {
+  const { t } = useTranslation();
   const location = locationOf(place);
 
   return (
@@ -83,7 +87,7 @@ const RowCard: React.FC<PlaceCardProps> = ({ place, onEdit, onOpenPanel }) => {
         disabled={!onOpenPanel}
         style={({ pressed }) => [selectAreaStyle, pressed && { opacity: 0.7 }]}
         accessibilityRole="button"
-        accessibilityLabel={`Abrir el panel de ${place.name}, ${location}`}
+        accessibilityLabel={t('places.card.openPanelA11y', { name: place.name, location })}
       >
         <View style={iconCircleStyle}>
           <Ionicons name={place.type === 'COMMERCIAL' ? 'storefront-outline' : 'home-outline'} size={22} color={theme.colors.primary} />
@@ -103,7 +107,7 @@ const RowCard: React.FC<PlaceCardProps> = ({ place, onEdit, onOpenPanel }) => {
         onPress={onEdit}
         style={editButtonStyle}
         accessibilityRole="button"
-        accessibilityLabel={`Editar ${place.name}`}
+        accessibilityLabel={t('places.card.editA11y', { name: place.name })}
         hitSlop={8}
       >
         <Ionicons name="create-outline" size={22} color={theme.colors.textSecondary} />
