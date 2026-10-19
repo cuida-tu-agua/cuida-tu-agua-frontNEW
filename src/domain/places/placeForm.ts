@@ -1,3 +1,4 @@
+import i18n from '../../i18n';
 import {
   CreatePlaceInput,
   MeasurementUnit,
@@ -37,20 +38,20 @@ export const validatePlaceForm = (values: PlaceFormValues): PlaceFormErrors => {
   const name = values.name.trim();
   const address = values.address.trim();
 
-  if (!name) errors.name = 'Escribe un nombre para el lugar.';
+  if (!name) errors.name = i18n.t('places.validation.nameRequired');
   else if (name.length > PLACE_NAME_MAX_LENGTH)
-    errors.name = `Máximo ${PLACE_NAME_MAX_LENGTH} caracteres.`;
+    errors.name = i18n.t('places.validation.maxLength', { max: PLACE_NAME_MAX_LENGTH });
 
-  if (!values.type) errors.type = 'Elige si es residencial o comercial.';
+  if (!values.type) errors.type = i18n.t('places.validation.typeRequired');
 
-  if (!address) errors.address = 'Escribe la dirección.';
+  if (!address) errors.address = i18n.t('places.validation.addressRequired');
   else if (address.length > PLACE_ADDRESS_MAX_LENGTH)
-    errors.address = `Máximo ${PLACE_ADDRESS_MAX_LENGTH} caracteres.`;
+    errors.address = i18n.t('places.validation.maxLength', { max: PLACE_ADDRESS_MAX_LENGTH });
 
-  if (!values.countryCode) errors.countryCode = 'Elige el país.';
-  if (!values.subdivisionId) errors.subdivisionId = 'Elige el departamento o provincia.';
-  if (!values.cityId) errors.cityId = 'Elige la ciudad.';
-  if (!values.measurementUnit) errors.measurementUnit = 'Elige la unidad de medida.';
+  if (!values.countryCode) errors.countryCode = i18n.t('places.validation.countryRequired');
+  if (!values.subdivisionId) errors.subdivisionId = i18n.t('places.validation.subdivisionRequired');
+  if (!values.cityId) errors.cityId = i18n.t('places.validation.cityRequired');
+  if (!values.measurementUnit) errors.measurementUnit = i18n.t('places.validation.unitRequired');
 
   return errors;
 };
