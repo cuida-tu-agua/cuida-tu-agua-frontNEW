@@ -1,4 +1,5 @@
 import { Platform } from 'react-native';
+import i18n from '../../i18n';
 import QRCode from 'qrcode';
 import { FactoryDevice, qrPayload } from '../../domain/admin/AdminDevices';
 
@@ -41,13 +42,13 @@ export const printLabels = async (devices: FactoryDevice[]): Promise<boolean> =>
   const labels = await Promise.all(
     devices.map(async (d) => {
       const svg = await QRCode.toString(qrPayload(d), { type: 'svg', margin: 0, errorCorrectionLevel: 'M' });
-      return `<div class="label"><div class="qr">${svg}</div><div><div class="serial">${escapeHtml(d.serialNumber)}</div><div class="code">Código: ${escapeHtml(d.pairingCode)}</div></div></div>`;
+      return `<div class="label"><div class="qr">${svg}</div><div><div class="serial">${escapeHtml(d.serialNumber)}</div><div class="code">${escapeHtml(i18n.t('credentials.code'))} ${escapeHtml(d.pairingCode)}</div></div></div>`;
     }),
   );
   const page = window.open('', '_blank');
   if (!page) return false;
   page.document.write(
-    `<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Etiquetas</title><style>
+    `<!doctype html><html lang="${i18n.language}"><head><meta charset="utf-8"><title>${escapeHtml(i18n.t('credentials.labelsTitle'))}</title><style>
       body{font-family:Arial,sans-serif;margin:16px}
       .label{display:flex;gap:12px;align-items:center;width:300px;border:1px dashed #888;padding:10px;margin:0 12px 12px 0;float:left;page-break-inside:avoid}
       .qr{width:96px;height:96px}.qr svg{width:100%;height:100%}
