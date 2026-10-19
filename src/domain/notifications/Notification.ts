@@ -1,3 +1,5 @@
+import i18n from '../../i18n';
+import { localeTag } from '../../i18n/format';
 /** What ms-notification sends. Values are the SNAKE_CASE_UPPER strings of its JSON. */
 export type NotificationSeverity = 'INFO' | 'WARNING' | 'CRITICAL';
 
@@ -41,23 +43,44 @@ export const PAGE_SIZE = 20;
 
 export const SEVERITY_ORDER: NotificationSeverity[] = ['CRITICAL', 'WARNING', 'INFO'];
 
+/** Getters: the text follows the language active when it is read. */
 export const SEVERITY_LABELS: Record<NotificationSeverity, string> = {
-  CRITICAL: 'Críticas',
-  WARNING: 'Importantes',
-  INFO: 'Informativas',
+  get CRITICAL() {
+    return i18n.t('notifications.severity.CRITICAL');
+  },
+  get WARNING() {
+    return i18n.t('notifications.severity.WARNING');
+  },
+  get INFO() {
+    return i18n.t('notifications.severity.INFO');
+  },
 };
 
 export const SEVERITY_HINTS: Record<NotificationSeverity, string> = {
-  CRITICAL: 'Una fuga o la válvula cerrada: necesitan tu atención ya.',
-  WARNING: 'Algo que conviene revisar, como un medidor desconectado.',
-  INFO: 'Avisos tranquilos: un medidor vinculado o reconectado.',
+  get CRITICAL() {
+    return i18n.t('notifications.severityHint.CRITICAL');
+  },
+  get WARNING() {
+    return i18n.t('notifications.severityHint.WARNING');
+  },
+  get INFO() {
+    return i18n.t('notifications.severityHint.INFO');
+  },
 };
 
 export const CHANNEL_LABELS: Record<NotificationChannel, string> = {
-  inApp: 'En la app',
-  push: 'Notificación al celular',
-  email: 'Correo',
-  sms: 'SMS / WhatsApp',
+  get inApp() {
+    return i18n.t('notifications.channel.inApp');
+  },
+  get push() {
+    return i18n.t('notifications.channel.push');
+  },
+  get email() {
+    return i18n.t('notifications.channel.email');
+  },
+  get sms() {
+    return i18n.t('notifications.channel.sms');
+  },
 };
 
 export const CHANNELS: NotificationChannel[] = ['inApp', 'push', 'email', 'sms'];
@@ -80,19 +103,19 @@ export const toggleChannel = (preference: LevelPreference, channel: Notification
 /** "99+" so the badge of the bell never grows out of its circle. Empty text = no badge. */
 export const badgeText = (count: number): string => (count <= 0 ? '' : count > 99 ? '99+' : String(count));
 
-/** "ahora", "hace 5 min", "hace 3 h", "ayer", "hace 4 días", and the date after a week. */
+/** "now", "5 min ago", "3 h ago", "yesterday", "4 days ago", and the date after a week (in the active language). */
 export const timeAgo = (iso: string, now: Date = new Date()): string => {
   const then = new Date(iso);
   const seconds = Math.floor((now.getTime() - then.getTime()) / 1000);
-  if (Number.isNaN(seconds) || seconds < 45) return 'ahora';
+  if (Number.isNaN(seconds) || seconds < 45) return i18n.t('notifications.timeAgo.now');
   const minutes = Math.round(seconds / 60);
-  if (minutes < 60) return `hace ${minutes} min`;
+  if (minutes < 60) return i18n.t('notifications.timeAgo.minutes', { count: minutes });
   const hours = Math.round(minutes / 60);
-  if (hours < 24) return `hace ${hours} h`;
+  if (hours < 24) return i18n.t('notifications.timeAgo.hours', { count: hours });
   const days = Math.round(hours / 24);
-  if (days === 1) return 'ayer';
-  if (days < 7) return `hace ${days} días`;
-  return then.toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' });
+  if (days === 1) return i18n.t('notifications.timeAgo.yesterday');
+  if (days < 7) return i18n.t('notifications.timeAgo.days', { count: days });
+  return then.toLocaleDateString(localeTag(), { day: 'numeric', month: 'short', year: 'numeric' });
 };
 
 /** The notification with a read mark, for the optimistic update of the list. */
