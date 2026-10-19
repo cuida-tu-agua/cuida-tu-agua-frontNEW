@@ -21,6 +21,8 @@ import { usePlaceTariffs } from '../../hooks/usePlaceTariffs';
 import { MainStackParamList } from '../../navigation/types';
 import { theme } from '../../styles/theme';
 import { themed } from '../../styles/themeRuntime';
+import { useTranslation } from 'react-i18next';
+import { localeTag } from '../../../i18n/format';
 
 type Props = NativeStackScreenProps<MainStackParamList, 'PlaceTariff'>;
 
@@ -29,7 +31,8 @@ type Props = NativeStackScreenProps<MainStackParamList, 'PlaceTariff'>;
  * stratum (preloaded) or type the price of the bill. Both are kept in a history; the app always says which one is in use.
  */
 export const PlaceTariffScreen: React.FC<Props> = ({ navigation, route }) => {
-  const { placeId, placeName = 'Mi lugar' } = route.params;
+  const { t: tr } = useTranslation();
+  const { placeId, placeName = tr('dashboard.defaultPlaceName') } = route.params;
   const t = usePlaceTariffs(placeId);
 
   const [picked, setPicked] = useState<number | null>(null);
@@ -60,8 +63,8 @@ export const PlaceTariffScreen: React.FC<Props> = ({ navigation, route }) => {
   if (!t.tariffs || !t.place) {
     return (
       <View style={centerStyle}>
-        <Banner tone="error" message={t.error?.message ?? 'No pudimos cargar la tarifa.'} />
-        <Button label="Reintentar" onPress={() => void t.reload()} />
+        <Banner tone="error" message={t.error?.message ?? tr('tariff.screen.loadFailed')} />
+        <Button label={tr('common.retry')} onPress={() => void t.reload()} />
       </View>
     );
   }
@@ -79,15 +82,15 @@ export const PlaceTariffScreen: React.FC<Props> = ({ navigation, route }) => {
   return (
     <PageContainer medium gap={theme.spacing.lg}>
       <PageHeader
-        back={{ label: 'Panel del lugar', onPress: () => navigation.goBack() }}
+        back={{ label: tr('tariff.screen.back'), onPress: () => navigation.goBack() }}
         caption={placeName}
-        title="Tarifa del agua"
-        subtitle="El agua se cobra por metro cúbico (m³). Con la tarifa calculamos cuánto dinero llevas gastado."
+        title={tr('tariff.screen.title')}
+        subtitle={tr('tariff.screen.intro')}
       />
       {Platform.OS !== 'web' && (
         <>
-          <Text style={titleStyle}>Tarifa de {placeName}</Text>
-          <Text style={mutedStyle}>El agua se cobra por metro cúbico (m³). Con la tarifa calculamos cuánto dinero llevas gastado.</Text>
+          <Text style={titleStyle}>{tr('tariff.screen.mobileTitle', { name: placeName })}</Text>
+          <Text style={mutedStyle}>{tr('tariff.screen.intro')}</Text>
         </>
       )}
 
@@ -95,24 +98,24 @@ export const PlaceTariffScreen: React.FC<Props> = ({ navigation, route }) => {
       {!!t.error && <Banner tone="error" message={t.error.message} onClose={t.dismissError} />}
 
       <Card variant="outlined" style={cardStyle}>
-        <Text style={sectionStyle}>Tarifa en uso</Text>
+        <Text style={sectionStyle}>{tr('tariff.screen.inUse')}</Text>
         {current ? <CurrentTariff tariff={current} /> : (
           <View style={emptyStyle}>
             <Ionicons name="cash-outline" size={32} color={theme.colors.textMuted} />
-            <Text style={mutedStyle}>Aún no hay tarifa. Elige una de las dos opciones de abajo.</Text>
+            <Text style={mutedStyle}>{tr('tariff.screen.none')}</Text>
           </View>
         )}
       </Card>
 
       <View style={optionsStyle}>
         <Card variant="outlined" style={[cardStyle, optionStyle]}>
-          <Text style={sectionStyle}>Usar la tarifa de mi ciudad</Text>
+          <Text style={sectionStyle}>{tr('tariff.screen.useCity')}</Text>
           {t.catalog?.available ? (
             <>
               <Text style={mutedStyle}>
-                {t.catalog.cityName}: elige el estrato que dice tu recibo (de 1 a 6). Los estratos 1, 2 y 3 reciben subsidio y el 5 y el 6 pagan contribución.
+                {tr('tariff.screen.cityIntro', { city: t.catalog.cityName })}
               </Text>
-              <View style={strataStyle} accessibilityRole="radiogroup" accessibilityLabel="Estrato">
+              <View style={strataStyle} accessibilityRole="radiogroup" accessibilityLabel={tr('tariff.screen.stratumGroup')}>
                 {STRATA.map((stratum) => {
                   const enabled = strataAvailable.has(stratum);
                   const selected = picked === stratum;
@@ -124,7 +127,7 @@ export const PlaceTariffScreen: React.FC<Props> = ({ navigation, route }) => {
                       style={[chipStyle, selected && chipSelectedStyle, !enabled && chipDisabledStyle]}
                       accessibilityRole="radio"
                       accessibilityState={{ selected, disabled: !enabled }}
-                      accessibilityLabel={`Estrato ${stratum}`}
+                      accessibilityLabel={tr('tariff.screen.stratumN', { n: stratum })}
                     >
                       <Text style={[chipTextStyle, selected && chipTextSelectedStyle]}>{stratum}</Text>
                     </TouchableOpacity>
@@ -135,7 +138,7 @@ export const PlaceTariffScreen: React.FC<Props> = ({ navigation, route }) => {
               {pickedRates && <RatesTable rates={pickedRates} currency={currency} />}
 
               <Button
-                label={current?.source === 'CATALOG' && current.stratum === picked ? 'Ya usas este estrato' : 'Usar este estrato'}
+                label={current?.source === 'CATALOG' && current.stratum === picked ? tr('tariff.screen.alreadyUsing') : tr('tariff.screen.useStratum')}
                 onPress={() => picked !== null && void t.chooseStratum(picked)}
                 disabled={picked === null || (current?.source === 'CATALOG' && current.stratum === picked)}
                 loading={t.saving}
@@ -144,17 +147,17 @@ export const PlaceTariffScreen: React.FC<Props> = ({ navigation, route }) => {
             </>
           ) : (
             <Text style={mutedStyle}>
-              {t.catalog?.cityName ?? 'Tu ciudad'} todavía no tiene tarifas precargadas. Escribe la de tu recibo aquí al lado.
+              {tr('tariff.screen.cityNoCatalog', { city: t.catalog?.cityName ?? tr('tariff.screen.yourCity') })}
             </Text>
           )}
         </Card>
 
         <Card variant="outlined" style={[cardStyle, optionStyle]}>
-          <Text style={sectionStyle}>Escribir mi tarifa</Text>
-          <Text style={mutedStyle}>Búscala en tu recibo de acueducto: el valor de cada metro cúbico y, si aparece, el cargo fijo mensual.</Text>
+          <Text style={sectionStyle}>{tr('tariff.screen.typeMine')}</Text>
+          <Text style={mutedStyle}>{tr('tariff.screen.typeIntro')}</Text>
           <Input
-            label={`Valor por metro cúbico (${currency})`}
-            placeholder="Ej.: 5.234"
+            label={tr('tariff.screen.priceLabel', { currency })}
+            placeholder={tr('tariff.screen.pricePlaceholder')}
             value={price}
             onChangeText={(text) => {
               setPrice(text);
@@ -164,8 +167,8 @@ export const PlaceTariffScreen: React.FC<Props> = ({ navigation, route }) => {
             keyboardType="numeric"
           />
           <Input
-            label="Cargo fijo mensual (opcional)"
-            placeholder="Ej.: 12.000"
+            label={tr('tariff.screen.fixedLabel')}
+            placeholder={tr('tariff.screen.fixedPlaceholder')}
             value={fixedCharge}
             onChangeText={(text) => {
               setFixedCharge(text);
@@ -173,30 +176,30 @@ export const PlaceTariffScreen: React.FC<Props> = ({ navigation, route }) => {
             }}
             error={fieldErrors.fixedCharge}
             keyboardType="numeric"
-            hint="Si tu recibo no lo trae, déjalo vacío."
+            hint={tr('tariff.screen.fixedHint')}
           />
-          <Button label="Guardar mi tarifa" onPress={() => void saveManual()} loading={t.saving} size="medium" />
+          <Button label={tr('tariff.screen.saveMine')} onPress={() => void saveManual()} loading={t.saving} size="medium" />
           {!!t.catalog?.available && current?.source === 'MANUAL' && (
-            <Text style={mutedStyle}>Guardar tu tarifa reemplaza a la precargada. Puedes volver a la de tu ciudad cuando quieras.</Text>
+            <Text style={mutedStyle}>{tr('tariff.screen.replaceNote')}</Text>
           )}
         </Card>
       </View>
 
       {t.tariffs.history.length > 1 && (
         <Card variant="outlined" style={cardStyle}>
-          <Text style={sectionStyle}>Historial de tarifas</Text>
-          <Text style={mutedStyle}>Las tarifas anteriores se conservan: cambiar la tarifa no altera lo que ya se calculó.</Text>
+          <Text style={sectionStyle}>{tr('tariff.screen.history')}</Text>
+          <Text style={mutedStyle}>{tr('tariff.screen.historyIntro')}</Text>
           {t.tariffs.history.map((tariff, index) => (
             <View key={tariff.id} style={historyRowStyle}>
               <View style={{ flex: 1 }}>
                 <Text style={historyTitleStyle}>
                   {tariff.source === 'MANUAL'
-                    ? `${formatMoney(tariff.unitPricePerM3 ?? 0, currency)} por m³`
-                    : `Estrato ${tariff.stratum} de tu ciudad`}
-                  {index === 0 ? '  ·  en uso' : ''}
+                    ? tr('tariff.screen.perM3', { price: formatMoney(tariff.unitPricePerM3 ?? 0, currency) })
+                    : tr('tariff.screen.historyStratum', { n: tariff.stratum })}
+                  {index === 0 ? tr('tariff.screen.inUseSuffix') : ''}
                 </Text>
                 <Text style={mutedStyle}>
-                  {sourceLabel(tariff.source, tariff.stratum)} · desde {new Date(tariff.validFrom).toLocaleDateString('es-CO')}
+                  {tr('tariff.screen.since', { source: sourceLabel(tariff.source, tariff.stratum), date: new Date(tariff.validFrom).toLocaleDateString(localeTag()) })}
                 </Text>
               </View>
             </View>
@@ -208,6 +211,7 @@ export const PlaceTariffScreen: React.FC<Props> = ({ navigation, route }) => {
 };
 
 const CurrentTariff: React.FC<{ tariff: Tariff }> = ({ tariff }) => {
+  const { t } = useTranslation();
   const rates = tariff.catalog;
   return (
     <View style={{ gap: theme.spacing.sm }}>
@@ -217,9 +221,9 @@ const CurrentTariff: React.FC<{ tariff: Tariff }> = ({ tariff }) => {
       </View>
       {tariff.source === 'MANUAL' ? (
         <>
-          <Text style={bigStyle}>{formatMoney(tariff.unitPricePerM3 ?? 0, tariff.currency)} por m³</Text>
+          <Text style={bigStyle}>{t('tariff.screen.perM3', { price: formatMoney(tariff.unitPricePerM3 ?? 0, tariff.currency) })}</Text>
           <Text style={mutedStyle}>
-            {tariff.fixedMonthlyCharge ? `Cargo fijo mensual: ${formatMoney(tariff.fixedMonthlyCharge, tariff.currency)}` : 'Sin cargo fijo mensual.'}
+            {tariff.fixedMonthlyCharge ? t('tariff.screen.fixedMonthly', { amount: formatMoney(tariff.fixedMonthlyCharge, tariff.currency) }) : t('tariff.screen.noFixed')}
           </Text>
         </>
       ) : (
@@ -230,15 +234,19 @@ const CurrentTariff: React.FC<{ tariff: Tariff }> = ({ tariff }) => {
 };
 
 /** Prices by range of the month (HU-066: basic, complementary, luxury) and the date of the last update. */
-const RatesTable: React.FC<{ rates: CatalogRates; currency: 'COP' | 'USD' }> = ({ rates, currency }) => (
-  <View style={tableStyle}>
-    <RateRow label={`Básico · hasta ${rates.basicLimitM3} m³`} value={`${formatMoney(rates.basicPrice, currency)} por m³`} />
-    <RateRow label={`Complementario · hasta ${rates.complementaryLimitM3} m³`} value={`${formatMoney(rates.complementaryPrice, currency)} por m³`} />
-    <RateRow label={`Suntuario · más de ${rates.complementaryLimitM3} m³`} value={`${formatMoney(rates.luxuryPrice, currency)} por m³`} />
-    <RateRow label="Cargo fijo mensual" value={formatMoney(rates.fixedCharge, currency)} />
-    <Text style={noteStyle}>Actualizada el {formatCatalogDate(rates.updatedAt)} · {rates.source}</Text>
-  </View>
-);
+const RatesTable: React.FC<{ rates: CatalogRates; currency: 'COP' | 'USD' }> = ({ rates, currency }) => {
+  const { t } = useTranslation();
+  const perM3 = (price: number) => t('tariff.screen.perM3', { price: formatMoney(price, currency) });
+  return (
+    <View style={tableStyle}>
+      <RateRow label={t('tariff.screen.basic', { limit: rates.basicLimitM3 })} value={perM3(rates.basicPrice)} />
+      <RateRow label={t('tariff.screen.complementary', { limit: rates.complementaryLimitM3 })} value={perM3(rates.complementaryPrice)} />
+      <RateRow label={t('tariff.screen.luxury', { limit: rates.complementaryLimitM3 })} value={perM3(rates.luxuryPrice)} />
+      <RateRow label={t('tariff.screen.fixedCharge')} value={formatMoney(rates.fixedCharge, currency)} />
+      <Text style={noteStyle}>{t('tariff.screen.updatedOn', { date: formatCatalogDate(rates.updatedAt), source: rates.source })}</Text>
+    </View>
+  );
+};
 
 const RateRow: React.FC<{ label: string; value: string }> = ({ label, value }) => (
   <View style={rateRowStyle}>
