@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ActivityIndicator, Text, TextStyle, View, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ACTION_LABELS, AdminDeviceDetail, badgeOf } from '../../../domain/admin/AdminDevices';
 import { formatLastReport } from '../../../domain/devices/deviceStatus';
@@ -30,6 +31,7 @@ export const AdminDeviceDetailScreen: React.FC<Props> = ({ navigation, route }) 
 );
 
 const Detail: React.FC<{ deviceId: string; onBack: () => void }> = ({ deviceId, onBack }) => {
+  const { t } = useTranslation();
   const d = useAdminDevice(deviceId);
   const [askRenew, setAskRenew] = useState(false);
   const [askDecommission, setAskDecommission] = useState(false);
@@ -40,7 +42,7 @@ const Detail: React.FC<{ deviceId: string; onBack: () => void }> = ({ deviceId, 
         {d.error ? (
           <>
             <Banner tone="error" message={d.error.message} />
-            <Button label="Volver a medidores" variant="secondary" onPress={onBack} />
+            <Button label={t('adminDeviceDetail.backToList')} variant="secondary" onPress={onBack} />
           </>
         ) : (
           <ActivityIndicator size="large" color={theme.colors.primary} />
@@ -57,7 +59,7 @@ const Detail: React.FC<{ deviceId: string; onBack: () => void }> = ({ deviceId, 
     <PageContainer gap={theme.spacing.lg}>
       <PageHeader
         webOnly={false}
-        back={{ label: 'Medidores', onPress: onBack }}
+        back={{ label: t('adminDeviceDetail.backLabel'), onPress: onBack }}
         title={device.serialNumber}
         right={<BadgePill tone={badge.tone} label={badge.label} />}
       />
@@ -65,41 +67,41 @@ const Detail: React.FC<{ deviceId: string; onBack: () => void }> = ({ deviceId, 
       {!!d.error && <Banner tone="error" message={d.error.message} onClose={d.dismissError} />}
 
       {d.issued && (
-        <CredentialsSheet devices={[d.issued]} onFinish={d.closeIssued} finishLabel="Cerrar" />
+        <CredentialsSheet devices={[d.issued]} onFinish={d.closeIssued} finishLabel={t('adminDeviceDetail.close')} />
       )}
 
       <View style={splitStyle}>
         <Card variant="outlined" style={halfStyle}>
-          <Text style={sectionTitleStyle}>Datos</Text>
-          <Row label="Lugar" value={device.placeId ? `Vinculado desde ${when(device.linkedAt)}` : 'Libre (nadie lo tiene vinculado)'} />
-          <Row label="Último reporte" value={device.lastReportAt ? `${when(device.lastReportAt)} (${formatLastReport(device.lastReportAt)})` : 'Nunca ha reportado'} />
-          <Row label="Firmware" value={device.firmwareVersion ?? '—'} />
-          <Row label="Registrado" value={when(device.createdAt)} />
-          <Row label="Token usado por última vez" value={when(device.tokenLastUsedAt)} />
-          <Row label="Intentos fallidos de emparejar" value={String(device.failedPairingAttempts)} />
-          {device.decommissioned && <Row label="Dado de baja" value={when(device.decommissionedAt)} />}
+          <Text style={sectionTitleStyle}>{t('adminDeviceDetail.data')}</Text>
+          <Row label={t('adminDeviceDetail.place')} value={device.placeId ? t('adminDeviceDetail.linkedSince', { date: when(device.linkedAt) }) : t('adminDeviceDetail.freePlace')} />
+          <Row label={t('adminDeviceDetail.lastReport')} value={device.lastReportAt ? `${when(device.lastReportAt)} (${formatLastReport(device.lastReportAt)})` : t('adminDeviceDetail.neverReported')} />
+          <Row label={t('adminDeviceDetail.firmware')} value={device.firmwareVersion ?? '—'} />
+          <Row label={t('adminDeviceDetail.registered')} value={when(device.createdAt)} />
+          <Row label={t('adminDeviceDetail.tokenLastUsed')} value={when(device.tokenLastUsedAt)} />
+          <Row label={t('adminDeviceDetail.failedAttempts')} value={String(device.failedPairingAttempts)} />
+          {device.decommissioned && <Row label={t('adminDeviceDetail.decommissioned')} value={when(device.decommissionedAt)} />}
         </Card>
 
         <Card variant="outlined" style={halfStyle}>
-          <Text style={sectionTitleStyle}>Acciones</Text>
+          <Text style={sectionTitleStyle}>{t('adminDeviceDetail.actions')}</Text>
           {device.decommissioned ? (
-            <Banner tone="error" message="Este medidor está dado de baja: el servidor ignora sus mensajes y nadie puede vincularlo." />
+            <Banner tone="error" message={t('adminDeviceDetail.decommissionedBanner')} />
           ) : device.placeId ? (
-            <Banner tone="info" message="Está vinculado a un lugar. Para darlo de baja o cambiarle las credenciales, su dueño debe desvincularlo desde la app." />
+            <Banner tone="info" message={t('adminDeviceDetail.linkedBanner')} />
           ) : null}
 
           <ActionRow
-            title="Generar credenciales nuevas"
-            text="Token y código nuevos; los anteriores dejan de funcionar. Sirve si se perdió la etiqueta o el equipo vuelve de reparación."
-            label="Generar"
+            title={t('adminDeviceDetail.renewTitle')}
+            text={t('adminDeviceDetail.renewText')}
+            label={t('adminDeviceDetail.renewButton')}
             variant="secondary"
             disabled={locked}
             onPress={() => setAskRenew(true)}
           />
           <ActionRow
-            title="Dar de baja"
-            text="El servidor ignora sus mensajes y nadie lo puede vincular. Para equipos robados, dañados o retirados. No se deshace."
-            label="Dar de baja"
+            title={t('adminDeviceDetail.decommissionTitle')}
+            text={t('adminDeviceDetail.decommissionText')}
+            label={t('adminDeviceDetail.decommissionButton')}
             variant="danger"
             disabled={locked}
             onPress={() => setAskDecommission(true)}
@@ -108,9 +110,9 @@ const Detail: React.FC<{ deviceId: string; onBack: () => void }> = ({ deviceId, 
       </View>
 
       <Card variant="outlined" style={{ gap: theme.spacing.sm }}>
-        <Text style={sectionTitleStyle}>Historial de administración</Text>
+        <Text style={sectionTitleStyle}>{t('adminDeviceDetail.history')}</Text>
         {device.log.length === 0 ? (
-          <Text style={mutedStyle}>Todavía no hay acciones registradas.</Text>
+          <Text style={mutedStyle}>{t('adminDeviceDetail.noHistory')}</Text>
         ) : (
           device.log.map((entry, index) => (
             <View key={`${entry.occurredAt}-${index}`} style={logRowStyle}>
@@ -118,7 +120,7 @@ const Detail: React.FC<{ deviceId: string; onBack: () => void }> = ({ deviceId, 
               <View style={{ flex: 1 }}>
                 <Text style={logTextStyle}>
                   <Text style={{ fontWeight: '800' }}>{ACTION_LABELS[entry.action]}</Text>
-                  {entry.adminName ? ` por ${entry.adminName}` : ''}
+                  {entry.adminName ? t('adminDeviceDetail.byAdmin', { name: entry.adminName }) : ''}
                 </Text>
                 <Text style={mutedStyle}>{when(entry.occurredAt)}</Text>
               </View>
@@ -128,15 +130,15 @@ const Detail: React.FC<{ deviceId: string; onBack: () => void }> = ({ deviceId, 
       </Card>
 
       <Card variant="outlined" style={{ gap: theme.spacing.sm }}>
-        <Text style={sectionTitleStyle}>Lugares donde ha estado</Text>
+        <Text style={sectionTitleStyle}>{t('adminDeviceDetail.stays')}</Text>
         {device.places.length === 0 ? (
-          <Text style={mutedStyle}>Nunca ha estado vinculado a un lugar.</Text>
+          <Text style={mutedStyle}>{t('adminDeviceDetail.noStays')}</Text>
         ) : (
           <View style={tableStyle}>
             <View style={[stayRowStyle, headStyle]}>
-              <Text style={[headCellStyle, { flex: 3 }]}>Lugar</Text>
-              <Text style={[headCellStyle, { flex: 2 }]}>Desde</Text>
-              <Text style={[headCellStyle, { flex: 2 }]}>Hasta</Text>
+              <Text style={[headCellStyle, { flex: 3 }]}>{t('adminDeviceDetail.place')}</Text>
+              <Text style={[headCellStyle, { flex: 2 }]}>{t('adminDeviceDetail.from')}</Text>
+              <Text style={[headCellStyle, { flex: 2 }]}>{t('adminDeviceDetail.until')}</Text>
             </View>
             {device.places.map((stay) => (
               <View key={`${stay.placeId}-${stay.from}`} style={[stayRowStyle, bodyStyle]}>
@@ -144,7 +146,7 @@ const Detail: React.FC<{ deviceId: string; onBack: () => void }> = ({ deviceId, 
                   {stay.placeId.slice(0, 8)}
                 </Text>
                 <Text style={[cellStyle, { flex: 2 }]}>{when(stay.from)}</Text>
-                <Text style={[cellStyle, { flex: 2 }]}>{stay.until ? when(stay.until) : 'Sigue vinculado'}</Text>
+                <Text style={[cellStyle, { flex: 2 }]}>{stay.until ? when(stay.until) : t('adminDeviceDetail.stillLinked')}</Text>
               </View>
             ))}
           </View>
@@ -153,10 +155,10 @@ const Detail: React.FC<{ deviceId: string; onBack: () => void }> = ({ deviceId, 
 
       <ConfirmDialog
         visible={askRenew}
-        title="¿Generar credenciales nuevas?"
-        message={`El token y el código actuales de ${device.serialNumber} dejarán de funcionar al instante. Los nuevos se muestran una sola vez.`}
-        confirmLabel="Sí, generar"
-        cancelLabel="Cancelar"
+        title={t('adminDeviceDetail.renewDialogTitle')}
+        message={t('adminDeviceDetail.renewDialogMessage', { serial: device.serialNumber })}
+        confirmLabel={t('adminDeviceDetail.renewConfirm')}
+        cancelLabel={t('adminDeviceDetail.cancel')}
         loading={d.busy}
         onConfirm={() => {
           setAskRenew(false);
@@ -167,10 +169,10 @@ const Detail: React.FC<{ deviceId: string; onBack: () => void }> = ({ deviceId, 
       <ConfirmDialog
         visible={askDecommission}
         tone="danger"
-        title={`¿Dar de baja ${device.serialNumber}?`}
-        message="Es definitivo: el servidor ignorará sus mensajes y nadie podrá vincularlo. No se puede deshacer."
-        confirmLabel="Sí, dar de baja"
-        cancelLabel="No, conservarlo"
+        title={t('adminDeviceDetail.decommissionDialogTitle', { serial: device.serialNumber })}
+        message={t('adminDeviceDetail.decommissionDialogMessage')}
+        confirmLabel={t('adminDeviceDetail.decommissionConfirm')}
+        cancelLabel={t('adminDeviceDetail.keep')}
         loading={d.busy}
         onConfirm={() => {
           setAskDecommission(false);
