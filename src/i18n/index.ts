@@ -5,6 +5,7 @@ import { DEFAULT_LANGUAGE, Language, SUPPORTED_LANGUAGES, resolveLanguage } from
 import { en } from './locales/en';
 import { es } from './locales/es';
 import { fr } from './locales/fr';
+import { pt } from './locales/pt';
 
 /** Language code of the phone or the browser ("es", "en", ...). Empty when it cannot be read. */
 const deviceLanguageCode = (): string | null => {
@@ -24,6 +25,7 @@ if (!i18n.isInitialized) {
       es: { translation: es },
       en: { translation: en },
       fr: { translation: fr },
+      pt: { translation: pt },
     },
     lng: initialLanguage(),
     // A text that is missing in the chosen language is shown in Spanish, never as a raw key
