@@ -1,4 +1,4 @@
-import i18n from '../../../i18n';
+import { changeLanguage } from '../../../i18n';
 import {
   describeRules,
   normalizeIdentifier,
@@ -80,7 +80,7 @@ describe('codes and recovery (HU-002, HU-005)', () => {
 
 describe('messages in English (HU-072)', () => {
   beforeEach(async () => {
-    await i18n.changeLanguage('en');
+    await changeLanguage('en');
   });
 
   it('form validation messages follow the language', () => {
