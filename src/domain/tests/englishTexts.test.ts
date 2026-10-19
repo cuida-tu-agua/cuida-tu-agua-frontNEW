@@ -1,5 +1,8 @@
 import { changeLanguage } from '../../i18n';
 import { bucketLabel, formatFlow, formatVolume, PERIOD_LABELS, PERIOD_TITLES } from '../consumption/consumptionFormat';
+import { CHANNEL_LABELS, SEVERITY_HINTS, SEVERITY_LABELS, timeAgo } from '../notifications/Notification';
+import { CATEGORY_LABELS, validateTip } from '../tips/Tip';
+import { navItemsFor } from '../../presentation/navigation/navItems';
 import { validateLinkDeviceForm } from '../devices/linkDeviceForm';
 import { ACTION_LABELS, availability, describeRequester, outcomeMessage, STATUS_LABELS, VALVE_STATE_LABELS } from '../valve/valveRules';
 import { Valve, ValveCommand } from '../valve/Valve';
@@ -73,6 +76,39 @@ describe('device linking and valve texts in English (HU-074)', () => {
     expect(availability({ pendingCommand: {} } as unknown as Valve).reason).toBe('An order is in progress. Wait for the meter to confirm.');
     expect(describeRequester({ origin: 'AUTO_LEAK' } as ValveCommand)).toBe('Automatic (possible leak)');
     expect(describeRequester({ origin: 'USER', requestedByName: null } as unknown as ValveCommand)).toBe('You');
+  });
+});
+
+describe('notification, tip and menu texts in English (HU-075)', () => {
+  beforeEach(async () => {
+    await changeLanguage('en');
+  });
+
+  it('notification labels and relative times', () => {
+    const now = new Date('2026-10-19T12:00:00Z');
+    expect(SEVERITY_LABELS.CRITICAL).toBe('Critical');
+    expect(SEVERITY_HINTS.WARNING).toMatch(/disconnected meter/);
+    expect(CHANNEL_LABELS.push).toBe('Phone notification');
+    expect(timeAgo('2026-10-19T11:59:50Z', now)).toBe('now');
+    expect(timeAgo('2026-10-19T11:55:00Z', now)).toBe('5 min ago');
+    expect(timeAgo('2026-10-18T11:00:00Z', now)).toBe('yesterday');
+    expect(timeAgo('2026-10-15T12:00:00Z', now)).toBe('4 days ago');
+    expect(timeAgo('2026-09-01T12:00:00Z', now)).toMatch(/Sep 1, 2026/);
+  });
+
+  it('tip categories and validation', () => {
+    expect(CATEGORY_LABELS.COMMERCIAL).toBe('Commercial');
+    expect(validateTip({ title: '', body: '', category: null }).errors).toEqual({
+      title: 'Enter a title.',
+      body: 'Enter the tip.',
+      category: 'Choose which type of place it is for.',
+    });
+  });
+
+  it('menu items follow the language', async () => {
+    expect(navItemsFor(['USER']).map((i) => i.label)).toEqual(['My places', 'Notifications', 'Favorite tips', 'My profile']);
+    await changeLanguage('es');
+    expect(navItemsFor(['USER']).map((i) => i.label)).toEqual(['Mis lugares', 'Notificaciones', 'Consejos favoritos', 'Mi perfil']);
   });
 });
 
