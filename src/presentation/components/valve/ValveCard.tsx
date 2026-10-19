@@ -9,6 +9,7 @@ import { Banner } from '../common/Banner';
 import { Button } from '../common/Button';
 import { Card } from '../common/Card';
 import { themed } from '../../styles/themeRuntime';
+import { useTranslation } from 'react-i18next';
 
 interface ValveCardProps {
   valve: Valve;
@@ -20,14 +21,14 @@ interface ValveCardProps {
   opening?: boolean;
 }
 
-const LOOK: Record<ValveState, { fg: string; bg: string; icon: keyof typeof Ionicons.glyphMap; text: string }> = themed(() => ({
-  OPEN: { fg: theme.colors.success, bg: theme.colors.successBg, icon: 'water', text: 'El agua está pasando.' },
-  CLOSED: { fg: theme.colors.error, bg: theme.colors.errorBg, icon: 'close-circle', text: 'El paso de agua está cerrado.' },
+const LOOK: Record<ValveState, { fg: string; bg: string; icon: keyof typeof Ionicons.glyphMap; textKey: string }> = themed(() => ({
+  OPEN: { fg: theme.colors.success, bg: theme.colors.successBg, icon: 'water', textKey: 'valve.card.lookOpen' },
+  CLOSED: { fg: theme.colors.error, bg: theme.colors.errorBg, icon: 'close-circle', textKey: 'valve.card.lookClosed' },
   UNKNOWN: {
     fg: theme.colors.textMuted,
     bg: theme.colors.grayLight,
     icon: 'help-circle-outline',
-    text: 'El medidor aún no ha reportado su válvula.',
+    textKey: 'valve.card.lookUnknown',
   },
 }));
 
@@ -40,6 +41,7 @@ export const ValveCard: React.FC<ValveCardProps> = ({
   onHistory,
   opening,
 }) => {
+  const { t } = useTranslation();
   const look = LOOK[valve.state];
   const rules = availability(valve);
   const noComm = valve.communication === 'NO_COMMUNICATION';
@@ -53,11 +55,11 @@ export const ValveCard: React.FC<ValveCardProps> = ({
           <Ionicons name={look.icon} size={26} color={look.fg} />
         </View>
         <View style={{ flex: 1 }}>
-          <Text style={captionStyle}>Válvula</Text>
-          <Text style={[stateStyle, { color: look.fg }]} accessibilityLabel={`Válvula ${VALVE_STATE_LABELS[valve.state]}`}>
+          <Text style={captionStyle}>{t('valve.card.title')}</Text>
+          <Text style={[stateStyle, { color: look.fg }]} accessibilityLabel={t('valve.card.a11y', { state: VALVE_STATE_LABELS[valve.state] })}>
             {VALVE_STATE_LABELS[valve.state]}
           </Text>
-          <Text style={captionStyle}>{look.text}</Text>
+          <Text style={captionStyle}>{t(look.textKey)}</Text>
         </View>
       </View>
 
@@ -68,8 +70,8 @@ export const ValveCard: React.FC<ValveCardProps> = ({
           color={noComm ? theme.colors.warning : theme.colors.textMuted}
         />
         <Text style={[captionStyle, noComm && { color: theme.colors.warning, fontWeight: '700' }]}>
-          {noComm ? 'Sin comunicación · ' : 'Confirmado por el medidor '}
-          {valve.lastConfirmedAt ? formatLastReport(valve.lastConfirmedAt) : 'nunca'}
+          {noComm ? t('valve.card.noCommPrefix') : t('valve.card.confirmedPrefix')}
+          {valve.lastConfirmedAt ? formatLastReport(valve.lastConfirmedAt) : t('valve.card.never')}
         </Text>
       </View>
 
@@ -77,7 +79,7 @@ export const ValveCard: React.FC<ValveCardProps> = ({
         <View style={waitingStyle} accessibilityLiveRegion="polite">
           <ActivityIndicator color={theme.colors.primary} />
           <Text style={waitingTextStyle}>
-            {command.action === 'CLOSE' ? 'Cerrando' : 'Abriendo'}… esperando que el medidor confirme (máx. 30 s)
+            {command.action === 'CLOSE' ? t('valve.card.closing') : t('valve.card.opening')}
           </Text>
         </View>
       )}
@@ -87,7 +89,7 @@ export const ValveCard: React.FC<ValveCardProps> = ({
 
       <View style={buttonsStyle}>
         <Button
-          label="Cerrar agua"
+          label={t('valve.card.close')}
           variant="danger"
           size="medium"
           onPress={onClose}
@@ -96,7 +98,7 @@ export const ValveCard: React.FC<ValveCardProps> = ({
           icon={<Ionicons name="lock-closed" size={18} color={theme.colors.error} />}
         />
         <Button
-          label="Abrir agua"
+          label={t('valve.card.open')}
           size="medium"
           onPress={onOpen}
           loading={opening}
@@ -105,7 +107,7 @@ export const ValveCard: React.FC<ValveCardProps> = ({
           icon={<Ionicons name="lock-open" size={18} color={theme.colors.textOnPrimary} />}
         />
       </View>
-      <Button label="Ver historial de la válvula" variant="ghost" size="small" onPress={onHistory} />
+      <Button label={t('valve.card.history')} variant="ghost" size="small" onPress={onHistory} />
     </Card>
   );
 };
