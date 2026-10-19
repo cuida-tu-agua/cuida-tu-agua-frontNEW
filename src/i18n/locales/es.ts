@@ -986,6 +986,18 @@ export const es = {
       cancel: 'Cancelar',
     },
   },
+  commonUi: {
+    close: 'Cerrar',
+    closeMessage: 'Cerrar mensaje',
+    backTo: 'Volver a {{label}}',
+    profilePhoto: 'Foto de perfil',
+    initials: 'Iniciales {{initials}}',
+    qrLabel: 'Código QR de la etiqueta',
+    success: '¡Éxito!',
+    codeInput: 'Código de {{length}} dígitos. {{written}} escritos.',
+    search: 'Buscar...',
+    noResults: 'No hay resultados.',
+  },
 };
 
 /** The shape of a dictionary: same keys as Spanish, any text as value. */

@@ -984,4 +984,16 @@ export const en: Translations = {
       cancel: 'Cancel',
     },
   },
+  commonUi: {
+    close: 'Close',
+    closeMessage: 'Close message',
+    backTo: 'Back to {{label}}',
+    profilePhoto: 'Profile photo',
+    initials: 'Initials {{initials}}',
+    qrLabel: 'QR code of the label',
+    success: 'Success!',
+    codeInput: '{{length}}-digit code. {{written}} typed.',
+    search: 'Search...',
+    noResults: 'No results.',
+  },
 };

@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { Pressable, Text, TextInput, TextStyle, View, ViewStyle } from 'react-native';
+import i18n from '../../../i18n';
 import { theme } from '../../styles/theme';
 import { themed } from '../../styles/themeRuntime';
 
@@ -35,7 +36,7 @@ export const CodeInput: React.FC<CodeInputProps> = ({
         style={rowStyle}
         onPress={() => inputRef.current?.focus()}
         accessibilityRole="none"
-        accessibilityLabel={`Código de ${length} dígitos. ${value.length} escritos.`}
+        accessibilityLabel={i18n.t('commonUi.codeInput', { length, written: value.length })}
       >
         {Array.from({ length }).map((_, index) => {
           const isCurrent = focused && index === Math.min(value.length, length - 1);
