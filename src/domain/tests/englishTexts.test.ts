@@ -1,5 +1,8 @@
 import { changeLanguage } from '../../i18n';
 import { bucketLabel, formatFlow, formatVolume, PERIOD_LABELS, PERIOD_TITLES } from '../consumption/consumptionFormat';
+import { validateLinkDeviceForm } from '../devices/linkDeviceForm';
+import { ACTION_LABELS, availability, describeRequester, outcomeMessage, STATUS_LABELS, VALVE_STATE_LABELS } from '../valve/valveRules';
+import { Valve, ValveCommand } from '../valve/Valve';
 import { DEVICE_STATUS_HINTS, DEVICE_STATUS_LABELS, formatLastReport } from '../devices/deviceStatus';
 import { formatCatalogDate, formatMoney, sourceLabel, validateManualTariff } from '../tariffs/Tariff';
 
@@ -42,6 +45,34 @@ describe('domain texts in English', () => {
     expect(sourceLabel('CATALOG', 3)).toBe('Preloaded for your city · stratum 3');
     expect(formatCatalogDate('2026-01-01')).toBe('January 1, 2026');
     expect(validateManualTariff({ price: '', fixedCharge: '' }).errors.price).toBe('Enter the price per cubic meter from your bill.');
+  });
+});
+
+describe('device linking and valve texts in English (HU-074)', () => {
+  beforeEach(async () => {
+    await changeLanguage('en');
+  });
+
+  it('link form validation', () => {
+    expect(validateLinkDeviceForm({ serialNumber: '', pairingCode: '' })).toEqual({
+      serialNumber: 'Enter the serial number shown on the box.',
+      pairingCode: 'Enter the pairing code.',
+    });
+    expect(validateLinkDeviceForm({ serialNumber: 'SW-ESP32-000001', pairingCode: 'ABCD-0EFG' }).pairingCode).toBe(
+      'The code does not use 0, O, 1, I or L. Check the label.',
+    );
+  });
+
+  it('valve labels and outcomes', () => {
+    expect(VALVE_STATE_LABELS.CLOSED).toBe('Closed');
+    expect(ACTION_LABELS.CLOSE).toBe('Close');
+    expect(STATUS_LABELS.ACK_TIMEOUT).toBe('No response');
+    const command = { action: 'CLOSE', status: 'ACK_SUCCESS' } as ValveCommand;
+    expect(outcomeMessage(command).text).toBe('The meter confirmed: the valve closed.');
+    expect(outcomeMessage({ ...command, action: 'OPEN' }).text).toBe('The meter confirmed: the valve opened.');
+    expect(availability({ pendingCommand: {} } as unknown as Valve).reason).toBe('An order is in progress. Wait for the meter to confirm.');
+    expect(describeRequester({ origin: 'AUTO_LEAK' } as ValveCommand)).toBe('Automatic (possible leak)');
+    expect(describeRequester({ origin: 'USER', requestedByName: null } as unknown as ValveCommand)).toBe('You');
   });
 });
 
