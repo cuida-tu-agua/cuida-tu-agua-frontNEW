@@ -22,7 +22,13 @@ describe('resolveLanguage: device language -> app language', () => {
 
   it('a language that is not supported falls back to Spanish', () => {
     expect(resolveLanguage('de')).toBe(DEFAULT_LANGUAGE);
-    expect(resolveLanguage('pt-BR')).toBe(DEFAULT_LANGUAGE);
+    expect(resolveLanguage('ja')).toBe(DEFAULT_LANGUAGE);
+  });
+
+  it('Portuguese devices get Portuguese, from Brazil or from Portugal', () => {
+    expect(resolveLanguage('pt')).toBe('pt');
+    expect(resolveLanguage('pt-BR')).toBe('pt');
+    expect(resolveLanguage('PT_pt')).toBe('pt');
   });
 
   it('an unknown language falls back to Spanish', () => {
@@ -54,6 +60,12 @@ describe('i18n instance', () => {
   it('shows the texts in French', async () => {
     await changeLanguage('fr');
     expect(i18n.t('common.cancel')).toBe('Annuler');
+  });
+
+  it('shows the texts in Portuguese', async () => {
+    await changeLanguage('pt');
+    expect(i18n.t('common.cancel')).toBe('Cancelar');
+    expect(i18n.t('common.save')).toBe('Salvar');
   });
 
   it('a text that exists only in Spanish is shown in Spanish when the language is English', async () => {

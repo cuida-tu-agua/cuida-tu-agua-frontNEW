@@ -58,6 +58,7 @@ describe('parseLanguagePreference', () => {
     expect(parseLanguagePreference('es')).toBe('es');
     expect(parseLanguagePreference('en')).toBe('en');
     expect(parseLanguagePreference('fr')).toBe('fr');
+    expect(parseLanguagePreference('pt')).toBe('pt');
   });
 
   it('ignores anything else', () => {

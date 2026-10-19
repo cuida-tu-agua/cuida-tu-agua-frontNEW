@@ -1,6 +1,7 @@
 import { en } from '../locales/en';
 import { es } from '../locales/es';
 import { fr } from '../locales/fr';
+import { pt } from '../locales/pt';
 
 /** Every text of a dictionary as "group.key": "value" (nested groups become dotted keys). */
 const flatten = (node: Record<string, unknown>, prefix = ''): Record<string, string> =>
@@ -16,6 +17,7 @@ const placeholders = (text: string) => (text.match(/{{\s*\w+\s*}}/g) ?? []).map(
 const OTHERS: [string, Record<string, unknown>][] = [
   ['English', en],
   ['French', fr],
+  ['Portuguese', pt],
 ];
 
 describe.each(OTHERS)('dictionaries: Spanish and %s have the same texts', (_name, dictionary) => {
