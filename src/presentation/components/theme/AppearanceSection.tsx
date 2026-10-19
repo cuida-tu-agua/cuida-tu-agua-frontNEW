@@ -6,23 +6,16 @@ import { theme } from '../../styles/theme';
 import { themed } from '../../styles/themeRuntime';
 import { ModePreference, useAppTheme } from '../../theme/ThemeProvider';
 import { SegmentedControl } from '../common/SegmentedControl';
+import { useTranslation } from 'react-i18next';
 
-const STYLE_OPTIONS: { value: ThemeStyle; label: string }[] = [
-  { value: 'classic', label: 'Clásico' },
-  { value: 'eco', label: 'Eco' },
-];
+const STYLES: ThemeStyle[] = ['classic', 'eco'];
+const MODES: ModePreference[] = ['light', 'dark', 'system'];
 
-const MODE_OPTIONS: { value: ModePreference; label: string }[] = [
-  { value: 'light', label: 'Claro' },
-  { value: 'dark', label: 'Oscuro' },
-  { value: 'system', label: 'Automático' },
-];
-
-const TILES: { name: ThemeName; style: ThemeStyle; mode: 'light' | 'dark'; label: string }[] = [
-  { name: 'classic-light', style: 'classic', mode: 'light', label: 'Clásico claro' },
-  { name: 'classic-dark', style: 'classic', mode: 'dark', label: 'Clásico oscuro' },
-  { name: 'eco-light', style: 'eco', mode: 'light', label: 'Eco claro' },
-  { name: 'eco-dark', style: 'eco', mode: 'dark', label: 'Eco oscuro' },
+const TILES: { name: ThemeName; style: ThemeStyle; mode: 'light' | 'dark' }[] = [
+  { name: 'classic-light', style: 'classic', mode: 'light' },
+  { name: 'classic-dark', style: 'classic', mode: 'dark' },
+  { name: 'eco-light', style: 'eco', mode: 'light' },
+  { name: 'eco-dark', style: 'eco', mode: 'dark' },
 ];
 
 /**
@@ -30,7 +23,10 @@ const TILES: { name: ThemeName; style: ThemeStyle; mode: 'light' | 'dark'; label
  * "Automático", the mode follows the setting of the phone or the browser.
  */
 export const AppearanceSection: React.FC = () => {
+  const { t } = useTranslation();
   const { preference, name, setStyle, setMode } = useAppTheme();
+  const styleOptions = STYLES.map((value) => ({ value, label: t(`appearance.styles.${value}`) }));
+  const modeOptions = MODES.map((value) => ({ value, label: t(`appearance.modes.${value}`) }));
 
   const pick = (tile: (typeof TILES)[number]) => {
     setStyle(tile.style);
@@ -39,13 +35,13 @@ export const AppearanceSection: React.FC = () => {
 
   return (
     <View>
-      <SegmentedControl label="Estilo" options={STYLE_OPTIONS} value={preference.style} onChange={setStyle} />
-      <SegmentedControl label="Modo" options={MODE_OPTIONS} value={preference.mode} onChange={setMode} />
+      <SegmentedControl label={t('appearance.style')} options={styleOptions} value={preference.style} onChange={setStyle} />
+      <SegmentedControl label={t('appearance.mode')} options={modeOptions} value={preference.mode} onChange={setMode} />
       {preference.mode === 'system' && (
-        <Text style={hintStyle}>Automático usa el modo claro u oscuro de tu dispositivo.</Text>
+        <Text style={hintStyle}>{t('appearance.systemHint')}</Text>
       )}
 
-      <View style={tilesStyle} accessibilityRole="radiogroup" accessibilityLabel="Los cuatro temas">
+      <View style={tilesStyle} accessibilityRole="radiogroup" accessibilityLabel={t('appearance.themesGroup')}>
         {TILES.map((tile) => {
           const colors = paletteFor(tile.name);
           const selected = tile.name === name;
@@ -56,7 +52,7 @@ export const AppearanceSection: React.FC = () => {
               style={[tileStyle, { backgroundColor: colors.background, borderColor: selected ? colors.primary : colors.border }, selected && selectedTileStyle]}
               accessibilityRole="radio"
               accessibilityState={{ selected }}
-              accessibilityLabel={tile.label}
+              accessibilityLabel={t(`appearance.themes.${tile.name}`)}
             >
               <View style={swatchRowStyle}>
                 {[colors.primary, colors.secondary, colors.accent].map((color) => (
@@ -67,10 +63,10 @@ export const AppearanceSection: React.FC = () => {
               <View style={[sampleStyle, { backgroundColor: colors.surface, borderColor: colors.border }]}>
                 <Text style={[sampleTitleStyle, { color: colors.textPrimary }]}>Aa</Text>
                 <Text style={[sampleTextStyle, { color: colors.textSecondary }]} numberOfLines={1}>
-                  Consumo de hoy
+                  {t('appearance.sample')}
                 </Text>
               </View>
-              <Text style={[tileLabelStyle, { color: colors.textPrimary }]}>{tile.label}</Text>
+              <Text style={[tileLabelStyle, { color: colors.textPrimary }]}>{t(`appearance.themes.${tile.name}`)}</Text>
             </TouchableOpacity>
           );
         })}
