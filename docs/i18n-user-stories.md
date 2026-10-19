@@ -1,7 +1,7 @@
-# Epic E16 — Internationalization (Spanish / English)
+# Epic E16 — Internationalization (Spanish, English, French, Portuguese)
 
 > Branch: `traduccion`. All new text, keys and documentation are written in English.
-> Spanish stays the default language; English is added as the second language.
+> Spanish stays the default language; English is the second language; French and Portuguese (Brazil) come after.
 
 ## Why
 
@@ -317,6 +317,102 @@ Scenario: complete dictionaries
 
 ---
 
+### HU-080 — Number, date and money formats for French and Portuguese
+
+> **As** a French or Portuguese speaking user
+> **I want** numbers, dates and prices written the way my language writes them
+> **so that** I read my consumption and my bill without confusion
+
+```gherkin
+Scenario: number format by language
+  Given the language is Spanish, Portuguese, English or French
+  When consumption is shown
+  Then Spanish and Portuguese use "1.234,5", English uses "1,234.5" and French uses "1 234,5"
+
+Scenario: price typed in the French way
+  Given the language is French
+  When I type "5 234,50" in the tariff field
+  Then the price is 5234.5
+
+Scenario: dates
+  Given the language is French or Portuguese
+  When a date is shown in history or alerts
+  Then it follows the format of fr-FR or pt-BR
+```
+
+| Field | Value |
+|-------|-------|
+| Story Points | 2 |
+| Priority | Should Have |
+| Service(s) | frontend |
+| Dependencies | HU-077 |
+
+---
+
+### HU-081 — French
+
+> **As** a French speaking user
+> **I want** the whole app in French
+> **so that** I can use it in my language
+
+```gherkin
+Scenario: choose French
+  Given I am on the Profile screen
+  When I choose Français
+  Then every translated text changes to French without restarting the app
+
+Scenario: French device
+  Given the device language is French and I never chose a language
+  When I open the app
+  Then the app opens in French
+
+Scenario: complete dictionary
+  Given a key exists in Spanish but not in French
+  When the tests run
+  Then the test fails and names the missing key
+```
+
+| Field | Value |
+|-------|-------|
+| Story Points | 8 |
+| Priority | Could Have |
+| Service(s) | frontend |
+| Dependencies | HU-070, HU-080 |
+
+---
+
+### HU-082 — Portuguese (Brazil)
+
+> **As** a Portuguese speaking user
+> **I want** the whole app in Portuguese
+> **so that** I can use it in my language
+
+```gherkin
+Scenario: choose Portuguese
+  Given I am on the Profile screen
+  When I choose Português
+  Then every translated text changes to Portuguese without restarting the app
+
+Scenario: Portuguese device
+  Given the device language is Portuguese (Brazil or Portugal) and I never chose a language
+  When I open the app
+  Then the app opens in Portuguese
+
+Scenario: complete dictionary
+  Given a key exists in Spanish but not in Portuguese
+  When the tests run
+  Then the test fails and names the missing key
+```
+
+| Field | Value |
+|-------|-------|
+| Story Points | 8 |
+| Priority | Could Have |
+| Service(s) | frontend |
+| Dependencies | HU-070, HU-080 |
+
+---
+
 ## Summary
 
 | Story | SP | Priority |
@@ -331,7 +427,10 @@ Scenario: complete dictionaries
 | HU-077 Numbers, dates, currency | 3 | Should |
 | HU-078 Admin screens | 5 | Could |
 | HU-079 Completeness check | 2 | Should |
-| **Total** | **37** | |
+| HU-080 Formats for French and Portuguese | 2 | Should |
+| HU-081 French | 8 | Could |
+| HU-082 Portuguese (Brazil) | 8 | Could |
+| **Total** | **55** | |
 
 Suggested order: HU-070, HU-079, HU-071, HU-072, HU-073, HU-074, HU-075, HU-077, HU-076, HU-078.
 
