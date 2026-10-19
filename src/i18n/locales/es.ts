@@ -12,6 +12,11 @@ export const es = {
     back: 'Volver',
     retry: 'Reintentar',
   },
+  language: {
+    title: 'Idioma',
+    label: 'Idioma de la aplicación',
+    hint: 'El cambio se aplica al instante y se recuerda en este dispositivo.',
+  },
 };
 
 /** The shape of a dictionary: same keys as Spanish, any text as value. */
