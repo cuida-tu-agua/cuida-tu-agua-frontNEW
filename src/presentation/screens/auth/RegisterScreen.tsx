@@ -36,8 +36,8 @@ const INITIAL = {
 
 export const RegisterScreen: React.FC<Props> = ({ navigation }) => {
   const form = useForm(INITIAL, {
-    firstName: (v) => validateName(v, 'nombre'),
-    lastName: (v) => validateName(v, 'apellido'),
+    firstName: (v) => validateName(v, 'firstName'),
+    lastName: (v) => validateName(v, 'lastName'),
     email: validateEmail,
     phone: validatePhone,
     password: validatePassword,

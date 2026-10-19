@@ -1,3 +1,4 @@
+import i18n from '../../../i18n';
 import {
   describeRules,
   normalizeIdentifier,
@@ -48,9 +49,9 @@ describe('email, name and phone', () => {
   });
 
   it('names accept Spanish letters, spaces, apostrophes and hyphens', () => {
-    expect(validateName("María José O'Neil-Díaz", 'nombre')).toBeUndefined();
-    expect(validateName('J', 'nombre')).toContain('al menos 2');
-    expect(validateName('Juan3', 'nombre')).toContain('solo puede tener letras');
+    expect(validateName("María José O'Neil-Díaz", 'firstName')).toBeUndefined();
+    expect(validateName('J', 'firstName')).toContain('al menos 2');
+    expect(validateName('Juan3', 'firstName')).toContain('solo puede tener letras');
   });
 
   it('phone is optional and ignores spaces, dashes and parentheses', () => {
@@ -74,5 +75,22 @@ describe('codes and recovery (HU-002, HU-005)', () => {
     expect(validateIdentifier('juan')).toBeDefined();
     expect(normalizeIdentifier(' Juan@Correo.com ')).toBe('juan@correo.com');
     expect(normalizeIdentifier('300-123-4567')).toBe('3001234567');
+  });
+});
+
+describe('messages in English (HU-072)', () => {
+  beforeEach(async () => {
+    await i18n.changeLanguage('en');
+  });
+
+  it('form validation messages follow the language', () => {
+    expect(validateEmail('')).toBe('Enter your email.');
+    expect(validateName('J', 'lastName')).toBe('The last name must have at least 2 letters.');
+    expect(validatePasswordConfirmation('Agua2026!', 'Agua2026?')).toBe('The passwords do not match.');
+  });
+
+  it('lists several missing password rules in natural English', () => {
+    expect(describeRules(['UPPERCASE', 'DIGIT', 'SPECIAL'])).toBe('an uppercase letter, a number and a symbol (!@#$...)');
+    expect(validatePassword('agua')).toBe('Your password needs at least 8 characters, an uppercase letter, a number and a symbol (!@#$...).');
   });
 });
