@@ -790,6 +790,33 @@ export const es = {
     },
     count: { integer: 'Escribe un número entero de 1 a {{max}}.', range: 'Debe ser de 1 a {{max}}.' },
   },
+  adminCommon: {
+    requiredTitle: 'Solo para administradores',
+    requiredText: 'Tu cuenta no tiene permisos para ver esta sección.',
+    retry: 'Reintentar',
+    previous: 'Anterior',
+    next: 'Siguiente',
+    pageOf: 'Página {{page}} de {{total}}',
+  },
+  adminUsers: {
+    title: 'Usuarios',
+    subtitle: 'Cuentas registradas. Nunca se muestran contraseñas ni datos sensibles.',
+    searchPlaceholder: 'Buscar por nombre o correo',
+    emptyFiltered: 'No hay usuarios con ese filtro.',
+    empty: 'Todavía no hay usuarios registrados.',
+    columns: { name: 'Nombre', phone: 'Teléfono', role: 'Rol', status: 'Estado', registered: 'Registro' },
+    block: 'Bloquear',
+    unblock: 'Desbloquear',
+    yourAccount: 'Tu cuenta',
+    blockTitle: '¿Bloquear a {{name}}?',
+    blockMessage: 'Cerraremos todas sus sesiones al instante y no podrá volver a entrar hasta que lo desbloquees.',
+    reasonLabel: 'Motivo (opcional)',
+    reasonPlaceholder: 'Ej.: uso indebido',
+    unblockTitle: '¿Desbloquear a {{name}}?',
+    unblockMessage: 'Podrá iniciar sesión de nuevo.',
+    blocked: 'Bloqueaste a {{name}}. Sus sesiones se cerraron.',
+    unblocked: '{{name}} puede volver a entrar.',
+  },
 };
 
 /** The shape of a dictionary: same keys as Spanish, any text as value. */
