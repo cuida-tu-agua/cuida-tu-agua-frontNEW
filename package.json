@@ -76,6 +76,9 @@
   "private": true,
   "jest": {
     "preset": "jest-expo",
+    "setupFilesAfterEnv": [
+      "<rootDir>/jest.setup.ts"
+    ],
     "moduleNameMapper": {
       "^sywater-jsx/(.*)$": "<rootDir>/src/presentation/styles/jsx/$1"
     }

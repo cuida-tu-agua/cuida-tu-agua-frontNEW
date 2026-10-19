@@ -1,3 +1,4 @@
+import i18n from '../../i18n';
 import {
   LETTERS,
   PASSWORD_MAX_LENGTH,
@@ -24,38 +25,38 @@ export const normalizePhone = (value: string): string => value.replace(/[\s\-.()
 
 export const validateEmail = (value: string): string | undefined => {
   const email = normalizeEmail(value);
-  if (!email) return 'Escribe tu correo.';
-  if (email.length > EMAIL_MAX_LENGTH || !EMAIL_REGEX.test(email)) return 'Escribe un correo válido, por ejemplo nombre@correo.com.';
+  if (!email) return i18n.t('validation.emailRequired');
+  if (email.length > EMAIL_MAX_LENGTH || !EMAIL_REGEX.test(email)) return i18n.t('validation.emailInvalid');
   return undefined;
 };
 
-export const validateName = (value: string, field: 'nombre' | 'apellido'): string | undefined => {
+export const validateName = (value: string, field: 'firstName' | 'lastName'): string | undefined => {
   const name = value.trim();
-  if (!name) return `Escribe tu ${field}.`;
-  if (name.length < 2) return `El ${field} debe tener al menos 2 letras.`;
-  if (name.length > NAME_MAX_LENGTH) return `El ${field} puede tener máximo ${NAME_MAX_LENGTH} caracteres.`;
-  if (!NAME_REGEX.test(name)) return `El ${field} solo puede tener letras, espacios, puntos, guiones o apóstrofes.`;
+  if (!name) return i18n.t(`validation.${field}Required`);
+  if (name.length < 2) return i18n.t(`validation.${field}TooShort`);
+  if (name.length > NAME_MAX_LENGTH) return i18n.t(`validation.${field}TooLong`, { max: NAME_MAX_LENGTH });
+  if (!NAME_REGEX.test(name)) return i18n.t(`validation.${field}Invalid`);
   return undefined;
 };
 
 export const validatePhone = (value: string): string | undefined => {
   const phone = normalizePhone(value);
   if (!phone) return undefined;
-  if (!PHONE_REGEX.test(phone)) return 'Escribe un teléfono de 7 a 15 dígitos (puede empezar con +).';
+  if (!PHONE_REGEX.test(phone)) return i18n.t('validation.phoneInvalid');
   return undefined;
 };
 
 export const validatePassword = (value: string): string | undefined => {
-  if (!value) return 'Escribe una contraseña.';
-  if (value.length > PASSWORD_MAX_LENGTH) return `La contraseña puede tener máximo ${PASSWORD_MAX_LENGTH} caracteres.`;
+  if (!value) return i18n.t('validation.passwordRequired');
+  if (value.length > PASSWORD_MAX_LENGTH) return i18n.t('validation.passwordTooLong', { max: PASSWORD_MAX_LENGTH });
   const unmet = passwordRules(value).filter((rule) => !rule.met).map((rule) => rule.id);
-  if (unmet.length > 0) return `A tu contraseña le falta ${describeRules(unmet)}.`;
+  if (unmet.length > 0) return i18n.t('validation.passwordMissing', { rules: describeRules(unmet) });
   return undefined;
 };
 
 export const validatePasswordConfirmation = (password: string, confirmation: string): string | undefined => {
-  if (!confirmation) return 'Repite la contraseña.';
-  if (password !== confirmation) return 'Las contraseñas no coinciden.';
+  if (!confirmation) return i18n.t('validation.confirmationRequired');
+  if (password !== confirmation) return i18n.t('validation.confirmationMismatch');
   return undefined;
 };
 
@@ -63,16 +64,16 @@ export const validateRequired = (value: string, message: string): string | undef
   value.trim() ? undefined : message;
 
 export const validateCode = (value: string): string | undefined => {
-  if (!value) return 'Escribe el código de 6 dígitos.';
-  if (!CODE_REGEX.test(value)) return 'El código tiene 6 dígitos.';
+  if (!value) return i18n.t('validation.codeRequired');
+  if (!CODE_REGEX.test(value)) return i18n.t('validation.codeInvalid');
   return undefined;
 };
 
 export const validateIdentifier = (value: string): string | undefined => {
   const trimmed = value.trim();
-  if (!trimmed) return 'Escribe tu correo o tu teléfono.';
+  if (!trimmed) return i18n.t('validation.identifierRequired');
   if (trimmed.includes('@')) return validateEmail(trimmed);
-  return PHONE_REGEX.test(normalizePhone(trimmed)) ? undefined : 'Escribe un correo o un teléfono válido.';
+  return PHONE_REGEX.test(normalizePhone(trimmed)) ? undefined : i18n.t('validation.identifierInvalid');
 };
 
 export const normalizeIdentifier = (value: string): string =>

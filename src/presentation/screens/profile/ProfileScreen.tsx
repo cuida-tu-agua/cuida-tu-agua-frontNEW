@@ -50,8 +50,8 @@ export const ProfileScreen: React.FC<Props> = ({ navigation }) => {
   const { t } = useTranslation();
   const { user, updateUser, logout } = useAuth();
   const form = useForm(toFormValues(user), {
-    firstName: (v) => validateName(v, 'nombre'),
-    lastName: (v) => validateName(v, 'apellido'),
+    firstName: (v) => validateName(v, 'firstName'),
+    lastName: (v) => validateName(v, 'lastName'),
     phone: validatePhone,
   });
   const { values, errors, blur, setValues } = form;
