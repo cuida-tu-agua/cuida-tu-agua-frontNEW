@@ -1,8 +1,10 @@
 import React from 'react';
 import { ActivityIndicator, Platform, Pressable, Text, TextStyle, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { Place } from '../../../domain/places/Place';
 import { Button } from '../common/Button';
+import { placeTypeLabel } from './placeLabels';
 import { theme } from '../../styles/theme';
 import { themed } from '../../styles/themeRuntime';
 
@@ -27,9 +29,10 @@ const locationOf = (place: Place): string =>
 
 /** Web (Figma "Mis lugares"): icon + selected mark on top, name, place, type and the two buttons under them. */
 const WebCard: React.FC<PlaceCardProps> = ({ place, onSelect, onEdit, onOpenPanel, selecting, disabled }) => {
+  const { t } = useTranslation();
   const selected = place.isDefault;
   const location = locationOf(place);
-  const typeLabel = place.type === 'COMMERCIAL' ? 'Comercial' : 'Residencial';
+  const typeLabel = placeTypeLabel(place.type);
 
   return (
     <View style={[webCardStyle, selected && webCardSelectedStyle]}>
@@ -44,7 +47,7 @@ const WebCard: React.FC<PlaceCardProps> = ({ place, onSelect, onEdit, onOpenPane
         {selected ? (
           <View style={selectedPillStyle} accessibilityRole="text">
             <Ionicons name="checkmark-circle" size={16} color={theme.colors.success} />
-            <Text style={selectedPillTextStyle}>Seleccionado</Text>
+            <Text style={selectedPillTextStyle}>{t('places.card.selected')}</Text>
           </View>
         ) : selecting ? (
           <ActivityIndicator color={theme.colors.primary} />
@@ -55,10 +58,10 @@ const WebCard: React.FC<PlaceCardProps> = ({ place, onSelect, onEdit, onOpenPane
             style={({ pressed }) => [selectLinkStyle, pressed && { opacity: 0.6 }]}
             accessibilityRole="radio"
             accessibilityState={{ checked: false, disabled }}
-            accessibilityLabel={`Seleccionar ${place.name}`}
+            accessibilityLabel={t('places.card.selectName', { name: place.name })}
           >
             <Ionicons name="ellipse-outline" size={16} color={theme.colors.textSecondary} />
-            <Text style={selectLinkTextStyle}>Seleccionar</Text>
+            <Text style={selectLinkTextStyle}>{t('places.card.select')}</Text>
           </Pressable>
         )}
       </View>
@@ -76,7 +79,7 @@ const WebCard: React.FC<PlaceCardProps> = ({ place, onSelect, onEdit, onOpenPane
       <View style={webButtonsStyle}>
         {!!onOpenPanel && (
           <Button
-            label="Ver panel"
+            label={t('places.card.viewPanel')}
             size="small"
             onPress={onOpenPanel}
             style={{ flex: 1 }}
@@ -84,7 +87,7 @@ const WebCard: React.FC<PlaceCardProps> = ({ place, onSelect, onEdit, onOpenPane
           />
         )}
         <Button
-          label="Editar"
+          label={t('places.card.edit')}
           size="small"
           variant="secondary"
           onPress={onEdit}
@@ -97,6 +100,7 @@ const WebCard: React.FC<PlaceCardProps> = ({ place, onSelect, onEdit, onOpenPane
 
 /** Phone (Figma mobile list): one row, the panel and edit buttons as round icons on the right. */
 const RowCard: React.FC<PlaceCardProps> = ({ place, onSelect, onEdit, onOpenPanel, selecting, disabled }) => {
+  const { t } = useTranslation();
   const selected = place.isDefault;
   const location = locationOf(place);
 
@@ -109,7 +113,7 @@ const RowCard: React.FC<PlaceCardProps> = ({ place, onSelect, onEdit, onOpenPane
         accessibilityRole="radio"
         accessibilityState={{ checked: selected, disabled }}
         accessibilityLabel={`${place.name}, ${location}`}
-        accessibilityHint={selected ? undefined : 'Toca para seleccionar este lugar'}
+        accessibilityHint={selected ? undefined : t('places.card.tapToSelect')}
       >
         <View style={[iconCircleStyle, selected && { backgroundColor: theme.colors.primary }]}>
           <Ionicons
@@ -129,7 +133,7 @@ const RowCard: React.FC<PlaceCardProps> = ({ place, onSelect, onEdit, onOpenPane
           {selected && (
             <View style={badgeStyle}>
               <Ionicons name="checkmark-circle" size={14} color={theme.colors.success} />
-              <Text style={badgeTextStyle}>Seleccionado</Text>
+              <Text style={badgeTextStyle}>{t('places.card.selected')}</Text>
             </View>
           )}
         </View>
@@ -140,7 +144,7 @@ const RowCard: React.FC<PlaceCardProps> = ({ place, onSelect, onEdit, onOpenPane
           onPress={onOpenPanel}
           style={[editButtonStyle, { backgroundColor: theme.colors.infoBg }]}
           accessibilityRole="button"
-          accessibilityLabel={`Ver consumo y válvula de ${place.name}`}
+          accessibilityLabel={t('places.card.viewPanelA11y', { name: place.name })}
           hitSlop={8}
         >
           <Ionicons name="stats-chart" size={20} color={theme.colors.primary} />
@@ -154,7 +158,7 @@ const RowCard: React.FC<PlaceCardProps> = ({ place, onSelect, onEdit, onOpenPane
           onPress={onEdit}
           style={editButtonStyle}
           accessibilityRole="button"
-          accessibilityLabel={`Editar ${place.name}`}
+          accessibilityLabel={t('places.card.editA11y', { name: place.name })}
           hitSlop={8}
         >
           <Ionicons name="create-outline" size={22} color={theme.colors.textSecondary} />
