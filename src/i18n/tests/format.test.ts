@@ -1,5 +1,5 @@
 import { changeLanguage } from '..';
-import { formatDate, formatDateTime, formatNumber, formatTime, localeTag } from '../format';
+import { formatDate, formatDateTime, formatNumber, formatTime, localeTag, numberMarks } from '../format';
 
 const SAMPLE = new Date(Date.UTC(2026, 9, 19, 16, 44)); // 19 Oct 2026
 
@@ -24,5 +24,15 @@ describe('shared formatters (HU-077)', () => {
     await changeLanguage('en');
     expect(formatDate(SAMPLE.toISOString())).toBe(formatDate(SAMPLE));
     expect(formatDate(SAMPLE.getTime())).toBe(formatDate(SAMPLE));
+  });
+});
+
+describe('formats of French and Portuguese (HU-080)', () => {
+  it('French uses a no-break space for thousands and a comma for decimals', async () => {
+    await changeLanguage('fr');
+    expect(localeTag()).toBe('fr-FR');
+    expect(numberMarks()).toEqual({ group: ' ', decimal: ',' });
+    expect(formatNumber(1234.5)).toMatch(/^1\s234,5$/);
+    expect(formatDate(SAMPLE)).toMatch(/oct/i);
   });
 });

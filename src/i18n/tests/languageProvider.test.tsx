@@ -57,12 +57,13 @@ describe('parseLanguagePreference', () => {
   it('accepts the supported languages', () => {
     expect(parseLanguagePreference('es')).toBe('es');
     expect(parseLanguagePreference('en')).toBe('en');
+    expect(parseLanguagePreference('fr')).toBe('fr');
   });
 
   it('ignores anything else', () => {
     expect(parseLanguagePreference(null)).toBeNull();
     expect(parseLanguagePreference('')).toBeNull();
-    expect(parseLanguagePreference('fr')).toBeNull();
+    expect(parseLanguagePreference('de')).toBeNull();
     expect(parseLanguagePreference('{"language":"en"}')).toBeNull();
   });
 });
