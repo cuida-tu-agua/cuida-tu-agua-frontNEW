@@ -762,6 +762,34 @@ export const es = {
       server: 'Ocurrió un error en el servidor. Inténtalo más tarde.',
     },
   },
+  admin: {
+    role: { ADMIN: 'Administrador', USER: 'Usuario' },
+    userStatus: { ACTIVE: 'Activa', BLOCKED: 'Bloqueada', UNVERIFIED: 'Sin verificar' },
+    userFilter: { ALL: 'Todas', ACTIVE: 'Activas', BLOCKED: 'Bloqueadas', UNVERIFIED: 'Sin verificar' },
+    range: '{{from}}–{{to}} de {{total}}',
+    noResults: '0 resultados',
+    section: { places: 'Lugares', devices: 'Dispositivos' },
+    statusFilter: {
+      ALL: 'Todos',
+      CONNECTED: 'Conectados',
+      DISCONNECTED: 'Desconectados',
+      NEVER_REPORTED: 'Nunca han reportado',
+      DECOMMISSIONED: 'Dados de baja',
+    },
+    linkFilter: { ALL: 'Vinculados y libres', LINKED: 'Vinculados', FREE: 'Libres' },
+    action: {
+      REGISTERED: 'Registrado en fábrica',
+      CREDENTIALS_REGENERATED: 'Credenciales nuevas',
+      DECOMMISSIONED: 'Dado de baja',
+    },
+    badge: {
+      decommissioned: 'Dado de baja',
+      connected: 'Conectado',
+      disconnected: 'Desconectado',
+      neverReported: 'Nunca ha reportado',
+    },
+    count: { integer: 'Escribe un número entero de 1 a {{max}}.', range: 'Debe ser de 1 a {{max}}.' },
+  },
 };
 
 /** The shape of a dictionary: same keys as Spanish, any text as value. */
