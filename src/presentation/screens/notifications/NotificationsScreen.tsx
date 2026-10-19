@@ -14,11 +14,13 @@ import { useNotifications } from '../../hooks/useNotifications';
 import { MainStackParamList } from '../../navigation/types';
 import { theme } from '../../styles/theme';
 import { themed } from '../../styles/themeRuntime';
+import { useTranslation } from 'react-i18next';
 
 type Props = NativeStackScreenProps<MainStackParamList, 'Notifications'>;
 
 /** HU-025: the inbox. Tapping a notification marks it read and opens the panel of its place. */
 export const NotificationsScreen: React.FC<Props> = ({ navigation }) => {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const inbox = useNotifications();
 
@@ -28,16 +30,16 @@ export const NotificationsScreen: React.FC<Props> = ({ navigation }) => {
       if (!item.placeId) return;
       // The panel shows the name of the place in its title: ask for it (a failure only loses the name)
       const place = await placeRepository.getById(item.placeId).catch(() => null);
-      navigation.navigate('PlaceDashboard', { placeId: item.placeId, placeName: place?.name ?? 'Mi lugar' });
+      navigation.navigate('PlaceDashboard', { placeId: item.placeId, placeName: place?.name ?? t('dashboard.defaultPlaceName') });
     },
-    [inbox, navigation],
+    [inbox, navigation, t],
   );
 
   if (!inbox.loaded) {
     return (
       <View style={centerStyle}>
         <ActivityIndicator size="large" color={theme.colors.primary} />
-        <Text style={mutedStyle}>Cargando tus notificaciones...</Text>
+        <Text style={mutedStyle}>{t('notifications.loading')}</Text>
       </View>
     );
   }
@@ -45,18 +47,18 @@ export const NotificationsScreen: React.FC<Props> = ({ navigation }) => {
   const toolbar = (
     <View style={toolbarStyle}>
       <Text style={countStyle}>
-        {inbox.unread > 0 ? `${inbox.unread} sin leer` : 'Estás al día'}
+        {inbox.unread > 0 ? t('notifications.unread', { count: inbox.unread }) : t('notifications.allRead')}
       </Text>
       <View style={actionsStyle}>
         <Button
-          label="Marcar todas como leídas"
+          label={t('notifications.markAllRead')}
           size="small"
           variant="secondary"
           onPress={() => void inbox.markAllRead()}
           disabled={inbox.unread === 0}
         />
         <Button
-          label="Preferencias"
+          label={t('notifications.preferences')}
           size="small"
           variant="ghost"
           icon={<Ionicons name="settings-outline" size={18} color={theme.colors.primary} />}
@@ -79,13 +81,13 @@ export const NotificationsScreen: React.FC<Props> = ({ navigation }) => {
       onEndReachedThreshold={0.4}
       ListHeaderComponent={
         <>
-          <PageHeader title="Notificaciones" />
+          <PageHeader title={t('notifications.title')} />
           {toolbar}
           {!!inbox.error && (
             <Banner
               tone={inbox.items.length ? 'warning' : 'error'}
               message={inbox.error.message}
-              action={{ label: 'Reintentar', onPress: () => void inbox.reload() }}
+              action={{ label: t('common.retry'), onPress: () => void inbox.reload() }}
               onClose={inbox.dismissError}
             />
           )}
@@ -98,9 +100,9 @@ export const NotificationsScreen: React.FC<Props> = ({ navigation }) => {
             <View style={emptyIconStyle}>
               <Ionicons name="notifications-off-outline" size={44} color={theme.colors.primary} />
             </View>
-            <Text style={emptyTitleStyle}>Todavía no tienes notificaciones</Text>
+            <Text style={emptyTitleStyle}>{t('notifications.emptyTitle')}</Text>
             <Text style={emptyTextStyle}>
-              Aquí aparecerán las alertas de tus medidores y de tu válvula: una fuga, un medidor desconectado o el agua cerrada.
+              {t('notifications.emptyText')}
             </Text>
           </View>
         )
