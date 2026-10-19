@@ -227,8 +227,10 @@ Scenario: unknown error
   Then a generic message in the current language is shown
 ```
 
-> Needs checking before estimating: whether every service already returns a stable
-> error code, or only a Spanish message. If only text, the services need codes first.
+> Checked: every service answers with a stable code in the `title` of the Problem Details
+> body (for example `auth.account_locked`), so the translation lives only in the app and no
+> service had to change. Texts written by the services themselves (notification title and body,
+> the tariff disclaimer) and the content of the tips stay in the language they were written in.
 
 | Field | Value |
 |-------|-------|
@@ -332,3 +334,14 @@ Scenario: complete dictionaries
 | **Total** | **37** | |
 
 Suggested order: HU-070, HU-079, HU-071, HU-072, HU-073, HU-074, HU-075, HU-077, HU-076, HU-078.
+
+## Status
+
+All stories are implemented in branch `traduccion`. Two tests guard the result:
+
+- `src/i18n/tests/dictionaries.test.ts` compares both dictionaries key by key (HU-079).
+- `src/i18n/tests/noHardcodedSpanish.test.ts` scans the source and fails if a text with Spanish
+  letters is written outside the dictionary.
+
+Known limits: the text of server notifications, the tariff disclaimer and the content of the tips
+are produced by the services or by the administrator, so they are shown as they were written.
