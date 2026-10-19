@@ -9,6 +9,7 @@ import { Button } from '../common/Button';
 import { CodeInput } from '../common/CodeInput';
 import { ConfirmDialog } from '../common/ConfirmDialog';
 import { themed } from '../../styles/themeRuntime';
+import { useTranslation } from 'react-i18next';
 
 interface CloseValveDialogProps {
   visible: boolean;
@@ -29,6 +30,7 @@ export const CloseValveDialog: React.FC<CloseValveDialogProps> = ({
   onDone,
   onCancel,
 }) => {
+  const { t } = useTranslation();
   const [sent, setSent] = useState<CodeSent | null>(null);
   const [code, setCode] = useState('');
   const [busy, setBusy] = useState(false);
@@ -56,7 +58,7 @@ export const CloseValveDialog: React.FC<CloseValveDialogProps> = ({
     } catch (e) {
       const appError = toAppError(e);
       if (appError.code === 'auth.code_recently_sent') {
-        setSent((s) => s ?? { maskedEmail: 'tu correo', expiresAt: '' });
+        setSent((s) => s ?? { maskedEmail: t('valve.dialog.yourEmail'), expiresAt: '' });
         resend.start(appError.details.retryAfterSeconds ?? RESEND_SECONDS);
       } else {
         setError(appError.message);
@@ -97,10 +99,10 @@ export const CloseValveDialog: React.FC<CloseValveDialogProps> = ({
       <ConfirmDialog
         visible={visible}
         tone="danger"
-        title="¿Cerrar el agua?"
-        message={`Se cortará el paso de agua en "${placeName}". Por seguridad te enviaremos un código a tu correo para confirmar.`}
-        confirmLabel="Enviarme el código"
-        cancelLabel="No, dejarla abierta"
+        title={t('valve.dialog.askTitle')}
+        message={t('valve.dialog.askBody', { name: placeName })}
+        confirmLabel={t('valve.dialog.sendCode')}
+        cancelLabel={t('valve.dialog.keepOpen')}
         loading={busy}
         onConfirm={sendCode}
         onCancel={cancel}
@@ -114,10 +116,10 @@ export const CloseValveDialog: React.FC<CloseValveDialogProps> = ({
     <ConfirmDialog
       visible={visible}
       tone="danger"
-      title="Escribe el código"
-      message={`Te enviamos un código de 6 dígitos a ${sent.maskedEmail}. Vence en 5 minutos.`}
-      confirmLabel="Cerrar el agua"
-      cancelLabel="Cancelar"
+      title={t('valve.dialog.codeTitle')}
+      message={t('valve.dialog.codeBody', { email: sent.maskedEmail })}
+      confirmLabel={t('valve.dialog.closeWater')}
+      cancelLabel={t('common.cancel')}
       loading={busy}
       confirmDisabled={code.length !== 6}
       onConfirm={() => submit()}
@@ -126,9 +128,9 @@ export const CloseValveDialog: React.FC<CloseValveDialogProps> = ({
       <CodeInput value={code} onChange={setCode} onComplete={submit} error={codeError} editable={!busy} />
       {!!error && <Banner tone="error" message={error} />}
       {resend.secondsLeft > 0 ? (
-        <Text style={hintStyle}>Puedes pedir otro código en {formatCountdown(resend.secondsLeft)}</Text>
+        <Text style={hintStyle}>{t('valve.dialog.resendIn', { time: formatCountdown(resend.secondsLeft) })}</Text>
       ) : (
-        <Button label="Enviar otro código" variant="ghost" size="small" onPress={sendCode} disabled={busy} />
+        <Button label={t('valve.dialog.resend')} variant="ghost" size="small" onPress={sendCode} disabled={busy} />
       )}
     </ConfirmDialog>
   );
