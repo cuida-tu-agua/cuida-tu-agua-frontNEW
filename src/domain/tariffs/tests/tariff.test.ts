@@ -109,3 +109,19 @@ describe('where the tariff comes from (HU-069)', () => {
     expect(formatCatalogDate('no es fecha')).toBe('no es fecha');
   });
 });
+
+describe('money in French (HU-080)', () => {
+  beforeEach(async () => { await changeLanguage('fr'); });
+
+  it('groups thousands with a no-break space and uses a decimal comma', () => {
+    expect(formatMoney(162800, 'COP')).toBe('$ 162 800');
+    expect(formatMoney(12.5, 'USD')).toBe('US$ 12,50');
+  });
+
+  it('reads the price the way a French speaker writes it', () => {
+    expect(parseMoneyInput('5 234,50')).toBe(5234.5);
+    expect(parseMoneyInput('5 234')).toBe(5234);
+    expect(parseMoneyInput('12,5')).toBe(12.5);
+    expect(parseMoneyInput(formatMoney(162800, 'COP'))).toBe(162800);
+  });
+});

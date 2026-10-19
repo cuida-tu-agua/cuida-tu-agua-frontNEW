@@ -1,5 +1,6 @@
 import { en } from '../locales/en';
 import { es } from '../locales/es';
+import { fr } from '../locales/fr';
 
 /** Every text of a dictionary as "group.key": "value" (nested groups become dotted keys). */
 const flatten = (node: Record<string, unknown>, prefix = ''): Record<string, string> =>
@@ -9,27 +10,36 @@ const flatten = (node: Record<string, unknown>, prefix = ''): Record<string, str
   }, {});
 
 const spanish = flatten(es);
-const english = flatten(en);
+const placeholders = (text: string) => (text.match(/{{\s*\w+\s*}}/g) ?? []).map((p) => p.replace(/\s/g, '')).sort();
 
-describe('dictionaries: Spanish and English have the same texts', () => {
-  it('no key is missing in English', () => {
-    const missing = Object.keys(spanish).filter((key) => !(key in english));
-    expect(missing).toEqual([]);
+/** Spanish is the reference: every other language must have exactly its keys and its placeholders. */
+const OTHERS: [string, Record<string, unknown>][] = [
+  ['English', en],
+  ['French', fr],
+];
+
+describe.each(OTHERS)('dictionaries: Spanish and %s have the same texts', (_name, dictionary) => {
+  const other = flatten(dictionary);
+
+  it('no key is missing', () => {
+    expect(Object.keys(spanish).filter((key) => !(key in other))).toEqual([]);
   });
 
-  it('no key exists only in English', () => {
-    const extra = Object.keys(english).filter((key) => !(key in spanish));
-    expect(extra).toEqual([]);
+  it('no key exists only in this language', () => {
+    expect(Object.keys(other).filter((key) => !(key in spanish))).toEqual([]);
   });
 
   it('no text is empty', () => {
-    const empty = [...Object.entries(spanish), ...Object.entries(english)].filter(([, text]) => text.trim() === '').map(([key]) => key);
+    const empty = Object.entries(other).filter(([, text]) => text.trim() === '').map(([key]) => key);
     expect(empty).toEqual([]);
   });
 
-  it('a text with {{placeholders}} uses the same ones in both languages', () => {
-    const placeholders = (text: string) => (text.match(/{{\s*\w+\s*}}/g) ?? []).map((p) => p.replace(/\s/g, '')).sort();
-    const different = Object.keys(spanish).filter((key) => key in english && placeholders(spanish[key]).join() !== placeholders(english[key]).join());
+  it('a text with {{placeholders}} uses the same ones as in Spanish', () => {
+    const different = Object.keys(spanish).filter((key) => key in other && placeholders(spanish[key]).join() !== placeholders(other[key]).join());
     expect(different).toEqual([]);
   });
+});
+
+it('no Spanish text is empty', () => {
+  expect(Object.entries(spanish).filter(([, text]) => text.trim() === '')).toEqual([]);
 });
