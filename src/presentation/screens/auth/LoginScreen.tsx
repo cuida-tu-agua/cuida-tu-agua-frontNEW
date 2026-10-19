@@ -5,7 +5,7 @@ import { useAuth } from '../../../core/auth/AuthContext';
 import { authService } from '../../../core/di/container';
 import { AppError } from '../../../domain/common/AppError';
 import { toAppError } from '../../../infrastructure/http/httpError';
-import { AuthFooterLink, AuthLayout, PasswordField, UIcon } from '../../components/auth';
+import { AuthFooterLink, AuthLayout, GoogleSignInButton, PasswordField, UIcon } from '../../components/auth';
 import { Banner, BannerTone } from '../../components/common/Banner';
 import { Button } from '../../components/common/Button';
 import { Input } from '../../components/common/Input';
@@ -13,6 +13,7 @@ import { formatCountdown, useCountdown } from '../../hooks/useCountdown';
 import { AuthStackParamList, LoginNotice } from '../../navigation/types';
 import { theme } from '../../styles/theme';
 import { normalizeEmail, validateEmail, validateRequired } from '../../utils/validation';
+import { themed } from '../../styles/themeRuntime';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'Login'>;
 
@@ -179,15 +180,17 @@ export const LoginScreen: React.FC<Props> = ({ navigation, route }) => {
         loading={submitting}
         disabled={locked}
       />
+
+      <GoogleSignInButton onError={(message) => setBanner({ tone: 'error', message })} />
     </AuthLayout>
   );
 };
 
-const forgotStyle: TextStyle = {
+const forgotStyle: TextStyle = themed(() => ({
   ...theme.textStyles.caption,
   color: theme.colors.primary,
   fontWeight: '600',
   textAlign: 'right',
   marginTop: -theme.spacing.sm,
   marginBottom: theme.spacing.xl,
-};
+}));

@@ -11,6 +11,7 @@ import { Banner } from '../common/Banner';
 import { Card } from '../common/Card';
 import { SegmentedControl } from '../common/SegmentedControl';
 import { ConsumptionChart } from './ConsumptionChart';
+import { themed } from '../../styles/themeRuntime';
 
 interface ConsumptionCardProps {
   period: ConsumptionPeriod;
@@ -77,9 +78,9 @@ export const ConsumptionCard: React.FC<ConsumptionCardProps> = ({ period, onPeri
 };
 
 const centerStyle: ViewStyle = { height: 220, alignItems: 'center', justifyContent: 'center' };
-const captionStyle: TextStyle = { ...theme.textStyles.caption, color: theme.colors.textMuted };
-const totalStyle: TextStyle = { ...theme.textStyles.h1, color: theme.colors.textPrimary, marginBottom: theme.spacing.sm };
-const mutedStyle: TextStyle = { ...theme.textStyles.caption, color: theme.colors.textMuted, textAlign: 'center' };
+const captionStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, color: theme.colors.textMuted }));
+const totalStyle: TextStyle = themed(() => ({ ...theme.textStyles.h1, color: theme.colors.textPrimary, marginBottom: theme.spacing.sm }));
+const mutedStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, color: theme.colors.textMuted, textAlign: 'center' }));
 const flowRowStyle: ViewStyle = {
   flexDirection: 'row',
   alignItems: 'center',

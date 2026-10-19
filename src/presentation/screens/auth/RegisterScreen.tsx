@@ -3,7 +3,7 @@ import { Text, TextStyle, View, ViewStyle } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { authService } from '../../../core/di/container';
 import { toAppError } from '../../../infrastructure/http/httpError';
-import { AuthFooterLink, AuthLayout, PasswordField, PasswordStrengthMeter, UIcon } from '../../components/auth';
+import { AuthFooterLink, AuthLayout, GoogleSignInButton, PasswordField, PasswordStrengthMeter, UIcon } from '../../components/auth';
 import { Banner, BannerTone } from '../../components/common/Banner';
 import { Button } from '../../components/common/Button';
 import { Checkbox } from '../../components/common/Checkbox';
@@ -20,6 +20,7 @@ import {
   validatePasswordConfirmation,
   validatePhone,
 } from '../../utils/validation';
+import { themed } from '../../styles/themeRuntime';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'Register'>;
 
@@ -196,6 +197,8 @@ export const RegisterScreen: React.FC<Props> = ({ navigation }) => {
       </Checkbox>
 
       <Button label="Crear cuenta" onPress={handleSubmit} loading={submitting} />
+
+      <GoogleSignInButton onError={(message) => setBanner({ tone: 'error', message })} />
     </AuthLayout>
   );
 };
@@ -204,6 +207,6 @@ const rowStyle: ViewStyle = { flexDirection: 'row', gap: theme.spacing.md };
 
 const halfStyle: ViewStyle = { flex: 1 };
 
-const termsTextStyle: TextStyle = { ...theme.textStyles.caption, color: theme.colors.textSecondary };
+const termsTextStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, color: theme.colors.textSecondary }));
 
-const termsLinkStyle: TextStyle = { color: theme.colors.primary, textDecorationLine: 'underline' };
+const termsLinkStyle: TextStyle = themed(() => ({ color: theme.colors.primary, textDecorationLine: 'underline' }));

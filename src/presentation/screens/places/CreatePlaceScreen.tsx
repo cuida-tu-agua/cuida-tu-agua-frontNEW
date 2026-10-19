@@ -2,7 +2,6 @@ import React, { useCallback, useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
-  ScrollView,
   Text,
   TextStyle,
   ViewStyle,
@@ -12,27 +11,24 @@ import { placeRepository } from '../../../core/di/container';
 import { AppError } from '../../../domain/common/AppError';
 import { Place } from '../../../domain/places/Place';
 import { toCreatePlaceInput } from '../../../domain/places/placeForm';
+import { PageContainer } from '../../components/common/PageContainer';
+import { PageHeader } from '../../components/common/PageHeader';
 import { SuccessModal } from '../../components/common/SuccessModal';
 import { PlaceForm } from '../../components/places/placeForm';
 import { usePlaceForm } from '../../hooks/usePlaceForm';
 import { MainStackParamList } from '../../navigation/types';
 import { theme } from '../../styles/theme';
+import { themed } from '../../styles/themeRuntime';
 
 type Props = NativeStackScreenProps<MainStackParamList, 'CreatePlace'>;
 
-const containerStyle: ViewStyle = { flex: 1, backgroundColor: theme.colors.background };
+const containerStyle: ViewStyle = themed(() => ({ flex: 1, backgroundColor: theme.colors.background }));
 
-const contentStyle: ViewStyle = {
-  paddingHorizontal: theme.spacing.lg,
-  paddingTop: theme.spacing.xl,
-  paddingBottom: theme.spacing.huge,
-};
-
-const introStyle: TextStyle = {
+const introStyle: TextStyle = themed(() => ({
   ...theme.textStyles.body,
   color: theme.colors.textSecondary,
   marginBottom: theme.spacing.xl,
-};
+}));
 
 export const CreatePlaceScreen: React.FC<Props> = ({ navigation }) => {
   const form = usePlaceForm();
@@ -67,10 +63,17 @@ export const CreatePlaceScreen: React.FC<Props> = ({ navigation }) => {
       style={containerStyle}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <ScrollView contentContainerStyle={contentStyle} keyboardShouldPersistTaps="handled">
-        <Text style={introStyle}>
-          Registra cada sitio donde quieras medir el agua: tu casa, tu local o tu bodega.
-        </Text>
+      <PageContainer narrow>
+        <PageHeader
+          back={{ label: 'Volver', onPress: () => navigation.goBack() }}
+          title="Registrar lugar"
+          subtitle="Registra cada sitio donde quieras medir el agua: tu casa, tu local o tu bodega."
+        />
+        {Platform.OS !== 'web' && (
+          <Text style={introStyle}>
+            Registra cada sitio donde quieras medir el agua: tu casa, tu local o tu bodega.
+          </Text>
+        )}
 
         <PlaceForm
           form={form}
@@ -79,7 +82,7 @@ export const CreatePlaceScreen: React.FC<Props> = ({ navigation }) => {
           submitting={submitting}
           submitError={submitError}
         />
-      </ScrollView>
+      </PageContainer>
 
       <SuccessModal
         visible={!!created}

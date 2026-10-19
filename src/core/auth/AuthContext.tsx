@@ -1,8 +1,9 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { authService } from '../di/container';
+import { authService, pushService } from '../di/container';
 import { refreshAccessToken, setSessionExpiredHandler } from '../http/ApiClient';
 import { tokenManager } from './TokenManager';
 import { AppError } from '../../domain/common/AppError';
+import { Session } from '../../domain/entities/Auth';
 import { User } from '../../domain/entities/User';
 import { normalizeEmail } from '../../presentation/utils/validation';
 
@@ -15,6 +16,8 @@ interface AuthContextValue {
   user: User | null;
   signedOutReason: SignedOutReason;
   login: (email: string, password: string) => Promise<void>;
+  /** HU-004: finishes "Continuar con Google" with the single-use code the server sent back. */
+  loginWithGoogleCode: (code: string) => Promise<void>;
   logout: () => Promise<void>;
   endSession: (reason: SignedOutReason) => Promise<void>;
   updateUser: (user: User) => Promise<void>;
@@ -71,13 +74,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => setSessionExpiredHandler(null);
   }, []);
 
-  const login = useCallback(async (email: string, password: string) => {
-    const session = await authService.login(normalizeEmail(email), password);
+  const startSession = useCallback(async (session: Session) => {
     await tokenManager.saveSession(session);
     setSignedOutReason(null);
     setUser(session.user);
     setStatus('signedIn');
   }, []);
+
+  const login = useCallback(
+    async (email: string, password: string) => startSession(await authService.login(normalizeEmail(email), password)),
+    [startSession],
+  );
+
+  const loginWithGoogleCode = useCallback(
+    async (code: string) => startSession(await authService.exchangeGoogleCode(code)),
+    [startSession],
+  );
 
   const endSession = useCallback(async (reason: SignedOutReason) => {
     await tokenManager.clear();
@@ -87,6 +99,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const logout = useCallback(async () => {
+    // First, while the session still works: this phone must stop receiving the alerts of the user who is leaving
+    await pushService.disable();
     if (tokenManager.isExpiring(await tokenManager.getAccessToken())) {
       await refreshAccessToken().catch(() => undefined);
     }
@@ -103,8 +117,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const clearSignedOutReason = useCallback(() => setSignedOutReason(null), []);
 
   const value = useMemo<AuthContextValue>(
-    () => ({ status, user, signedOutReason, login, logout, endSession, updateUser, clearSignedOutReason }),
-    [status, user, signedOutReason, login, logout, endSession, updateUser, clearSignedOutReason],
+    () => ({ status, user, signedOutReason, login, loginWithGoogleCode, logout, endSession, updateUser, clearSignedOutReason }),
+    [status, user, signedOutReason, login, loginWithGoogleCode, logout, endSession, updateUser, clearSignedOutReason],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

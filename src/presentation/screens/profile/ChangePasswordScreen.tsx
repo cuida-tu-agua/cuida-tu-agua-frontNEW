@@ -6,11 +6,14 @@ import { toAppError } from '../../../infrastructure/http/httpError';
 import { PasswordField, PasswordStrengthMeter } from '../../components/auth';
 import { Banner } from '../../components/common/Banner';
 import { Button } from '../../components/common/Button';
+import { PageContainer } from '../../components/common/PageContainer';
+import { PageHeader } from '../../components/common/PageHeader';
 import { SuccessModal } from '../../components/common/SuccessModal';
 import { useForm } from '../../hooks/useForm';
 import { MainStackParamList } from '../../navigation/types';
 import { theme } from '../../styles/theme';
 import { validatePassword, validatePasswordConfirmation, validateRequired } from '../../utils/validation';
+import { themed } from '../../styles/themeRuntime';
 
 type Props = NativeStackScreenProps<MainStackParamList, 'ChangePassword'>;
 
@@ -50,7 +53,8 @@ export const ChangePasswordScreen: React.FC<Props> = ({ navigation }) => {
 
   return (
     <KeyboardAvoidingView style={screenStyle} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <ScrollView contentContainerStyle={contentStyle} keyboardShouldPersistTaps="handled">
+      <PageContainer narrow>
+        <PageHeader back={{ label: 'Volver', onPress: () => navigation.goBack() }} title="Cambiar contraseña" />
         {bannerMessage && <Banner tone="error" message={bannerMessage} onClose={() => setBannerMessage(null)} />}
 
         <PasswordField
@@ -78,7 +82,7 @@ export const ChangePasswordScreen: React.FC<Props> = ({ navigation }) => {
         />
 
         <Button label="Cambiar contraseña" onPress={save} loading={saving} />
-      </ScrollView>
+      </PageContainer>
 
       <SuccessModal
         visible={done}
@@ -90,5 +94,5 @@ export const ChangePasswordScreen: React.FC<Props> = ({ navigation }) => {
   );
 };
 
-const screenStyle: ViewStyle = { flex: 1, backgroundColor: theme.colors.background };
+const screenStyle: ViewStyle = themed(() => ({ flex: 1, backgroundColor: theme.colors.background }));
 const contentStyle: ViewStyle = { padding: theme.spacing.lg, paddingBottom: theme.spacing.huge };

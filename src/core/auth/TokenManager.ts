@@ -1,4 +1,4 @@
-import * as SecureStore from 'expo-secure-store';
+import { secureStorage } from '../storage/secureStorage';
 import { jwtDecode } from 'jwt-decode';
 import { Session } from '../../domain/entities/Auth';
 import { User } from '../../domain/entities/User';
@@ -14,25 +14,25 @@ const USER_KEY = 'session_user';
 
 class TokenManagerClass {
   async saveSession(session: Session): Promise<void> {
-    await SecureStore.setItemAsync(REFRESH_TOKEN_KEY, session.refreshToken);
-    await SecureStore.setItemAsync(ACCESS_TOKEN_KEY, session.accessToken);
+    await secureStorage.setItem(REFRESH_TOKEN_KEY, session.refreshToken);
+    await secureStorage.setItem(ACCESS_TOKEN_KEY, session.accessToken);
     await this.saveUser(session.user);
   }
 
   async saveUser(user: User): Promise<void> {
-    await SecureStore.setItemAsync(USER_KEY, JSON.stringify(user));
+    await secureStorage.setItem(USER_KEY, JSON.stringify(user));
   }
 
   getAccessToken(): Promise<string | null> {
-    return SecureStore.getItemAsync(ACCESS_TOKEN_KEY);
+    return secureStorage.getItem(ACCESS_TOKEN_KEY);
   }
 
   getRefreshToken(): Promise<string | null> {
-    return SecureStore.getItemAsync(REFRESH_TOKEN_KEY);
+    return secureStorage.getItem(REFRESH_TOKEN_KEY);
   }
 
   async getUser(): Promise<User | null> {
-    const raw = await SecureStore.getItemAsync(USER_KEY);
+    const raw = await secureStorage.getItem(USER_KEY);
     if (!raw) return null;
     try {
       return JSON.parse(raw) as User;
@@ -53,9 +53,9 @@ class TokenManagerClass {
 
   async clear(): Promise<void> {
     await Promise.all([
-      SecureStore.deleteItemAsync(ACCESS_TOKEN_KEY),
-      SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY),
-      SecureStore.deleteItemAsync(USER_KEY),
+      secureStorage.removeItem(ACCESS_TOKEN_KEY),
+      secureStorage.removeItem(REFRESH_TOKEN_KEY),
+      secureStorage.removeItem(USER_KEY),
     ]);
   }
 }

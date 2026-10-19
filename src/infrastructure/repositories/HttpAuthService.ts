@@ -35,6 +35,19 @@ export class HttpAuthService implements AuthService {
     await this.call(() => this.http.post(AUTH_ENDPOINTS.RESET_PASSWORD, input));
   }
 
+  async googleEnabled(): Promise<boolean> {
+    try {
+      const { data } = await this.http.get<{ enabled: boolean }>(AUTH_ENDPOINTS.GOOGLE_STATUS);
+      return data?.enabled === true;
+    } catch {
+      return false; // an older server or no connection: simply no Google button
+    }
+  }
+
+  exchangeGoogleCode(code: string): Promise<Session> {
+    return this.call(() => this.http.post<Session>(AUTH_ENDPOINTS.GOOGLE_EXCHANGE, { code }));
+  }
+
   private async call<T>(request: () => Promise<{ data: T }>): Promise<T> {
     try {
       const { data } = await request();

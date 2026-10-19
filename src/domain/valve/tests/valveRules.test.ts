@@ -1,5 +1,5 @@
 import { Valve, ValveCommand } from '../Valve';
-import { availability, describeRequester, isFinished, outcomeMessage } from '../valveRules.ts';
+import { availability, describeRequester, isFinished, outcomeMessage } from '../valveRules';
 
 const command = (overrides: Partial<ValveCommand> = {}): ValveCommand => ({
   id: 'c1',

@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { Pressable, Text, TextInput, TextStyle, View, ViewStyle } from 'react-native';
 import { theme } from '../../styles/theme';
+import { themed } from '../../styles/themeRuntime';
 
 interface CodeInputProps {
   value: string;
@@ -83,7 +84,7 @@ const wrapperStyle: ViewStyle = { marginBottom: theme.spacing.lg };
 
 const rowStyle: ViewStyle = { flexDirection: 'row', justifyContent: 'space-between', gap: theme.spacing.sm };
 
-const boxStyle: ViewStyle = {
+const boxStyle: ViewStyle = themed(() => ({
   flex: 1,
   maxWidth: 52,
   height: 60,
@@ -93,21 +94,21 @@ const boxStyle: ViewStyle = {
   backgroundColor: theme.colors.surface,
   alignItems: 'center',
   justifyContent: 'center',
-};
+}));
 
-const digitStyle: TextStyle = {
+const digitStyle: TextStyle = themed(() => ({
   fontFamily: theme.typography.fontFamily.monospace, // codes are data: IBM Plex Mono
   fontSize: 26,
   fontWeight: '700',
   color: theme.colors.textPrimary,
-};
+}));
 
 // Invisible but focusable (opacity 0 keeps paste / autofill working)
 const hiddenInputStyle: TextStyle = { position: 'absolute', opacity: 0, width: 1, height: 1 };
 
-const errorStyle: TextStyle = {
+const errorStyle: TextStyle = themed(() => ({
   ...theme.textStyles.caption,
   color: theme.colors.error,
   marginTop: theme.spacing.sm,
   textAlign: 'center',
-};
+}));

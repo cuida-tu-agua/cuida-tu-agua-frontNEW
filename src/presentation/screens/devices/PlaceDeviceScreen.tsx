@@ -5,6 +5,8 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { toAppError } from '../../../infrastructure/http/httpError';
 import { DEVICE_STATUS_HINTS } from '../../../domain/devices/deviceStatus';
 import { Banner } from '../../components/common/Banner';
+import { PageContainer } from '../../components/common/PageContainer';
+import { PageHeader } from '../../components/common/PageHeader';
 import { Button } from '../../components/common/Button';
 import { Card } from '../../components/common/Card';
 import { ConfirmDialog } from '../../components/common/ConfirmDialog';
@@ -13,6 +15,7 @@ import { DeviceStatusCard } from '../../components/devices/DeviceStatusCard';
 import { usePlaceDevice } from '../../hooks/usePlaceDevice';
 import { MainStackParamList } from '../../navigation/types';
 import { theme } from '../../styles/theme';
+import { themed } from '../../styles/themeRuntime';
 
 type Props = NativeStackScreenProps<MainStackParamList, 'PlaceDevice'>;
 
@@ -76,7 +79,8 @@ export const PlaceDeviceScreen: React.FC<Props> = ({ navigation, route }) => {
   const hint = device ? DEVICE_STATUS_HINTS[device.status] : null;
 
   return (
-    <ScrollView style={screenStyle} contentContainerStyle={contentStyle}>
+    <PageContainer medium gap={theme.spacing.lg}>
+      <PageHeader back={{ label: 'Volver', onPress: () => navigation.goBack() }} title="Medidor" />
       <Text style={eyebrowStyle}>Lugar</Text>
       <Text style={placeNameStyle}>{placeName}</Text>
 
@@ -152,11 +156,11 @@ export const PlaceDeviceScreen: React.FC<Props> = ({ navigation, route }) => {
         onDismiss={handleUnlinkedDismiss}
         autoCloseDuration={1500}
       />
-    </ScrollView>
+    </PageContainer>
   );
 };
 
-const screenStyle: ViewStyle = { flex: 1, backgroundColor: theme.colors.background };
+const screenStyle: ViewStyle = themed(() => ({ flex: 1, backgroundColor: theme.colors.background }));
 
 const contentStyle: ViewStyle = {
   paddingHorizontal: theme.spacing.lg,
@@ -165,73 +169,73 @@ const contentStyle: ViewStyle = {
   gap: theme.spacing.lg,
 };
 
-const centeredStyle: ViewStyle = {
+const centeredStyle: ViewStyle = themed(() => ({
   flex: 1,
   alignItems: 'stretch',
   justifyContent: 'center',
   gap: theme.spacing.md,
   padding: theme.spacing.xl,
   backgroundColor: theme.colors.background,
-};
+}));
 
-const eyebrowStyle: TextStyle = {
+const eyebrowStyle: TextStyle = themed(() => ({
   ...theme.textStyles.label,
   color: theme.colors.textMuted,
   textTransform: 'uppercase',
   marginBottom: -theme.spacing.md,
-};
+}));
 
-const placeNameStyle: TextStyle = { ...theme.textStyles.h2, color: theme.colors.textPrimary };
+const placeNameStyle: TextStyle = themed(() => ({ ...theme.textStyles.h2, color: theme.colors.textPrimary }));
 
-const mutedStyle: TextStyle = { ...theme.textStyles.caption, color: theme.colors.textMuted, textAlign: 'center' };
+const mutedStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, color: theme.colors.textMuted, textAlign: 'center' }));
 
 const footnoteStyle: TextStyle = { ...mutedStyle, marginTop: -theme.spacing.sm };
 
-const dangerZoneStyle: ViewStyle = {
+const dangerZoneStyle: ViewStyle = themed(() => ({
   marginTop: theme.spacing.lg,
   paddingTop: theme.spacing.xl,
   borderTopWidth: 1,
   borderTopColor: theme.colors.border,
-};
+}));
 
-const dangerTitleStyle: TextStyle = {
+const dangerTitleStyle: TextStyle = themed(() => ({
   ...theme.textStyles.label,
   color: theme.colors.error,
   textTransform: 'uppercase',
   marginBottom: theme.spacing.sm,
-};
+}));
 
-const dangerTextStyle: TextStyle = {
+const dangerTextStyle: TextStyle = themed(() => ({
   ...theme.textStyles.caption,
   color: theme.colors.textSecondary,
   marginBottom: theme.spacing.lg,
-};
+}));
 
 const emptyCardStyle: ViewStyle = { alignItems: 'center', gap: theme.spacing.md, paddingVertical: theme.spacing.xl };
 
-const emptyIconStyle: ViewStyle = {
+const emptyIconStyle: ViewStyle = themed(() => ({
   width: 80,
   height: 80,
   borderRadius: 40,
   backgroundColor: theme.colors.infoBg,
   alignItems: 'center',
   justifyContent: 'center',
-};
+}));
 
-const emptyTitleStyle: TextStyle = {
+const emptyTitleStyle: TextStyle = themed(() => ({
   ...theme.textStyles.h2,
   fontSize: theme.typography.sizes.h3,
   lineHeight: theme.typography.sizes.h3 * 1.3,
   color: theme.colors.textPrimary,
   textAlign: 'center',
-};
+}));
 
-const emptyTextStyle: TextStyle = {
+const emptyTextStyle: TextStyle = themed(() => ({
   ...theme.textStyles.caption,
   fontSize: 16,
   lineHeight: 24,
   color: theme.colors.textSecondary,
   textAlign: 'center',
-};
+}));
 
 const fullWidthStyle: ViewStyle = { alignSelf: 'stretch' };

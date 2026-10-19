@@ -5,6 +5,7 @@ import {
   StyleProp,
 } from 'react-native';
 import { theme } from '../../styles/theme';
+import { themed } from '../../styles/themeRuntime';
 
 interface CardProps {
   children: React.ReactNode;
@@ -12,14 +13,14 @@ interface CardProps {
   variant?: 'default' | 'elevated' | 'outlined';
 }
 
-const cardBase: ViewStyle = {
+const cardBase: ViewStyle = themed(() => ({
   backgroundColor: theme.colors.surface,
   borderRadius: theme.borderRadius.medium,
   paddingHorizontal: theme.spacing.lg,
   paddingVertical: theme.spacing.lg,
-};
+}));
 
-const variantStyles: Record<'default' | 'elevated' | 'outlined', ViewStyle> = {
+const variantStyles: Record<'default' | 'elevated' | 'outlined', ViewStyle> = themed(() => ({
   default: {
     ...theme.shadows.subtle,
   },
@@ -30,7 +31,7 @@ const variantStyles: Record<'default' | 'elevated' | 'outlined', ViewStyle> = {
     borderWidth: 1,
     borderColor: theme.colors.border,
   },
-};
+}));
 
 export const Card: React.FC<CardProps> = ({
   children,

@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { theme } from '../../styles/theme';
+import { themed } from '../../styles/themeRuntime';
 
 export interface SelectOption {
   value: string;
@@ -35,13 +36,13 @@ const normalize = (text: string) =>
 
 const containerStyle: ViewStyle = { marginBottom: theme.spacing.lg };
 
-const labelStyle: TextStyle = {
+const labelStyle: TextStyle = themed(() => ({
   ...theme.textStyles.label,
   color: theme.colors.textPrimary,
   marginBottom: theme.spacing.sm,
-};
+}));
 
-const fieldStyle: ViewStyle = {
+const fieldStyle: ViewStyle = themed(() => ({
   flexDirection: 'row',
   alignItems: 'center',
   height: 54, // same height as Input
@@ -50,32 +51,32 @@ const fieldStyle: ViewStyle = {
   borderWidth: 1,
   borderColor: theme.colors.border,
   backgroundColor: theme.colors.surface,
-};
+}));
 
-const valueTextStyle: TextStyle = {
+const valueTextStyle: TextStyle = themed(() => ({
   ...theme.textStyles.body,
   flex: 1,
   color: theme.colors.textPrimary,
-};
+}));
 
-const chevronStyle: TextStyle = {
+const chevronStyle: TextStyle = themed(() => ({
   fontSize: 16,
   color: theme.colors.textMuted,
   marginLeft: theme.spacing.sm,
-};
+}));
 
-const errorTextStyle: TextStyle = {
+const errorTextStyle: TextStyle = themed(() => ({
   ...theme.textStyles.caption,
   color: theme.colors.error,
   marginTop: theme.spacing.sm,
-};
+}));
 
-const sheetStyle: ViewStyle = {
+const sheetStyle: ViewStyle = themed(() => ({
   flex: 1,
   backgroundColor: theme.colors.background,
-};
+}));
 
-const sheetHeaderStyle: ViewStyle = {
+const sheetHeaderStyle: ViewStyle = themed(() => ({
   flexDirection: 'row',
   alignItems: 'center',
   justifyContent: 'space-between',
@@ -84,21 +85,21 @@ const sheetHeaderStyle: ViewStyle = {
   borderBottomWidth: 1,
   borderBottomColor: theme.colors.border,
   backgroundColor: theme.colors.surface,
-};
+}));
 
-const sheetTitleStyle: TextStyle = {
+const sheetTitleStyle: TextStyle = themed(() => ({
   ...theme.textStyles.h2,
   fontSize: theme.typography.sizes.h3,
   color: theme.colors.textPrimary,
   flex: 1,
-};
+}));
 
-const closeTextStyle: TextStyle = {
+const closeTextStyle: TextStyle = themed(() => ({
   ...theme.textStyles.button,
   color: theme.colors.primary,
-};
+}));
 
-const searchStyle: TextStyle = {
+const searchStyle: TextStyle = themed(() => ({
   ...theme.textStyles.body,
   height: 48,
   margin: theme.spacing.lg,
@@ -108,28 +109,28 @@ const searchStyle: TextStyle = {
   borderColor: theme.colors.border,
   backgroundColor: theme.colors.surface,
   color: theme.colors.textPrimary,
-};
+}));
 
-const optionStyle: ViewStyle = {
+const optionStyle: ViewStyle = themed(() => ({
   minHeight: 52,
   justifyContent: 'center',
   paddingHorizontal: theme.spacing.lg,
   borderBottomWidth: 1,
   borderBottomColor: theme.colors.border,
   backgroundColor: theme.colors.surface,
-};
+}));
 
-const optionTextStyle: TextStyle = {
+const optionTextStyle: TextStyle = themed(() => ({
   ...theme.textStyles.body,
   color: theme.colors.textPrimary,
-};
+}));
 
-const emptyTextStyle: TextStyle = {
+const emptyTextStyle: TextStyle = themed(() => ({
   ...theme.textStyles.caption,
   color: theme.colors.textMuted,
   textAlign: 'center',
   padding: theme.spacing.xl,
-};
+}));
 
 export const SelectField: React.FC<SelectFieldProps> = ({
   label,

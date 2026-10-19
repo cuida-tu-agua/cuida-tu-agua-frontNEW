@@ -4,9 +4,12 @@ import { Ionicons } from '@expo/vector-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { DEVICE_SETUP_URL } from '../../../config/api';
 import { Banner } from '../../components/common/Banner';
+import { PageContainer } from '../../components/common/PageContainer';
+import { PageHeader } from '../../components/common/PageHeader';
 import { Button } from '../../components/common/Button';
 import { MainStackParamList } from '../../navigation/types';
 import { theme } from '../../styles/theme';
+import { themed } from '../../styles/themeRuntime';
 
 type Props = NativeStackScreenProps<MainStackParamList, 'DeviceWifiSetup'>;
 
@@ -52,7 +55,8 @@ export const DeviceWifiSetupScreen: React.FC<Props> = ({ navigation, route }) =>
       : navigation.goBack(); // PlaceDeviceScreen reloads the status on focus
 
   return (
-    <ScrollView style={screenStyle} contentContainerStyle={contentStyle}>
+    <PageContainer medium gap={theme.spacing.md}>
+      <PageHeader back={{ label: 'Volver', onPress: () => navigation.goBack() }} title="WiFi del medidor" />
       <Text style={titleStyle}>Conectar el medidor a tu WiFi</Text>
       <Text style={mutedStyle}>Solo se hace una vez, o cuando cambies de router o de contraseña.</Text>
 
@@ -84,29 +88,29 @@ export const DeviceWifiSetupScreen: React.FC<Props> = ({ navigation, route }) =>
         tone="info"
         message="El medidor solo funciona con redes de 2.4 GHz. Si escribiste mal la contraseña, en un minuto vuelve a crear su red CuidaTuAgua para que lo intentes de nuevo."
       />
-    </ScrollView>
+    </PageContainer>
   );
 };
 
-const screenStyle: ViewStyle = { flex: 1, backgroundColor: theme.colors.background };
+const screenStyle: ViewStyle = themed(() => ({ flex: 1, backgroundColor: theme.colors.background }));
 const contentStyle: ViewStyle = { padding: theme.spacing.lg, paddingBottom: theme.spacing.huge, gap: theme.spacing.md };
-const titleStyle: TextStyle = { ...theme.textStyles.h2, color: theme.colors.textPrimary };
-const mutedStyle: TextStyle = { ...theme.textStyles.caption, color: theme.colors.textMuted, marginBottom: theme.spacing.sm };
-const stepStyle: ViewStyle = {
+const titleStyle: TextStyle = themed(() => ({ ...theme.textStyles.h2, color: theme.colors.textPrimary }));
+const mutedStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, color: theme.colors.textMuted, marginBottom: theme.spacing.sm }));
+const stepStyle: ViewStyle = themed(() => ({
   flexDirection: 'row',
   alignItems: 'flex-start',
   gap: theme.spacing.md,
   padding: theme.spacing.md,
   borderRadius: theme.borderRadius.medium,
   backgroundColor: theme.colors.surfaceAlt,
-};
-const numberStyle: ViewStyle = {
+}));
+const numberStyle: ViewStyle = themed(() => ({
   width: 24,
   height: 24,
   borderRadius: 12,
   backgroundColor: theme.colors.primary,
   alignItems: 'center',
   justifyContent: 'center',
-};
-const numberTextStyle: TextStyle = { ...theme.textStyles.label, color: theme.colors.textOnPrimary };
-const stepTextStyle: TextStyle = { ...theme.textStyles.caption, color: theme.colors.textSecondary, flex: 1 };
+}));
+const numberTextStyle: TextStyle = themed(() => ({ ...theme.textStyles.label, color: theme.colors.textOnPrimary }));
+const stepTextStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, color: theme.colors.textSecondary, flex: 1 }));

@@ -8,9 +8,12 @@ import { toAppError } from '../../../infrastructure/http/httpError';
 import { PasswordField } from '../../components/auth';
 import { Banner } from '../../components/common/Banner';
 import { Button } from '../../components/common/Button';
+import { PageContainer } from '../../components/common/PageContainer';
+import { PageHeader } from '../../components/common/PageHeader';
 import { Checkbox } from '../../components/common/Checkbox';
 import { MainStackParamList } from '../../navigation/types';
 import { theme } from '../../styles/theme';
+import { themed } from '../../styles/themeRuntime';
 
 type Props = NativeStackScreenProps<MainStackParamList, 'DeleteAccount'>;
 
@@ -56,7 +59,8 @@ export const DeleteAccountScreen: React.FC<Props> = ({ navigation }) => {
 
   return (
     <KeyboardAvoidingView style={screenStyle} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <ScrollView contentContainerStyle={contentStyle} keyboardShouldPersistTaps="handled">
+      <PageContainer narrow gap={theme.spacing.xs}>
+        <PageHeader back={{ label: 'Volver', onPress: () => navigation.goBack() }} title="Eliminar cuenta" />
         <View style={warningCardStyle}>
           <Ionicons name="warning" size={32} color={theme.colors.error} />
           <Text style={warningTitleStyle}>Vas a eliminar tu cuenta</Text>
@@ -93,26 +97,26 @@ export const DeleteAccountScreen: React.FC<Props> = ({ navigation }) => {
 
         <Button label="Eliminar mi cuenta" variant="danger" onPress={handleDelete} loading={deleting} />
         <Button label="No, volver" variant="ghost" onPress={() => navigation.goBack()} disabled={deleting} />
-      </ScrollView>
+      </PageContainer>
     </KeyboardAvoidingView>
   );
 };
 
-const screenStyle: ViewStyle = { flex: 1, backgroundColor: theme.colors.background };
+const screenStyle: ViewStyle = themed(() => ({ flex: 1, backgroundColor: theme.colors.background }));
 const contentStyle: ViewStyle = { padding: theme.spacing.lg, paddingBottom: theme.spacing.huge, gap: theme.spacing.xs };
 
-const warningCardStyle: ViewStyle = {
+const warningCardStyle: ViewStyle = themed(() => ({
   backgroundColor: theme.colors.errorBg,
   borderRadius: theme.borderRadius.medium,
   padding: theme.spacing.lg,
   gap: theme.spacing.sm,
   marginBottom: theme.spacing.xl,
-};
+}));
 
-const warningTitleStyle: TextStyle = { ...theme.textStyles.h2, fontSize: 22, color: theme.colors.error };
+const warningTitleStyle: TextStyle = themed(() => ({ ...theme.textStyles.h2, fontSize: 22, color: theme.colors.error }));
 
 const bulletRowStyle: ViewStyle = { flexDirection: 'row', alignItems: 'flex-start', gap: theme.spacing.sm };
 
-const bulletTextStyle: TextStyle = { ...theme.textStyles.caption, flex: 1, color: theme.colors.textPrimary };
+const bulletTextStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, flex: 1, color: theme.colors.textPrimary }));
 
-const checkboxTextStyle: TextStyle = { ...theme.textStyles.caption, color: theme.colors.textPrimary };
+const checkboxTextStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, color: theme.colors.textPrimary }));

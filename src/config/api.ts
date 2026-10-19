@@ -1,9 +1,13 @@
-// On a physical phone use your PC's LAN IP, never "localhost". Values come from .env.
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://192.168.20.180:3001'; // ms-iam
-const PLACES_API_BASE_URL = process.env.EXPO_PUBLIC_PLACES_API_URL || 'http://192.168.20.180:3002'; // ms-places
-const DEVICES_API_BASE_URL = process.env.EXPO_PUBLIC_DEVICES_API_URL || 'http://192.168.20.180:3003'; // ms-devices
-const CONSUMPTION_API_BASE_URL = process.env.EXPO_PUBLIC_CONSUMPTION_API_URL || 'http://192.168.20.180:3004'; // ms-consumption
-const VALVE_API_BASE_URL = process.env.EXPO_PUBLIC_VALVE_API_URL || 'http://192.168.20.180:3005'; // ms-valve
+import { serviceUrl } from './serviceUrl';
+
+// One project for web and mobile. Each address comes from its EXPO_PUBLIC_* variable when it is set; otherwise
+// serviceUrl() works it out (web: the host of the page; phone in development: the PC running Expo). See serviceUrl.ts.
+const API_BASE_URL = serviceUrl(process.env.EXPO_PUBLIC_API_URL, 3001); // ms-iam
+const PLACES_API_BASE_URL = serviceUrl(process.env.EXPO_PUBLIC_PLACES_API_URL, 3002); // ms-places
+const DEVICES_API_BASE_URL = serviceUrl(process.env.EXPO_PUBLIC_DEVICES_API_URL, 3003); // ms-devices
+const CONSUMPTION_API_BASE_URL = serviceUrl(process.env.EXPO_PUBLIC_CONSUMPTION_API_URL, 3004); // ms-consumption
+const VALVE_API_BASE_URL = serviceUrl(process.env.EXPO_PUBLIC_VALVE_API_URL, 3005); // ms-valve
+const NOTIFICATIONS_API_BASE_URL = serviceUrl(process.env.EXPO_PUBLIC_NOTIFICATIONS_API_URL, 3006); // ms-notification
 
 export const API_CONFIG = {
   baseURL: API_BASE_URL,
@@ -33,6 +37,11 @@ export const VALVE_API_CONFIG = {
   baseURL: VALVE_API_BASE_URL,
 };
 
+export const NOTIFICATIONS_API_CONFIG = {
+  ...API_CONFIG,
+  baseURL: NOTIFICATIONS_API_BASE_URL,
+};
+
 export const AUTH_ENDPOINTS = {
   REGISTER: '/api/auth/register',
   VERIFY_EMAIL: '/api/auth/verify-email',
@@ -42,6 +51,10 @@ export const AUTH_ENDPOINTS = {
   LOGOUT: '/api/auth/logout',
   FORGOT_PASSWORD: '/api/auth/password/forgot',
   RESET_PASSWORD: '/api/auth/password/reset',
+  /** HU-004 "Continuar con Google": status (show the button?), start (opened in the browser), exchange (code → session). */
+  GOOGLE_STATUS: '/api/auth/google/status',
+  GOOGLE_START: '/api/auth/google/start',
+  GOOGLE_EXCHANGE: '/api/auth/google/exchange',
 };
 
 /** Endpoints that work WITHOUT a token (the same list as SecurityConfig.PUBLIC_POSTS in ms-iam). */
@@ -52,6 +65,7 @@ export const PUBLIC_AUTH_PATHS = [
   AUTH_ENDPOINTS.REFRESH,
   AUTH_ENDPOINTS.FORGOT_PASSWORD,
   AUTH_ENDPOINTS.RESET_PASSWORD,
+  '/api/auth/google', // status, start, callback and exchange
 ];
 
 export const PROFILE_ENDPOINTS = {
@@ -88,6 +102,56 @@ export const VALVE_ENDPOINTS = {
   OPEN: (placeId: string) => `/api/places/${placeId}/valve/open`,
   COMMANDS: (placeId: string) => `/api/places/${placeId}/valve/commands`,
   COMMAND: (placeId: string, commandId: string) => `/api/places/${placeId}/valve/commands/${commandId}`,
+};
+
+/** ms-places: tariffs and cost (HU-054, HU-056, HU-066, HU-069). */
+export const TARIFF_ENDPOINTS = {
+  TARIFF: (placeId: string) => `/api/places/${placeId}/tariff`,
+  MANUAL: (placeId: string) => `/api/places/${placeId}/tariff/manual`,
+  CATALOG_CHOICE: (placeId: string) => `/api/places/${placeId}/tariff/catalog`,
+  CATALOG: (cityId: string) => `/api/tariffs/catalog/cities/${cityId}`,
+  COST: (placeId: string) => `/api/places/${placeId}/cost`,
+};
+
+/** ms-places: water saving tips, favorites and their administration (HU-063, HU-064, HU-065). */
+export const TIP_ENDPOINTS = {
+  TIPS: '/api/tips',
+  FAVORITES: '/api/tips/favorites',
+  FAVORITE: (tipId: string) => `/api/tips/${tipId}/favorite`,
+  ADMIN: '/api/admin/tips',
+  ADMIN_TIP: (tipId: string) => `/api/admin/tips/${tipId}`,
+  ADMIN_ACTIVE: (tipId: string) => `/api/admin/tips/${tipId}/active`,
+};
+
+/** ms-iam, administrator only (HU-059, HU-060, HU-062). */
+export const ADMIN_ENDPOINTS = {
+  USERS: '/api/admin/users',
+  BLOCK: (userId: string) => `/api/admin/users/${userId}/block`,
+  UNBLOCK: (userId: string) => `/api/admin/users/${userId}/unblock`,
+  METRICS: '/api/admin/metrics',
+};
+
+/** ms-device, administrator only: the meters of the whole platform. */
+export const ADMIN_DEVICE_ENDPOINTS = {
+  LIST: '/api/admin/devices',
+  ONE: (id: string) => `/api/admin/devices/${id}`,
+  CREDENTIALS: (id: string) => `/api/admin/devices/${id}/credentials`,
+  DECOMMISSION: (id: string) => `/api/admin/devices/${id}/decommission`,
+};
+
+/** ms-notification (HU-025, HU-034): the inbox of the user and the channels they chose for each urgency level. */
+export const NOTIFICATION_ENDPOINTS = {
+  LIST: '/api/notifications',
+  UNREAD_COUNT: '/api/notifications/unread-count',
+  READ: (id: string) => `/api/notifications/${id}/read`,
+  READ_ALL: '/api/notifications/read-all',
+  PREFERENCES: '/api/notification-preferences',
+  PREFERENCE: (severity: string) => `/api/notification-preferences/${severity}`,
+};
+
+/** ms-notification (HU-026): the Expo push token of this phone. */
+export const PUSH_ENDPOINTS = {
+  TOKENS: '/api/push-tokens',
 };
 
 /** Page served by the meter itself while it is in setup mode (its own WiFi network). */
