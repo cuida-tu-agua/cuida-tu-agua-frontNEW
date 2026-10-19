@@ -760,4 +760,32 @@ export const en: Translations = {
       server: 'A server error occurred. Try again later.',
     },
   },
+  admin: {
+    role: { ADMIN: 'Administrator', USER: 'User' },
+    userStatus: { ACTIVE: 'Active', BLOCKED: 'Blocked', UNVERIFIED: 'Unverified' },
+    userFilter: { ALL: 'All', ACTIVE: 'Active', BLOCKED: 'Blocked', UNVERIFIED: 'Unverified' },
+    range: '{{from}}–{{to}} of {{total}}',
+    noResults: '0 results',
+    section: { places: 'Places', devices: 'Devices' },
+    statusFilter: {
+      ALL: 'All',
+      CONNECTED: 'Connected',
+      DISCONNECTED: 'Disconnected',
+      NEVER_REPORTED: 'Never reported',
+      DECOMMISSIONED: 'Decommissioned',
+    },
+    linkFilter: { ALL: 'Linked and free', LINKED: 'Linked', FREE: 'Free' },
+    action: {
+      REGISTERED: 'Registered at the factory',
+      CREDENTIALS_REGENERATED: 'New credentials',
+      DECOMMISSIONED: 'Decommissioned',
+    },
+    badge: {
+      decommissioned: 'Decommissioned',
+      connected: 'Connected',
+      disconnected: 'Disconnected',
+      neverReported: 'Never reported',
+    },
+    count: { integer: 'Enter a whole number from 1 to {{max}}.', range: 'It must be from 1 to {{max}}.' },
+  },
 };
