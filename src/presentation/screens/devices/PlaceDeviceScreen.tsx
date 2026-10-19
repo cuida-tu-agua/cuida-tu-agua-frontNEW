@@ -79,8 +79,10 @@ export const PlaceDeviceScreen: React.FC<Props> = ({ navigation, route }) => {
   const hint = device ? DEVICE_STATUS_HINTS[device.status] : null;
 
   return (
-    <PageContainer medium gap={theme.spacing.lg}>
+    <PageContainer>
       <PageHeader back={{ label: 'Volver', onPress: () => navigation.goBack() }} title="Medidor" />
+      {/* the title stays on the left; the content is centered in a 720 px column */}
+      <View style={formColumnStyle}>
       <Text style={eyebrowStyle}>Lugar</Text>
       <Text style={placeNameStyle}>{placeName}</Text>
 
@@ -156,10 +158,12 @@ export const PlaceDeviceScreen: React.FC<Props> = ({ navigation, route }) => {
         onDismiss={handleUnlinkedDismiss}
         autoCloseDuration={1500}
       />
+      </View>
     </PageContainer>
   );
 };
 
+const formColumnStyle: ViewStyle = { width: '100%', maxWidth: 720, alignSelf: 'center', gap: theme.spacing.lg };
 const screenStyle: ViewStyle = themed(() => ({ flex: 1, backgroundColor: theme.colors.background }));
 
 const contentStyle: ViewStyle = {

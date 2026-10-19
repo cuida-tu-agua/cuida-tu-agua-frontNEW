@@ -31,6 +31,7 @@ import { themed } from '../../styles/themeRuntime';
 
 type Props = NativeStackScreenProps<MainStackParamList, 'LinkDevice'>;
 
+const formColumnStyle: ViewStyle = { width: '100%', maxWidth: 720, alignSelf: 'center' };
 const STEPS = [
   'Instala el medidor y conéctalo a la corriente.',
   'Conéctalo a tu WiFi (la luz azul queda fija cuando está en línea).',
@@ -82,8 +83,10 @@ export const LinkDeviceScreen: React.FC<Props> = ({ navigation, route }) => {
 
   return (
     <KeyboardAvoidingView style={screenStyle} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <PageContainer medium>
+      <PageContainer>
         <PageHeader back={{ label: 'Volver', onPress: () => navigation.goBack() }} title="Vincular medidor" />
+      {/* the title stays on the left; the content is centered in a 720 px column */}
+      <View style={formColumnStyle}>
         <Text style={titleStyle}>Vincular medidor a {placeName}</Text>
 
         <View style={stepsStyle}>
@@ -140,7 +143,8 @@ export const LinkDeviceScreen: React.FC<Props> = ({ navigation, route }) => {
         />
 
         <Button label="Vincular medidor" onPress={handleSubmit} loading={submitting} />
-      </PageContainer>
+        </View>
+    </PageContainer>
 
       <SuccessModal
         visible={linked}

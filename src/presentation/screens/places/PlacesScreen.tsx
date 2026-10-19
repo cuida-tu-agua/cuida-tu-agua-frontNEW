@@ -14,13 +14,11 @@ import { useFocusEffect } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import * as Haptics from 'expo-haptics';
 import { useAuth } from '../../../core/auth/AuthContext';
 import { placeRepository } from '../../../core/di/container';
 import { avatarUri } from '../../../config/api';
 import { AppError } from '../../../domain/common/AppError';
 import { Place } from '../../../domain/places/Place';
-import { markSelected } from '../../../domain/places/selection';
 import { toAppError } from '../../../infrastructure/http/httpError';
 import { Avatar } from '../../components/common/Avatar';
 import { Banner } from '../../components/common/Banner';
@@ -44,8 +42,6 @@ export const PlacesScreen: React.FC<Props> = ({ navigation, route }) => {
   const [places, setPlaces] = useState<Place[] | null>(null); // null = first load
   const [loadError, setLoadError] = useState<AppError | null>(null);
   const [refreshing, setRefreshing] = useState(false);
-  const [selectingId, setSelectingId] = useState<string | null>(null);
-  const [actionError, setActionError] = useState<string | null>(null);
   const notice = route.params?.notice;
 
   useFocusEffect(
@@ -76,23 +72,6 @@ export const PlacesScreen: React.FC<Props> = ({ navigation, route }) => {
       setLoadError(toAppError(error));
     } finally {
       setRefreshing(false);
-    }
-  };
-
-  const select = async (place: Place) => {
-    if (!places || selectingId) return;
-    const previous = places;
-    setActionError(null);
-    setSelectingId(place.id);
-    setPlaces(markSelected(places, place.id)); // optimistic: the mark moves right away
-    Haptics.selectionAsync().catch(() => undefined);
-    try {
-      await placeRepository.select(place.id);
-    } catch (error) {
-      setPlaces(previous); // undo
-      setActionError(`No pudimos seleccionar "${place.name}". ${toAppError(error).message}`);
-    } finally {
-      setSelectingId(null);
     }
   };
 
@@ -143,7 +122,6 @@ export const PlacesScreen: React.FC<Props> = ({ navigation, route }) => {
   const banners = (
     <>
       {!!notice && <Banner tone="success" message={notice} onClose={() => navigation.setParams({ notice: undefined })} />}
-      {!!actionError && <Banner tone="error" message={actionError} onClose={() => setActionError(null)} />}
     </>
   );
 
@@ -233,11 +211,8 @@ export const PlacesScreen: React.FC<Props> = ({ navigation, route }) => {
           <View style={columns > 1 ? { flex: 1, maxWidth: `${100 / columns}%` } : undefined}>
             <PlaceCard
               place={item}
-              onSelect={() => select(item)}
               onEdit={() => navigation.navigate('EditPlace', { placeId: item.id })}
               onOpenPanel={() => navigation.navigate('PlaceDashboard', { placeId: item.id, placeName: item.name })}
-              selecting={selectingId === item.id}
-              disabled={!!selectingId}
             />
           </View>
         )}

@@ -4,6 +4,7 @@ import {
   Platform,
   Text,
   TextStyle,
+  View,
   ViewStyle,
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -22,6 +23,7 @@ import { themed } from '../../styles/themeRuntime';
 
 type Props = NativeStackScreenProps<MainStackParamList, 'CreatePlace'>;
 
+const formColumnStyle: ViewStyle = { width: '100%', maxWidth: 720, alignSelf: 'center' };
 const containerStyle: ViewStyle = themed(() => ({ flex: 1, backgroundColor: theme.colors.background }));
 
 const introStyle: TextStyle = themed(() => ({
@@ -63,12 +65,14 @@ export const CreatePlaceScreen: React.FC<Props> = ({ navigation }) => {
       style={containerStyle}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <PageContainer narrow>
+      <PageContainer>
         <PageHeader
           back={{ label: 'Volver', onPress: () => navigation.goBack() }}
           title="Registrar lugar"
           subtitle="Registra cada sitio donde quieras medir el agua: tu casa, tu local o tu bodega."
         />
+        {/* the title stays on the left; the form is centered in a 720 px column */}
+        <View style={formColumnStyle}>
         {Platform.OS !== 'web' && (
           <Text style={introStyle}>
             Registra cada sitio donde quieras medir el agua: tu casa, tu local o tu bodega.
@@ -82,6 +86,7 @@ export const CreatePlaceScreen: React.FC<Props> = ({ navigation }) => {
           submitting={submitting}
           submitError={submitError}
         />
+        </View>
       </PageContainer>
 
       <SuccessModal

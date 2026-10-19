@@ -26,7 +26,7 @@ const VIEW_OPTIONS: { value: TipsView; label: string }[] = [
  * HU-065: general water saving tips for a home or a business (not personalised), at least 3 different ones, and the ones the
  * user marked as favorite.
  */
-export const TipsScreen: React.FC<Props> = ({ route }) => {
+export const TipsScreen: React.FC<Props> = ({ navigation, route }) => {
   const tips = useTips(route.params?.placeId);
   const { columns } = useLayout();
   // Web (Figma "Consejos favoritos"): only the ones you kept; the day's tips live in the panel of each place
@@ -60,7 +60,12 @@ export const TipsScreen: React.FC<Props> = ({ route }) => {
       refreshControl={<RefreshControl refreshing={tips.loading} onRefresh={() => void tips.reload()} tintColor={theme.colors.primary} />}
     >
       {isWeb ? (
-        <PageHeader title="Consejos favoritos" subtitle="Los consejos de ahorro que guardaste desde el panel de tus lugares." />
+        <PageHeader
+          // Opened from a place's panel: a way back to that same panel (no detour through "Mis lugares")
+          back={route.params?.placeId ? { label: 'Volver al panel', onPress: () => navigation.goBack() } : undefined}
+          title="Consejos favoritos"
+          subtitle="Los consejos de ahorro que guardaste desde el panel de tus lugares."
+        />
       ) : (
         <>
           <Text style={titleStyle}>Consejos para ahorrar agua</Text>

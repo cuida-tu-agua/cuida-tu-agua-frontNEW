@@ -13,6 +13,7 @@ import { themed } from '../../styles/themeRuntime';
 
 type Props = NativeStackScreenProps<MainStackParamList, 'DeviceWifiSetup'>;
 
+const formColumnStyle: ViewStyle = { width: '100%', maxWidth: 720, alignSelf: 'center', gap: theme.spacing.md };
 const STEPS: { icon: keyof typeof Ionicons.glyphMap; text: string }[] = [
   {
     icon: 'power',
@@ -55,8 +56,10 @@ export const DeviceWifiSetupScreen: React.FC<Props> = ({ navigation, route }) =>
       : navigation.goBack(); // PlaceDeviceScreen reloads the status on focus
 
   return (
-    <PageContainer medium gap={theme.spacing.md}>
+    <PageContainer>
       <PageHeader back={{ label: 'Volver', onPress: () => navigation.goBack() }} title="WiFi del medidor" />
+      {/* the title stays on the left; the content is centered in a 720 px column */}
+      <View style={formColumnStyle}>
       <Text style={titleStyle}>Conectar el medidor a tu WiFi</Text>
       <Text style={mutedStyle}>Solo se hace una vez, o cuando cambies de router o de contraseña.</Text>
 
@@ -88,6 +91,7 @@ export const DeviceWifiSetupScreen: React.FC<Props> = ({ navigation, route }) =>
         tone="info"
         message="El medidor solo funciona con redes de 2.4 GHz. Si escribiste mal la contraseña, en un minuto vuelve a crear su red CuidaTuAgua para que lo intentes de nuevo."
       />
+      </View>
     </PageContainer>
   );
 };

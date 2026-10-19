@@ -28,6 +28,7 @@ import { themed } from '../../styles/themeRuntime';
 
 type Props = NativeStackScreenProps<MainStackParamList, 'EditPlace'>;
 
+const formColumnStyle: ViewStyle = { width: '100%', maxWidth: 720, alignSelf: 'center' };
 const containerStyle: ViewStyle = themed(() => ({ flex: 1, backgroundColor: theme.colors.background }));
 
 const centeredStyle: ViewStyle = themed(() => ({
@@ -198,12 +199,14 @@ export const EditPlaceScreen: React.FC<Props> = ({ navigation, route }) => {
       style={containerStyle}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <PageContainer narrow>
+      <PageContainer>
         <PageHeader
           back={{ label: 'Volver', onPress: () => navigation.goBack() }}
           title="Editar lugar"
           subtitle={`Última modificación: ${formatDate(place.updatedAt)}`}
         />
+        {/* the title stays on the left; the form is centered in a 720 px column */}
+        <View style={formColumnStyle}>
         {Platform.OS !== 'web' && <Text style={metaStyle}>Última modificación: {formatDate(place.updatedAt)}</Text>}
 
         <PlaceForm
@@ -241,6 +244,7 @@ export const EditPlaceScreen: React.FC<Props> = ({ navigation, route }) => {
             />
           )}
           <Button label="Eliminar lugar" variant="danger" onPress={() => setConfirmingDelete(true)} />
+        </View>
         </View>
       </PageContainer>
 

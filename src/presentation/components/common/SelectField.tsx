@@ -1,8 +1,10 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import {
   ActivityIndicator,
   FlatList,
   Modal,
+  Platform,
   Text,
   TextInput,
   TextStyle,
@@ -125,6 +127,28 @@ const optionTextStyle: TextStyle = themed(() => ({
   color: theme.colors.textPrimary,
 }));
 
+// Web: a dropdown under the field (not a full-screen sheet). The field is a text box: typing filters the list.
+const webAnchorStyle: ViewStyle = { position: 'relative' };
+const webInputStyle: TextStyle = themed(() => ({
+  ...theme.textStyles.body,
+  flex: 1,
+  height: '100%',
+  paddingVertical: 0,
+  color: theme.colors.textPrimary,
+  ...({ outlineStyle: 'none' } as unknown as TextStyle),
+}));
+const webListStyle: ViewStyle = themed(() => ({
+  ...({ position: 'fixed' } as unknown as ViewStyle),
+  zIndex: 9999,
+  maxHeight: 280,
+  borderRadius: theme.borderRadius.small,
+  borderWidth: 1,
+  borderColor: theme.colors.border,
+  backgroundColor: theme.colors.surface,
+  overflow: 'hidden',
+  ...({ boxShadow: '0 8px 24px rgba(0,0,0,0.12)' } as unknown as ViewStyle),
+}));
+
 const emptyTextStyle: TextStyle = themed(() => ({
   ...theme.textStyles.caption,
   color: theme.colors.textMuted,
@@ -166,6 +190,115 @@ export const SelectField: React.FC<SelectFieldProps> = ({
   };
 
   const isDisabled = disabled || loading;
+
+  // Web: the list is drawn in the body of the page, at the place of the field, so no field of the form can cover it
+  const anchorRef = useRef<View>(null);
+  const listRef = useRef<View>(null);
+  const [anchor, setAnchor] = useState<{ top: number; left: number; width: number } | null>(null);
+  // Where the field is on the screen now (the list follows it when the page scrolls)
+  const measureAnchor = () =>
+    anchorRef.current?.measureInWindow((x, y, width, height) => setAnchor({ top: y + height + 4, left: x, width }));
+  const openList = () => {
+    measureAnchor();
+    setQuery('');
+    setOpen(true);
+  };
+
+  // Web: a click outside the field and its list closes the list. The rest of the page stays usable (no backdrop).
+  useEffect(() => {
+    if (Platform.OS !== 'web' || !open || typeof document === 'undefined') return;
+    const onPointerDown = (event: MouseEvent) => {
+      const target = event.target as Node;
+      const inside = [anchorRef.current, listRef.current].some((view) => {
+        const node = view as unknown as Node | null;
+        return !!node && node.contains(target);
+      });
+      if (!inside) close();
+    };
+    document.addEventListener('mousedown', onPointerDown);
+    // The list is drawn at a fixed place: when the page moves or the window changes size, it moves with the field
+    window.addEventListener('scroll', measureAnchor, true);
+    window.addEventListener('resize', measureAnchor);
+    return () => {
+      document.removeEventListener('mousedown', onPointerDown);
+      window.removeEventListener('scroll', measureAnchor, true);
+      window.removeEventListener('resize', measureAnchor);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
+
+  if (Platform.OS === 'web') {
+    return (
+      <View style={containerStyle}>
+        <Text style={labelStyle}>{label}</Text>
+
+        <View ref={anchorRef} style={webAnchorStyle}>
+          <View
+            style={[
+              fieldStyle,
+              !!error && { borderColor: theme.colors.error },
+              isDisabled && { backgroundColor: theme.colors.grayLight },
+            ]}
+          >
+            <TextInput
+              style={[webInputStyle, isDisabled && { color: theme.colors.textMuted }]}
+              value={open ? query : selected?.label ?? ''}
+              placeholder={placeholder}
+              placeholderTextColor={theme.colors.textMuted}
+              editable={!isDisabled}
+              autoCorrect={false}
+              accessibilityLabel={`${label}: ${selected?.label ?? placeholder}`}
+              onFocus={openList}
+              onChangeText={(text) => {
+                setQuery(text);
+                setOpen(true);
+              }}
+              onSubmitEditing={() => {
+                if (filtered[0]) pick(filtered[0].value);
+              }}
+            />
+            {loading ? (
+              <ActivityIndicator size="small" color={theme.colors.primary} />
+            ) : (
+              <Text style={chevronStyle}>▾</Text>
+            )}
+          </View>
+
+          {open && !isDisabled && anchor && typeof document !== 'undefined' &&
+            createPortal(
+              <>
+                <View ref={listRef} style={[webListStyle, { top: anchor.top, left: anchor.left, width: anchor.width }]}>
+                  <FlatList
+                    data={filtered}
+                    keyExtractor={(item) => item.value}
+                    keyboardShouldPersistTaps="handled"
+                    renderItem={({ item }) => {
+                      const isSelected = item.value === value;
+                      return (
+                        <TouchableOpacity
+                          style={[optionStyle, isSelected && { backgroundColor: theme.colors.infoBg }]}
+                          onPress={() => pick(item.value)}
+                          accessibilityRole="button"
+                          accessibilityState={{ selected: isSelected }}
+                        >
+                          <Text style={[optionTextStyle, isSelected && { fontWeight: '600' }]}>
+                            {isSelected ? `✓ ${item.label}` : item.label}
+                          </Text>
+                        </TouchableOpacity>
+                      );
+                    }}
+                    ListEmptyComponent={<Text style={emptyTextStyle}>No hay resultados.</Text>}
+                  />
+                </View>
+              </>,
+              document.body,
+            )}
+        </View>
+
+        {error && <Text style={errorTextStyle}>{error}</Text>}
+      </View>
+    );
+  }
 
   return (
     <View style={containerStyle}>
