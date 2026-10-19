@@ -4,6 +4,7 @@ import { getLocales } from 'expo-localization';
 import { DEFAULT_LANGUAGE, Language, SUPPORTED_LANGUAGES, resolveLanguage } from './languages';
 import { en } from './locales/en';
 import { es } from './locales/es';
+import { fr } from './locales/fr';
 
 /** Language code of the phone or the browser ("es", "en", ...). Empty when it cannot be read. */
 const deviceLanguageCode = (): string | null => {
@@ -22,6 +23,7 @@ if (!i18n.isInitialized) {
     resources: {
       es: { translation: es },
       en: { translation: en },
+      fr: { translation: fr },
     },
     lng: initialLanguage(),
     // A text that is missing in the chosen language is shown in Spanish, never as a raw key

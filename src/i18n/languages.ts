@@ -1,5 +1,5 @@
 /** Languages the app is translated into. Spanish is the original one and the fallback of everything. */
-export const SUPPORTED_LANGUAGES = ['es', 'en'] as const;
+export const SUPPORTED_LANGUAGES = ['es', 'en', 'fr'] as const;
 
 export type Language = (typeof SUPPORTED_LANGUAGES)[number];
 
