@@ -1,3 +1,4 @@
+import i18n from '../../i18n';
 import { LinkDeviceInput } from './Device';
 
 // Same rules as DeviceSecrets in ms-devices, so most mistakes are caught before calling the API.
@@ -42,17 +43,17 @@ export const validateLinkDeviceForm = (values: LinkDeviceFormValues): LinkDevice
   const code = pairingCodeChars(values.pairingCode);
 
   if (!serial) {
-    errors.serialNumber = 'Escribe el serial que aparece en la caja.';
+    errors.serialNumber = i18n.t('deviceScreens.validation.serialRequired');
   } else if (!SERIAL_PATTERN.test(serial)) {
-    errors.serialNumber = 'El serial solo tiene letras, números y guiones (ej. SW-ESP32-000001).';
+    errors.serialNumber = i18n.t('deviceScreens.validation.serialInvalid');
   }
 
   if (!code) {
-    errors.pairingCode = 'Escribe el código de emparejamiento.';
+    errors.pairingCode = i18n.t('deviceScreens.validation.codeRequired');
   } else if (code.length !== PAIRING_CODE_LENGTH) {
-    errors.pairingCode = `El código tiene ${PAIRING_CODE_LENGTH} caracteres (ej. ABCD-EFGH).`;
+    errors.pairingCode = i18n.t('deviceScreens.validation.codeLength', { length: PAIRING_CODE_LENGTH });
   } else if ([...code].some((c) => !PAIRING_ALPHABET.includes(c))) {
-    errors.pairingCode = 'El código no usa 0, O, 1, I ni L. Revisa la etiqueta.';
+    errors.pairingCode = i18n.t('deviceScreens.validation.codeChars');
   }
 
   return errors;

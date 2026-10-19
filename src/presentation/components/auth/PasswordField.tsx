@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { TextInputProps } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { Input } from '../common/Input';
 import { theme } from '../../styles/theme';
 import { EyeIcon } from './EyeIcon';
@@ -30,6 +31,7 @@ export const PasswordField: React.FC<PasswordFieldProps> = ({
   returnKeyType,
   onSubmitEditing,
 }) => {
+  const { t } = useTranslation();
   const [visible, setVisible] = useState(false);
 
   return (
@@ -54,7 +56,7 @@ export const PasswordField: React.FC<PasswordFieldProps> = ({
           crossed={visible}
           size={22}
           color={theme.colors.textPrimary}
-          accessibilityLabel={visible ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+          accessibilityLabel={visible ? t('password.hide') : t('password.show')}
         />
       }
       onIconPress={() => setVisible((v) => !v)}

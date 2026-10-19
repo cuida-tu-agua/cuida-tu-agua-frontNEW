@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Modal, ScrollView, Text, TextStyle, View, ViewStyle } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { AdminTip, BODY_MAX, CATEGORY_LABELS, TIP_CATEGORIES, TITLE_MAX, TipForm, TipInput, validateTip } from '../../../domain/tips/Tip';
 import { theme } from '../../styles/theme';
 import { themed } from '../../styles/themeRuntime';
@@ -18,6 +19,7 @@ interface TipFormDialogProps {
 
 /** HU-063: the form of the administrator asks for title, body and category (residential / commercial). */
 export const TipFormDialog: React.FC<TipFormDialogProps> = ({ visible, tip, saving, onSave, onCancel }) => {
+  const { t } = useTranslation();
   const [form, setForm] = useState<TipForm>({ title: '', body: '', category: null });
   const [errors, setErrors] = useState<Partial<Record<keyof TipForm, string>>>({});
 
@@ -40,39 +42,39 @@ export const TipFormDialog: React.FC<TipFormDialogProps> = ({ visible, tip, savi
         <View style={cardStyle} accessibilityViewIsModal>
           <ScrollView keyboardShouldPersistTaps="handled">
             <Text style={titleStyle} accessibilityRole="header">
-              {tip ? 'Editar consejo' : 'Nuevo consejo'}
+              {tip ? t('adminTips.form.editTitle') : t('adminTips.form.newTitle')}
             </Text>
 
             <Input
-              label="Título"
+              label={t('adminTips.form.title')}
               value={form.title}
               onChangeText={(title) => setForm((f) => ({ ...f, title }))}
               error={errors.title}
               maxLength={TITLE_MAX}
-              placeholder="Ej.: Cierra la llave mientras te cepillas"
+              placeholder={t('adminTips.form.titlePlaceholder')}
             />
             <Input
-              label="Consejo"
+              label={t('adminTips.form.body')}
               value={form.body}
               onChangeText={(body) => setForm((f) => ({ ...f, body }))}
               error={errors.body}
               maxLength={BODY_MAX}
               multiline
-              placeholder="Explica la buena práctica y cuánta agua ahorra"
-              hint={`${form.body.length} de ${BODY_MAX} caracteres`}
+              placeholder={t('adminTips.form.bodyPlaceholder')}
+              hint={t('adminTips.form.counter', { count: form.body.length, max: BODY_MAX })}
             />
             <SegmentedControl
-              label="¿Para qué tipo de lugar?"
+              label={t('adminTips.form.category')}
               options={TIP_CATEGORIES.map((value) => ({ value, label: CATEGORY_LABELS[value] }))}
               value={form.category}
               onChange={(category) => setForm((f) => ({ ...f, category }))}
               error={errors.category}
             />
-            {!tip && <Text style={hintStyle}>Al publicarlo lo verán todos los usuarios de ese tipo de lugar.</Text>}
+            {!tip && <Text style={hintStyle}>{t('adminTips.form.publishHint')}</Text>}
 
             <View style={buttonsStyle}>
-              <Button label={tip ? 'Guardar cambios' : 'Publicar consejo'} onPress={submit} loading={saving} size="medium" />
-              <Button label="Cancelar" onPress={onCancel} variant="ghost" size="medium" disabled={saving} />
+              <Button label={tip ? t('adminTips.form.save') : t('adminTips.form.publish')} onPress={submit} loading={saving} size="medium" />
+              <Button label={t('adminTips.form.cancel')} onPress={onCancel} variant="ghost" size="medium" disabled={saving} />
             </View>
           </ScrollView>
         </View>

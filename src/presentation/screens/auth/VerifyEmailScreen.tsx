@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Text, TextStyle } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { formatDateTime } from '../../../i18n/format';
 import { authService } from '../../../core/di/container';
 import { toAppError } from '../../../infrastructure/http/httpError';
 import { AuthLayout } from '../../components/auth';
@@ -15,10 +17,10 @@ import { themed } from '../../styles/themeRuntime';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'VerifyEmail'>;
 
-const formatExpiry = (iso?: string) =>
-  iso ? new Date(iso).toLocaleString('es-CO', { dateStyle: 'medium', timeStyle: 'short' }) : null;
+const formatExpiry = (iso?: string) => (iso ? formatDateTime(iso) : null);
 
 export const VerifyEmailScreen: React.FC<Props> = ({ navigation, route }) => {
+  const { t } = useTranslation();
   const { email, justRegistered } = route.params;
   const cooldown = useCountdown(route.params.cooldownSeconds ?? 0);
 
@@ -29,7 +31,7 @@ export const VerifyEmailScreen: React.FC<Props> = ({ navigation, route }) => {
   const [verifying, setVerifying] = useState(false);
   const [resending, setResending] = useState(false);
   const [banner, setBanner] = useState<{ tone: BannerTone; message: string; title?: string } | null>(
-    justRegistered ? { tone: 'success', title: '¡Cuenta creada!', message: 'Solo falta confirmar tu correo.' } : null,
+    justRegistered ? { tone: 'success', title: t('auth.verify.createdTitle'), message: t('auth.verify.createdMessage') } : null,
   );
 
   const goToLogin = () =>
@@ -56,7 +58,7 @@ export const VerifyEmailScreen: React.FC<Props> = ({ navigation, route }) => {
       }
       setCode('');
       if (appError.code === 'auth.invalid_code' && appError.details.remainingAttempts === 0) {
-        setCodeError('Agotaste los intentos de este código. Pide uno nuevo.');
+        setCodeError(t('auth.attemptsExhausted'));
       } else if (appError.fieldErrors.code) {
         setCodeError(appError.fieldErrors.code);
       } else {
@@ -74,7 +76,7 @@ export const VerifyEmailScreen: React.FC<Props> = ({ navigation, route }) => {
       setExpiresAt(sent.expiresAt);
       setCode('');
       setCodeError(undefined);
-      setBanner({ tone: 'success', message: `Te enviamos un código nuevo. El anterior ya no sirve.` });
+      setBanner({ tone: 'success', message: t('auth.verify.newCodeSent') });
       cooldown.start(60);
     } catch (err) {
       const appError = toAppError(err);
@@ -93,8 +95,8 @@ export const VerifyEmailScreen: React.FC<Props> = ({ navigation, route }) => {
 
   return (
     <AuthLayout
-      title="Verifica tu correo"
-      subtitle={`Escribe el código de 6 dígitos que enviamos a ${maskedEmail}`}
+      title={t('auth.verify.title')}
+      subtitle={t('auth.verify.subtitle', { email: maskedEmail })}
       onBack={() => navigation.goBack()}
     >
       {banner && <Banner {...banner} onClose={() => setBanner(null)} />}
@@ -110,12 +112,12 @@ export const VerifyEmailScreen: React.FC<Props> = ({ navigation, route }) => {
         editable={!verifying}
       />
 
-      {expiry && <Text style={hintStyle}>El código vence el {expiry}. Revisa también la carpeta de spam.</Text>}
+      {expiry && <Text style={hintStyle}>{t('auth.verify.expiry', { date: expiry })}</Text>}
 
-      <Button label="Verificar" onPress={() => verify(code)} loading={verifying} />
+      <Button label={t('auth.verify.submit')} onPress={() => verify(code)} loading={verifying} />
 
       <Button
-        label={cooldown.secondsLeft > 0 ? `Reenviar código en ${formatCountdown(cooldown.secondsLeft)}` : 'Reenviar código'}
+        label={cooldown.secondsLeft > 0 ? t('auth.resendCodeIn', { time: formatCountdown(cooldown.secondsLeft) }) : t('auth.resendCode')}
         variant="ghost"
         onPress={resend}
         loading={resending}

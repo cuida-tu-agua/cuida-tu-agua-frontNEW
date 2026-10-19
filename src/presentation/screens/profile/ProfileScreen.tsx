@@ -20,7 +20,9 @@ import { profileService } from '../../../core/di/container';
 import { avatarUri } from '../../../config/api';
 import { User } from '../../../domain/entities/User';
 import { toAppError } from '../../../infrastructure/http/httpError';
+import { useTranslation } from 'react-i18next';
 import { AppearanceSection } from '../../components/theme/AppearanceSection';
+import { LanguageSection } from '../../components/language/LanguageSection';
 import { Avatar } from '../../components/common/Avatar';
 import { Banner, BannerTone } from '../../components/common/Banner';
 import { Button } from '../../components/common/Button';
@@ -45,10 +47,11 @@ const toFormValues = (user: User | null) => ({
 });
 
 export const ProfileScreen: React.FC<Props> = ({ navigation }) => {
+  const { t } = useTranslation();
   const { user, updateUser, logout } = useAuth();
   const form = useForm(toFormValues(user), {
-    firstName: (v) => validateName(v, 'nombre'),
-    lastName: (v) => validateName(v, 'apellido'),
+    firstName: (v) => validateName(v, 'firstName'),
+    lastName: (v) => validateName(v, 'lastName'),
     phone: validatePhone,
   });
   const { values, errors, blur, setValues } = form;
@@ -101,7 +104,7 @@ export const ProfileScreen: React.FC<Props> = ({ navigation }) => {
       await updateUser(updated);
       setValues(toFormValues(updated));
       edited.current = false;
-      setBanner({ tone: 'success', message: 'Guardamos tus cambios.' });
+      setBanner({ tone: 'success', message: t('profile.saved') });
     } catch (error) {
       const appError = toAppError(error);
       form.setServerErrors(appError.fieldErrors);
@@ -115,7 +118,7 @@ export const ProfileScreen: React.FC<Props> = ({ navigation }) => {
     setBanner(null);
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permission.granted) {
-      setBanner({ tone: 'warning', message: 'Necesitamos permiso para ver tus fotos. Actívalo en los ajustes del teléfono.' });
+      setBanner({ tone: 'warning', message: t('profile.photoPermission') });
       return;
     }
 
@@ -130,11 +133,11 @@ export const ProfileScreen: React.FC<Props> = ({ navigation }) => {
     const asset = result.assets[0];
     const mimeType = asset.mimeType === 'image/png' ? 'image/png' : asset.mimeType?.startsWith('image/jp') ? 'image/jpeg' : null;
     if (!mimeType) {
-      setBanner({ tone: 'error', message: 'Usa una foto en formato JPG o PNG.' });
+      setBanner({ tone: 'error', message: t('profile.photoFormat') });
       return;
     }
     if (asset.fileSize && asset.fileSize > AVATAR_MAX_BYTES) {
-      setBanner({ tone: 'error', message: 'La foto pesa más de 2 MB. Elige otra o recórtala más.' });
+      setBanner({ tone: 'error', message: t('profile.photoTooBig') });
       return;
     }
 
@@ -146,7 +149,7 @@ export const ProfileScreen: React.FC<Props> = ({ navigation }) => {
         fileName: asset.fileName ?? `avatar.${mimeType === 'image/png' ? 'png' : 'jpg'}`,
       });
       await updateUser(updated);
-      setBanner({ tone: 'success', message: 'Actualizamos tu foto.' });
+      setBanner({ tone: 'success', message: t('profile.photoUpdated') });
     } catch (error) {
       setBanner({ tone: 'error', message: toAppError(error).message });
     } finally {
@@ -173,7 +176,7 @@ export const ProfileScreen: React.FC<Props> = ({ navigation }) => {
   return (
     <KeyboardAvoidingView style={screenStyle} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <PageContainer>
-        <PageHeader title="Mi perfil" />
+        <PageHeader title={t('profile.title')} />
         <View style={formColumnStyle}>
         <View style={avatarBlockStyle}>
           <View>
@@ -185,18 +188,18 @@ export const ProfileScreen: React.FC<Props> = ({ navigation }) => {
             )}
           </View>
           <View style={avatarActionsStyle}>
-            <Button label="Cambiar foto" size="small" variant="secondary" onPress={changePhoto} disabled={uploading} />
+            <Button label={t('profile.changePhoto')} size="small" variant="secondary" onPress={changePhoto} disabled={uploading} />
             {!!user.avatarUrl && (
-              <Button label="Quitar" size="small" variant="ghost" onPress={removePhoto} disabled={uploading} />
+              <Button label={t('profile.removePhoto')} size="small" variant="ghost" onPress={removePhoto} disabled={uploading} />
             )}
           </View>
         </View>
 
         {banner && <Banner {...banner} onClose={() => setBanner(null)} />}
 
-        <Text style={sectionStyle}>Datos personales</Text>
+        <Text style={sectionStyle}>{t('profile.personalData')}</Text>
         <Input
-          label="Nombres"
+          label={t('auth.register.firstNameLabel')}
           value={values.firstName}
           onChangeText={(t) => setValue('firstName', t)}
           onBlur={() => blur('firstName')}
@@ -205,7 +208,7 @@ export const ProfileScreen: React.FC<Props> = ({ navigation }) => {
           maxLength={100}
         />
         <Input
-          label="Apellidos"
+          label={t('auth.register.lastNameLabel')}
           value={values.lastName}
           onChangeText={(t) => setValue('lastName', t)}
           onBlur={() => blur('lastName')}
@@ -214,53 +217,56 @@ export const ProfileScreen: React.FC<Props> = ({ navigation }) => {
           maxLength={100}
         />
         <Input
-          label="Teléfono (opcional)"
+          label={t('auth.register.phoneLabel')}
           value={values.phone}
           onChangeText={(t) => setValue('phone', t)}
           onBlur={() => blur('phone')}
           error={errors.phone}
           keyboardType="phone-pad"
           maxLength={20}
-          hint="Déjalo vacío para quitarlo."
+          hint={t('profile.phoneHint')}
         />
         <Input
-          label="Correo"
+          label={t('auth.emailLabel')}
           value={user.email}
           onChangeText={() => undefined}
           editable={false}
-          hint="El correo no se puede cambiar: es tu usuario para iniciar sesión."
+          hint={t('profile.emailHint')}
           leftIcon={<Ionicons name="lock-closed-outline" size={18} color={theme.colors.textMuted} />}
         />
-        <Button label={isDirty ? 'Guardar cambios' : 'Sin cambios'} onPress={save} loading={saving} disabled={!isDirty} />
+        <Button label={isDirty ? t('profile.saveChanges') : t('profile.noChanges')} onPress={save} loading={saving} disabled={!isDirty} />
 
         {isAdmin(user.roles) && (
           <>
-            <Text style={[sectionStyle, { marginTop: theme.spacing.xxl }]}>Administración</Text>
-            <MenuRow icon="stats-chart-outline" label="Métricas de la plataforma" onPress={() => navigation.navigate('AdminMetrics')} />
-            <MenuRow icon="people-outline" label="Usuarios" onPress={() => navigation.navigate('AdminUsers')} />
-            <MenuRow icon="create-outline" label="Gestionar consejos" onPress={() => navigation.navigate('AdminTips')} />
+            <Text style={[sectionStyle, { marginTop: theme.spacing.xxl }]}>{t('profile.adminSection')}</Text>
+            <MenuRow icon="stats-chart-outline" label={t('profile.metrics')} onPress={() => navigation.navigate('AdminMetrics')} />
+            <MenuRow icon="people-outline" label={t('profile.users')} onPress={() => navigation.navigate('AdminUsers')} />
+            <MenuRow icon="create-outline" label={t('profile.manageTips')} onPress={() => navigation.navigate('AdminTips')} />
           </>
         )}
 
-        <Text style={[sectionStyle, { marginTop: theme.spacing.xxl }]}>Ahorro</Text>
-        <MenuRow icon="bulb-outline" label="Consejos para ahorrar agua" onPress={() => navigation.navigate('Tips')} />
+        <Text style={[sectionStyle, { marginTop: theme.spacing.xxl }]}>{t('profile.savingSection')}</Text>
+        <MenuRow icon="bulb-outline" label={t('profile.savingTips')} onPress={() => navigation.navigate('Tips')} />
 
-        <Text style={[sectionStyle, { marginTop: theme.spacing.xl }]}>Apariencia</Text>
+        <Text style={[sectionStyle, { marginTop: theme.spacing.xl }]}>{t('profile.appearanceSection')}</Text>
         <AppearanceSection />
 
-        <Text style={[sectionStyle, { marginTop: theme.spacing.xl }]}>Alertas</Text>
+        <Text style={[sectionStyle, { marginTop: theme.spacing.xl }]}>{t('language.title')}</Text>
+        <LanguageSection />
+
+        <Text style={[sectionStyle, { marginTop: theme.spacing.xl }]}>{t('profile.alertsSection')}</Text>
         <MenuRow
           icon="notifications-outline"
-          label="Preferencias de notificaciones"
+          label={t('profile.notificationPrefs')}
           onPress={() => navigation.navigate('NotificationPreferences')}
         />
 
-        <Text style={[sectionStyle, { marginTop: theme.spacing.xl }]}>Seguridad</Text>
-        <MenuRow icon="key-outline" label="Cambiar contraseña" onPress={() => navigation.navigate('ChangePassword')} />
-        <MenuRow icon="log-out-outline" label="Cerrar sesión" onPress={() => setConfirmingLogout(true)} />
+        <Text style={[sectionStyle, { marginTop: theme.spacing.xl }]}>{t('profile.securitySection')}</Text>
+        <MenuRow icon="key-outline" label={t('profile.changePassword')} onPress={() => navigation.navigate('ChangePassword')} />
+        <MenuRow icon="log-out-outline" label={t('profile.logout')} onPress={() => setConfirmingLogout(true)} />
         <MenuRow
           icon="trash-outline"
-          label="Eliminar mi cuenta"
+          label={t('profile.deleteAccount')}
           danger
           onPress={() => navigation.navigate('DeleteAccount')}
         />
@@ -269,9 +275,9 @@ export const ProfileScreen: React.FC<Props> = ({ navigation }) => {
 
       <ConfirmDialog
         visible={confirmingLogout}
-        title="¿Cerrar sesión?"
-        message="Tendrás que escribir tu correo y contraseña para volver a entrar."
-        confirmLabel="Cerrar sesión"
+        title={t('profile.logoutTitle')}
+        message={t('profile.logoutBody')}
+        confirmLabel={t('profile.logout')}
         loading={loggingOut}
         onConfirm={confirmLogout}
         onCancel={() => setConfirmingLogout(false)}

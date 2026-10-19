@@ -5,6 +5,7 @@ import { CATEGORY_LABELS, Tip } from '../../../domain/tips/Tip';
 import { theme } from '../../styles/theme';
 import { themed } from '../../styles/themeRuntime';
 import { Card } from '../common/Card';
+import { useTranslation } from 'react-i18next';
 
 interface TipCardProps {
   tip: Tip;
@@ -15,8 +16,9 @@ interface TipCardProps {
 }
 
 /** HU-065: one tip. The star marks it as favorite; the state is also said in words for screen readers (never only color). */
-export const TipCard: React.FC<TipCardProps> = ({ tip, busy = false, onToggleFavorite, compact = false }) =>
-  compact ? (
+export const TipCard: React.FC<TipCardProps> = ({ tip, busy = false, onToggleFavorite, compact = false }) => {
+  const { t } = useTranslation();
+  return compact ? (
     <Card variant="outlined" style={compactCardStyle}>
       <Ionicons name="bulb-outline" size={22} color={theme.colors.primary} style={{ marginTop: 2 }} />
       <View style={{ flex: 1, gap: 2 }}>
@@ -29,7 +31,7 @@ export const TipCard: React.FC<TipCardProps> = ({ tip, busy = false, onToggleFav
         style={heartButtonStyle}
         hitSlop={8}
         accessibilityRole="button"
-        accessibilityLabel={tip.isFavorite ? 'Quitar de favoritos' : 'Marcar como favorito'}
+        accessibilityLabel={tip.isFavorite ? t('tips.removeFavorite') : t('tips.addFavorite')}
         accessibilityState={{ selected: tip.isFavorite, busy }}
       >
         {busy ? (
@@ -55,7 +57,7 @@ export const TipCard: React.FC<TipCardProps> = ({ tip, busy = false, onToggleFav
         style={starStyle}
         hitSlop={8}
         accessibilityRole="button"
-        accessibilityLabel={tip.isFavorite ? 'Quitar de favoritos' : 'Marcar como favorito'}
+        accessibilityLabel={tip.isFavorite ? t('tips.removeFavorite') : t('tips.addFavorite')}
         accessibilityState={{ selected: tip.isFavorite, busy }}
       >
         {busy ? (
@@ -68,6 +70,7 @@ export const TipCard: React.FC<TipCardProps> = ({ tip, busy = false, onToggleFav
     <Text style={bodyStyle}>{tip.body}</Text>
   </Card>
   );
+};
 
 const compactCardStyle: ViewStyle = { flexDirection: 'row', alignItems: 'flex-start', gap: theme.spacing.md };
 const compactTitleStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, fontSize: 15, fontWeight: '800', color: theme.colors.textPrimary }));

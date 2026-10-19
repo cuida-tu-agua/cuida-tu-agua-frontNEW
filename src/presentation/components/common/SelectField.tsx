@@ -12,7 +12,9 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import i18n from '../../../i18n';
 import { theme } from '../../styles/theme';
 import { themed } from '../../styles/themeRuntime';
 
@@ -167,6 +169,7 @@ export const SelectField: React.FC<SelectFieldProps> = ({
   loading = false,
   searchable = false,
 }) => {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
@@ -287,7 +290,7 @@ export const SelectField: React.FC<SelectFieldProps> = ({
                         </TouchableOpacity>
                       );
                     }}
-                    ListEmptyComponent={<Text style={emptyTextStyle}>No hay resultados.</Text>}
+                    ListEmptyComponent={<Text style={emptyTextStyle}>{t('commonUi.noResults')}</Text>}
                   />
                 </View>
               </>,
@@ -339,7 +342,7 @@ export const SelectField: React.FC<SelectFieldProps> = ({
               {label}
             </Text>
             <TouchableOpacity onPress={close} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
-              <Text style={closeTextStyle}>Cerrar</Text>
+              <Text style={closeTextStyle}>{i18n.t('commonUi.close')}</Text>
             </TouchableOpacity>
           </View>
 
@@ -348,7 +351,7 @@ export const SelectField: React.FC<SelectFieldProps> = ({
               style={searchStyle}
               value={query}
               onChangeText={setQuery}
-              placeholder="Buscar..."
+              placeholder={i18n.t('commonUi.search')}
               placeholderTextColor={theme.colors.textMuted}
               autoCorrect={false}
               autoFocus
@@ -375,7 +378,7 @@ export const SelectField: React.FC<SelectFieldProps> = ({
                 </TouchableOpacity>
               );
             }}
-            ListEmptyComponent={<Text style={emptyTextStyle}>No hay resultados.</Text>}
+            ListEmptyComponent={<Text style={emptyTextStyle}>{i18n.t('commonUi.noResults')}</Text>}
           />
         </View>
       </Modal>

@@ -4,6 +4,7 @@ import { deviceRepository } from '../../core/di/container';
 import { AppError } from '../../domain/common/AppError';
 import { Device } from '../../domain/devices/Device';
 import { DeviceRepository } from '../../domain/devices/DeviceRepository';
+import i18n from '../../i18n';
 
 /** HU-013: how often the screen asks for the status again while it is visible. */
 export const DEVICE_POLL_MS = 30_000;
@@ -21,7 +22,7 @@ interface PlaceDeviceState {
 const INITIAL_STATE: PlaceDeviceState = { loaded: false, device: null, error: null, checkedAt: null };
 
 const asAppError = (error: unknown) =>
-  error instanceof AppError ? error : new AppError('server', 'No se pudo consultar el medidor.');
+  error instanceof AppError ? error : new AppError('server', i18n.t('deviceScreens.place.loadFailed'));
 
 /**
  * Device of a place + its status. Loads when the screen gains focus (also when coming back from

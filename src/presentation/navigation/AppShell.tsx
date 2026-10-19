@@ -11,6 +11,7 @@ import { theme } from '../styles/theme';
 import { themed } from '../styles/themeRuntime';
 import { NavItem, NavSection, isAdminSection, navItemsFor, sectionOf, USER_DOOR } from './navItems';
 import { navigationRef } from './navigationRef';
+import { useTranslation } from 'react-i18next';
 
 /** The section of the screen that is open now, kept in sync with the navigator. */
 const useCurrentSection = (): NavSection | null => {
@@ -58,6 +59,7 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
 
 /** Things the menus share: who is signed in, which items to show, how to open one. */
 const useMenu = () => {
+  const { t } = useTranslation();
   const { user, logout } = useAuth();
   const section = useCurrentSection();
   const roles = user?.roles ?? [];
@@ -71,18 +73,31 @@ const useMenu = () => {
     navigationRef.reset({ index: 0, routes: [{ name: route } as never] });
   };
 
-  return { user, logout, section, items, unread, open, adminArea, roleLabel: isAdmin(roles) ? 'Administrador' : 'Usuario' };
+  return {
+    user,
+    logout,
+    section,
+    items,
+    unread,
+    open,
+    adminArea,
+    roleLabel: isAdmin(roles) ? t('nav.roleAdmin') : t('nav.roleUser'),
+    brandSubtitle: adminArea ? t('nav.adminPanel') : t('nav.myAccount'),
+  };
 };
 
-const Brand: React.FC<{ subtitle: string; compact?: boolean }> = ({ subtitle, compact }) => (
-  <View style={brandStyle}>
-    <Logo type="isotipo" theme="light" size={compact ? 36 : 40} />
-    <View style={{ flexShrink: 1 }}>
-      <Text style={brandTextStyle}>Cuida Tu Agua</Text>
-      <Text style={brandSubStyle}>{subtitle}</Text>
+const Brand: React.FC<{ subtitle: string; compact?: boolean }> = ({ subtitle, compact }) => {
+  const { t } = useTranslation();
+  return (
+    <View style={brandStyle}>
+      <Logo type="isotipo" theme="light" size={compact ? 36 : 40} />
+      <View style={{ flexShrink: 1 }}>
+        <Text style={brandTextStyle}>{t('common.appName')}</Text>
+        <Text style={brandSubStyle}>{subtitle}</Text>
+      </View>
     </View>
-  </View>
-);
+  );
+};
 
 const MenuItem: React.FC<{ item: NavItem; active: boolean; unread: number; onPress: () => void }> = ({ item, active, unread, onPress }) => (
   <TouchableOpacity
@@ -104,29 +119,33 @@ const UserBlock: React.FC<{ name: string; role: string; adminArea: boolean; onUs
   adminArea,
   onUserArea,
   onLogout,
-}) => (
-  <View style={footerStyle}>
-    <View style={userStyle}>
-      <Text style={userNameStyle} numberOfLines={1}>
-        {name}
-      </Text>
-      <Text style={userRoleStyle}>{role}</Text>
-    </View>
-    {adminArea && (
-      <TouchableOpacity onPress={onUserArea} style={linkStyle} accessibilityRole="link" accessibilityLabel={USER_DOOR.label}>
-        <Ionicons name={USER_DOOR.icon} size={20} color={theme.colors.primary} />
-        <Text style={linkTextStyle}>{USER_DOOR.label}</Text>
+}) => {
+  const { t } = useTranslation();
+  return (
+    <View style={footerStyle}>
+      <View style={userStyle}>
+        <Text style={userNameStyle} numberOfLines={1}>
+          {name}
+        </Text>
+        <Text style={userRoleStyle}>{role}</Text>
+      </View>
+      {adminArea && (
+        <TouchableOpacity onPress={onUserArea} style={linkStyle} accessibilityRole="link" accessibilityLabel={USER_DOOR.label}>
+          <Ionicons name={USER_DOOR.icon} size={20} color={theme.colors.primary} />
+          <Text style={linkTextStyle}>{USER_DOOR.label}</Text>
+        </TouchableOpacity>
+      )}
+      <TouchableOpacity onPress={onLogout} style={linkStyle} accessibilityRole="button" accessibilityLabel={t('nav.logout')}>
+        <Ionicons name="log-out-outline" size={20} color={theme.colors.error} />
+        <Text style={logoutTextStyle}>{t('nav.logout')}</Text>
       </TouchableOpacity>
-    )}
-    <TouchableOpacity onPress={onLogout} style={linkStyle} accessibilityRole="button" accessibilityLabel="Cerrar sesión">
-      <Ionicons name="log-out-outline" size={20} color={theme.colors.error} />
-      <Text style={logoutTextStyle}>Cerrar sesión</Text>
-    </TouchableOpacity>
-  </View>
-);
+    </View>
+  );
+};
 
 const SideMenu: React.FC<{ collapsed: boolean }> = ({ collapsed }) => {
-  const { user, logout, section, items, unread, open, adminArea, roleLabel } = useMenu();
+  const { t } = useTranslation();
+  const { user, logout, section, items, unread, open, adminArea, roleLabel, brandSubtitle } = useMenu();
 
   if (collapsed) {
     // Tablet app: icons only
@@ -150,7 +169,7 @@ const SideMenu: React.FC<{ collapsed: boolean }> = ({ collapsed }) => {
             </TouchableOpacity>
           ))}
         </View>
-        <TouchableOpacity onPress={() => void logout()} style={[itemStyle, railItemStyle]} accessibilityRole="button" accessibilityLabel="Cerrar sesión">
+        <TouchableOpacity onPress={() => void logout()} style={[itemStyle, railItemStyle]} accessibilityRole="button" accessibilityLabel={t('nav.logout')}>
           <Ionicons name="log-out-outline" size={22} color={theme.colors.error} />
         </TouchableOpacity>
       </View>
@@ -159,7 +178,7 @@ const SideMenu: React.FC<{ collapsed: boolean }> = ({ collapsed }) => {
 
   return (
     <View style={[menuStyle, { width: SIDEBAR_WIDTH }]} accessibilityRole="menu">
-      <Brand subtitle={adminArea ? 'Panel administrador' : 'Mi cuenta'} />
+      <Brand subtitle={brandSubtitle} />
       <View style={itemsStyle}>
         {items.map((item) => (
           <MenuItem key={item.route} item={item} active={item.section === section} unread={unread} onPress={() => open(item.route)} />
@@ -180,7 +199,8 @@ const SideMenu: React.FC<{ collapsed: boolean }> = ({ collapsed }) => {
 
 /** Web, narrow window: brand + ☰. The menu opens over the page, like the Figma "ventana angosta" board. */
 const TopBar: React.FC = () => {
-  const { user, logout, section, items, unread, open, adminArea, roleLabel } = useMenu();
+  const { t } = useTranslation();
+  const { user, logout, section, items, unread, open, adminArea, roleLabel, brandSubtitle } = useMenu();
   const [opened, setOpened] = useState(false);
 
   // Going to another screen (or the window growing) closes it
@@ -194,12 +214,12 @@ const TopBar: React.FC = () => {
   return (
     <View style={topWrapStyle}>
       <View style={topBarStyle}>
-        <Brand subtitle={adminArea ? 'Panel administrador' : 'Mi cuenta'} compact />
+        <Brand subtitle={brandSubtitle} compact />
         <TouchableOpacity
           onPress={() => setOpened((value) => !value)}
           style={hamburgerStyle}
           accessibilityRole="button"
-          accessibilityLabel={opened ? 'Cerrar menú' : unread > 0 ? `Abrir menú, ${unread} notificaciones sin leer` : 'Abrir menú'}
+          accessibilityLabel={opened ? t('nav.closeMenu') : unread > 0 ? t('nav.openMenuUnread', { count: unread }) : t('nav.openMenu')}
           accessibilityState={{ expanded: opened }}
         >
           <Ionicons name={opened ? 'close' : 'menu'} size={28} color={theme.colors.textPrimary} />
@@ -209,7 +229,7 @@ const TopBar: React.FC = () => {
 
       {opened && (
         <>
-          <Pressable style={scrimStyle} onPress={() => setOpened(false)} accessibilityLabel="Cerrar menú" />
+          <Pressable style={scrimStyle} onPress={() => setOpened(false)} accessibilityLabel={t('nav.closeMenu')} />
           <View style={dropdownStyle} accessibilityRole="menu">
             {items.map((item) => (
               <MenuItem key={item.route} item={item} active={item.section === section} unread={unread} onPress={() => go(item.route)} />

@@ -5,6 +5,7 @@ import { useTips } from '../../hooks/useTips';
 import { theme } from '../../styles/theme';
 import { themed } from '../../styles/themeRuntime';
 import { Card } from '../common/Card';
+import { useTranslation } from 'react-i18next';
 
 const MAX_TIPS = 3;
 
@@ -15,6 +16,7 @@ interface TipsPanelProps {
 
 /** Figma "Consejos para ahorrar": three tips of the session next to the valve, with the heart to keep them (HU-065). */
 export const TipsPanel: React.FC<TipsPanelProps> = ({ placeId, onOpenFavorites }) => {
+  const { t } = useTranslation();
   const tips = useTips(placeId);
   const shown = (tips.session?.tips ?? []).slice(0, MAX_TIPS);
 
@@ -22,19 +24,19 @@ export const TipsPanel: React.FC<TipsPanelProps> = ({ placeId, onOpenFavorites }
     <Card variant="outlined" style={cardStyle}>
       <View style={headerStyle}>
         <Text style={titleStyle} accessibilityRole="header">
-          Consejos para ahorrar
+          {t('tips.panelTitle')}
         </Text>
         <TouchableOpacity onPress={onOpenFavorites} accessibilityRole="link" hitSlop={8}>
-          <Text style={linkStyle}>Mis favoritos</Text>
+          <Text style={linkStyle}>{t('tips.panelFavorites')}</Text>
         </TouchableOpacity>
       </View>
 
       {tips.loading && !tips.session ? (
         <ActivityIndicator color={theme.colors.primary} />
       ) : !tips.session ? (
-        <Text style={mutedStyle}>No pudimos cargar los consejos.</Text>
+        <Text style={mutedStyle}>{t('tips.loadFailed')}</Text>
       ) : shown.length === 0 ? (
-        <Text style={mutedStyle}>Por ahora no hay consejos. Vuelve más tarde.</Text>
+        <Text style={mutedStyle}>{t('tips.panelEmpty')}</Text>
       ) : (
         shown.map((tip) => (
           <View key={tip.id} style={rowStyle}>
@@ -49,7 +51,7 @@ export const TipsPanel: React.FC<TipsPanelProps> = ({ placeId, onOpenFavorites }
               hitSlop={8}
               style={heartStyle}
               accessibilityRole="button"
-              accessibilityLabel={tip.isFavorite ? 'Quitar de favoritos' : 'Marcar como favorito'}
+              accessibilityLabel={tip.isFavorite ? t('tips.removeFavorite') : t('tips.addFavorite')}
               accessibilityState={{ selected: tip.isFavorite }}
             >
               <Ionicons

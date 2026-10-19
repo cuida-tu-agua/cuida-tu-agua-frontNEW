@@ -5,6 +5,7 @@ import { badgeText } from '../../../domain/notifications/Notification';
 import { useUnreadCount } from '../../hooks/useUnreadCount';
 import { theme } from '../../styles/theme';
 import { themed } from '../../styles/themeRuntime';
+import { useTranslation } from 'react-i18next';
 
 /** Red circle with the number; nothing at zero. Shared by the bell and the side menu. */
 export const UnreadBadge: React.FC<{ count: number; style?: ViewStyle }> = ({ count, style }) => {
@@ -19,6 +20,7 @@ export const UnreadBadge: React.FC<{ count: number; style?: ViewStyle }> = ({ co
 
 /** HU-025: the bell next to the avatar. It shows how many notifications are unread and opens the inbox. */
 export const NotificationBell: React.FC<{ onPress: () => void }> = ({ onPress }) => {
+  const { t } = useTranslation();
   const { count } = useUnreadCount();
 
   return (
@@ -26,7 +28,7 @@ export const NotificationBell: React.FC<{ onPress: () => void }> = ({ onPress })
       onPress={onPress}
       style={bellStyle}
       accessibilityRole="button"
-      accessibilityLabel={count > 0 ? `Notificaciones, ${count} sin leer` : 'Notificaciones'}
+      accessibilityLabel={count > 0 ? t('notifications.bellUnread', { count }) : t('notifications.bell')}
       hitSlop={8}
     >
       <Ionicons name={count > 0 ? 'notifications' : 'notifications-outline'} size={24} color={theme.colors.textPrimary} />

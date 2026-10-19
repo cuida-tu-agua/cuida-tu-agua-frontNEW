@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Text, TextStyle, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { FactoryDevice, credentialsCsv, qrPayload, secretsPy, setupPassword } from '../../../domain/admin/AdminDevices';
 import { theme } from '../../styles/theme';
 import { themed } from '../../styles/themeRuntime';
@@ -23,7 +24,8 @@ interface CredentialsSheetProps {
  * The credentials of the devices that were just registered (or renewed): QR + serial + pairing code + firmware token.
  * They are shown ONCE (the server keeps only hashes), so leaving is blocked until the administrator says they saved them.
  */
-export const CredentialsSheet: React.FC<CredentialsSheetProps> = ({ devices, onFinish, finishLabel = 'Terminar' }) => {
+export const CredentialsSheet: React.FC<CredentialsSheetProps> = ({ devices, onFinish, finishLabel }) => {
+  const { t } = useTranslation();
   const [saved, setSaved] = useState(false);
   const [broker, setBroker] = useState('');
   const [notice, setNotice] = useState<string | null>(null);
@@ -31,35 +33,35 @@ export const CredentialsSheet: React.FC<CredentialsSheetProps> = ({ devices, onF
 
   const say = (message: string) => setNotice(message);
 
-  const copy = async (device: FactoryDevice) => say((await copyText(device.authToken)) ? `Token de ${device.serialNumber} copiado.` : 'No se pudo copiar: selecciona el token y cópialo a mano.');
+  const copy = async (device: FactoryDevice) => say((await copyText(device.authToken)) ? t('credentials.tokenCopied', { serial: device.serialNumber }) : t('credentials.copyFailed'));
   const download = (name: string, content: string, mime?: string) =>
-    say(downloadTextFile(name, content, mime) ? `Descargaste ${name}.` : 'La descarga solo funciona en la versión web.');
-  const print = async () => say((await printLabels(devices)) ? 'Se abrió la ventana de impresión.' : 'No se pudo abrir la impresión (¿bloqueó la ventana el navegador?).');
+    say(downloadTextFile(name, content, mime) ? t('credentials.downloaded', { name }) : t('credentials.downloadWebOnly'));
+  const print = async () => say((await printLabels(devices)) ? t('credentials.printOpened') : t('credentials.printFailed'));
 
   return (
     <Card variant="outlined" style={cardStyle}>
       <Text style={titleStyle} accessibilityRole="header">
-        {devices.length === 1 ? `Credenciales de ${devices[0].serialNumber}` : `Credenciales de ${devices.length} dispositivos`}
+        {devices.length === 1 ? t('credentials.titleOne', { serial: devices[0].serialNumber }) : t('credentials.titleMany', { count: devices.length })}
       </Text>
 
       <Banner
         tone="warning"
-        title="Se muestran una sola vez"
-        message="El sistema solo guarda una huella (hash) que no se puede revertir. Descarga la hoja, imprime las etiquetas y copia cada token a su ESP32 antes de salir de esta página."
+        title={t('credentials.onceTitle')}
+        message={t('credentials.onceMessage')}
       />
-      {!web && <Banner tone="info" message="Descargar, imprimir y copiar funcionan en la versión web. Aquí puedes leer los datos." />}
+      {!web && <Banner tone="info" message={t('credentials.webOnly')} />}
       {!!notice && <Banner tone="success" message={notice} onClose={() => setNotice(null)} />}
 
       <View style={toolbarStyle}>
         <Button
-          label="Descargar hoja (CSV)"
+          label={t('credentials.download')}
           size="small"
           icon={<Ionicons name="download-outline" size={18} color={theme.colors.textOnPrimary} />}
-          onPress={() => download('medidores-credenciales.csv', credentialsCsv(devices), 'text/csv')}
+          onPress={() => download(t('credentials.sheetFile'), credentialsCsv(devices), 'text/csv')}
         />
-        <Button label="Imprimir etiquetas" size="small" variant="secondary" icon={<Ionicons name="print-outline" size={18} color={theme.colors.primary} />} onPress={() => void print()} />
+        <Button label={t('credentials.print')} size="small" variant="secondary" icon={<Ionicons name="print-outline" size={18} color={theme.colors.primary} />} onPress={() => void print()} />
         <Input
-          label="IP del broker para secrets.py"
+          label={t('credentials.brokerLabel')}
           placeholder="192.168.1.20"
           value={broker}
           onChangeText={setBroker}
@@ -76,22 +78,22 @@ export const CredentialsSheet: React.FC<CredentialsSheetProps> = ({ devices, onF
               {device.serialNumber}
             </Text>
             <Text style={detailStyle} selectable>
-              Código: <Text style={monoStyle}>{device.pairingCode}</Text> · WiFi de configuración: <Text style={monoStyle}>{setupPassword(device)}</Text>
+              {t('credentials.code')} <Text style={monoStyle}>{device.pairingCode}</Text> · {t('credentials.setupWifi')} <Text style={monoStyle}>{setupPassword(device)}</Text>
             </Text>
             <Text style={tokenStyle} selectable>
               {device.authToken}
             </Text>
           </View>
           <View style={rowActionsStyle}>
-            <TouchableOpacity onPress={() => void copy(device)} style={actionStyle} accessibilityRole="button" accessibilityLabel={`Copiar el token de ${device.serialNumber}`}>
+            <TouchableOpacity onPress={() => void copy(device)} style={actionStyle} accessibilityRole="button" accessibilityLabel={t('credentials.copyTokenA11y', { serial: device.serialNumber })}>
               <Ionicons name="copy-outline" size={16} color={theme.colors.primary} />
-              <Text style={actionTextStyle}>Copiar token</Text>
+              <Text style={actionTextStyle}>{t('credentials.copyToken')}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => download('secrets.py', secretsPy(device, broker))}
               style={actionStyle}
               accessibilityRole="button"
-              accessibilityLabel={`Descargar secrets.py de ${device.serialNumber}`}
+              accessibilityLabel={t('credentials.secretsA11y', { serial: device.serialNumber })}
             >
               <Ionicons name="document-text-outline" size={16} color={theme.colors.primary} />
               <Text style={actionTextStyle}>secrets.py</Text>
@@ -103,10 +105,10 @@ export const CredentialsSheet: React.FC<CredentialsSheetProps> = ({ devices, onF
       <View style={footerStyle}>
         <View style={{ flex: 1, minWidth: 240 }}>
           <Checkbox checked={saved} onChange={setSaved}>
-            <Text style={confirmStyle}>Ya guardé la hoja y copié los tokens</Text>
+            <Text style={confirmStyle}>{t('credentials.saved')}</Text>
           </Checkbox>
         </View>
-        <Button label={finishLabel} size="medium" disabled={!saved} onPress={onFinish} />
+        <Button label={finishLabel ?? t('credentials.finish')} size="medium" disabled={!saved} onPress={onFinish} />
       </View>
     </Card>
   );

@@ -1,18 +1,41 @@
+import i18n from '../../i18n';
 import { Valve, ValveAction, ValveCommand, ValveCommandStatus, ValveState } from './Valve';
 
+/** Getters: the text follows the language active when it is read. */
 export const VALVE_STATE_LABELS: Record<ValveState, string> = {
-  OPEN: 'Abierta',
-  CLOSED: 'Cerrada',
-  UNKNOWN: 'Desconocido',
+  get OPEN() {
+    return i18n.t('valve.state.OPEN');
+  },
+  get CLOSED() {
+    return i18n.t('valve.state.CLOSED');
+  },
+  get UNKNOWN() {
+    return i18n.t('valve.state.UNKNOWN');
+  },
 };
 
-export const ACTION_LABELS: Record<ValveAction, string> = { OPEN: 'Abrir', CLOSE: 'Cerrar' };
+export const ACTION_LABELS: Record<ValveAction, string> = {
+  get OPEN() {
+    return i18n.t('valve.action.OPEN');
+  },
+  get CLOSE() {
+    return i18n.t('valve.action.CLOSE');
+  },
+};
 
 export const STATUS_LABELS: Record<ValveCommandStatus, string> = {
-  SENT: 'Esperando al medidor',
-  ACK_SUCCESS: 'Confirmada',
-  ACK_TIMEOUT: 'Sin respuesta',
-  FAILED: 'Falló',
+  get SENT() {
+    return i18n.t('valve.status.SENT');
+  },
+  get ACK_SUCCESS() {
+    return i18n.t('valve.status.ACK_SUCCESS');
+  },
+  get ACK_TIMEOUT() {
+    return i18n.t('valve.status.ACK_TIMEOUT');
+  },
+  get FAILED() {
+    return i18n.t('valve.status.FAILED');
+  },
 };
 
 export const COMMAND_POLL_MS = 2_000;
@@ -21,19 +44,18 @@ export const COMMAND_WAIT_MS = 40_000;
 export const isFinished = (command: ValveCommand): boolean => command.status !== 'SENT';
 
 export const outcomeMessage = (command: ValveCommand): { tone: 'success' | 'error'; text: string } => {
-  const verb = command.action === 'CLOSE' ? 'cerró' : 'abrió';
   switch (command.status) {
     case 'ACK_SUCCESS':
-      return { tone: 'success', text: `El medidor confirmó: la válvula se ${verb}.` };
+      return { tone: 'success', text: i18n.t(command.action === 'CLOSE' ? 'valve.outcome.closed' : 'valve.outcome.opened') };
     case 'ACK_TIMEOUT':
       return {
         tone: 'error',
-        text: 'El medidor no respondió en 30 segundos. La válvula sigue como estaba. Revisa su conexión e inténtalo de nuevo.',
+        text: i18n.t('valve.outcome.timeout'),
       };
     case 'FAILED':
-      return { tone: 'error', text: 'La orden no se pudo completar. La válvula sigue como estaba.' };
+      return { tone: 'error', text: i18n.t('valve.outcome.failed') };
     default:
-      return { tone: 'success', text: 'Orden enviada. Esperando confirmación del medidor…' };
+      return { tone: 'success', text: i18n.t('valve.outcome.sent') };
   }
 };
 
@@ -45,19 +67,19 @@ export interface ValveAvailability {
 
 export const availability = (valve: Valve): ValveAvailability => {
   if (valve.pendingCommand) {
-    return { canClose: false, canOpen: false, reason: 'Hay una orden en curso. Espera la confirmación del medidor.' };
+    return { canClose: false, canOpen: false, reason: i18n.t('valve.availability.pending') };
   }
   if (valve.communication === 'NO_COMMUNICATION') {
     return {
       canClose: false,
       canOpen: true,
-      reason: 'Sin comunicación con el medidor: el estado puede no estar actualizado y no se puede cerrar hasta que vuelva a reportar.',
+      reason: i18n.t('valve.availability.noComm'),
     };
   }
   return { canClose: valve.state !== 'CLOSED', canOpen: valve.state !== 'OPEN', reason: null };
 };
 
 export const describeRequester = (command: ValveCommand): string => {
-  if (command.origin === 'AUTO_LEAK') return 'Automático (posible fuga)';
-  return command.requestedByName ?? 'Tú';
+  if (command.origin === 'AUTO_LEAK') return i18n.t('valve.requester.autoLeak');
+  return command.requestedByName ?? i18n.t('valve.requester.you');
 };

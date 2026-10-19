@@ -3,7 +3,7 @@ import { ActivityIndicator, Text, TextStyle, View, ViewStyle } from 'react-nativ
 import { theme } from '../styles/theme';
 import { Logo } from '../components/common/Logo';
 import { themed } from '../styles/themeRuntime';
-
+import { useTranslation } from 'react-i18next';
 
 const containerStyle: ViewStyle = themed(() => ({
   flex: 1,
@@ -26,11 +26,15 @@ const subtitleStyle: TextStyle = themed(() => ({
 }));
 
 
-export const SplashScreen: React.FC = () => (
-  <View style={containerStyle}>
-    <Logo type="isotipo" theme="light" size={120} />
-    <Text style={titleStyle}>Cuida Tu Agua</Text>
-    <Text style={subtitleStyle}>Monitoreo Inteligente</Text>
-    <ActivityIndicator size="large" color={theme.colors.primary} />
-  </View>
-);
+// Shown while the saved language is being read, so it uses the language of the device until then
+export const SplashScreen: React.FC = () => {
+  const { t } = useTranslation();
+  return (
+    <View style={containerStyle}>
+      <Logo type="isotipo" theme="light" size={120} />
+      <Text style={titleStyle}>{t('common.appName')}</Text>
+      <Text style={subtitleStyle}>{t('splash.tagline')}</Text>
+      <ActivityIndicator size="large" color={theme.colors.primary} />
+    </View>
+  );
+};

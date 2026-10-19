@@ -14,6 +14,8 @@ import { PageHeader } from '../../components/common/PageHeader';
 import { MainStackParamList } from '../../navigation/types';
 import { theme } from '../../styles/theme';
 import { themed } from '../../styles/themeRuntime';
+import { useTranslation } from 'react-i18next';
+import { formatDateTime } from '../../../i18n/format';
 
 type Props = NativeStackScreenProps<MainStackParamList, 'ValveHistory'>;
 
@@ -24,9 +26,10 @@ const STATUS_COLOR: Record<ValveCommandStatus, string> = themed(() => ({
   FAILED: theme.colors.error,
 }));
 
-const formatDate = (iso: string) => new Date(iso).toLocaleString('es-CO', { dateStyle: 'medium', timeStyle: 'short' });
+const formatDate = (iso: string) => formatDateTime(iso);
 
 export const ValveHistoryScreen: React.FC<Props> = ({ navigation, route }) => {
+  const { t } = useTranslation();
   const { placeId } = route.params;
   const [items, setItems] = useState<ValveCommand[] | null>(null);
   const [error, setError] = useState<AppError | null>(null);
@@ -83,12 +86,12 @@ export const ValveHistoryScreen: React.FC<Props> = ({ navigation, route }) => {
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} tintColor={theme.colors.primary} />}
       ListHeaderComponent={
         <>
-          <PageHeader back={{ label: 'Volver', onPress: () => navigation.goBack() }} title="Historial de la válvula" />
+          <PageHeader back={{ label: t('common.back'), onPress: () => navigation.goBack() }} title={t('valve.history.title')} />
           {!!error && <Banner tone="error" message={error.message} />}
-          <Text style={mutedStyle}>Últimos 30 días</Text>
+          <Text style={mutedStyle}>{t('valve.history.last30')}</Text>
         </>
       }
-      ListEmptyComponent={!error ? <Text style={mutedStyle}>Todavía no se ha abierto ni cerrado la válvula.</Text> : null}
+      ListEmptyComponent={!error ? <Text style={mutedStyle}>{t('valve.history.empty')}</Text> : null}
       renderItem={({ item }) => (
         <View style={rowStyle}>
           <View style={[iconStyle, { backgroundColor: item.action === 'CLOSE' ? theme.colors.errorBg : theme.colors.successBg }]}>
@@ -99,13 +102,13 @@ export const ValveHistoryScreen: React.FC<Props> = ({ navigation, route }) => {
             />
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={titleStyle}>{item.action === 'CLOSE' ? 'Cerrar agua' : 'Abrir agua'}</Text>
+            <Text style={titleStyle}>{item.action === 'CLOSE' ? t('valve.history.closeWater') : t('valve.history.openWater')}</Text>
             <Text style={mutedLeftStyle}>
               {formatDate(item.createdAt)} · {describeRequester(item)}
             </Text>
             {!!item.failureReason && item.status !== 'ACK_SUCCESS' && (
               <Text style={mutedLeftStyle} numberOfLines={2}>
-                {item.status === 'ACK_TIMEOUT' ? 'El medidor no respondió a tiempo.' : 'No se pudo completar.'}
+                {item.status === 'ACK_TIMEOUT' ? t('valve.history.timeout') : t('valve.history.failed')}
               </Text>
             )}
           </View>

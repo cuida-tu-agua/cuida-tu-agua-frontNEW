@@ -1,3 +1,5 @@
+import i18n from '../../i18n';
+import { localeTag, numberMarks } from '../../i18n/format';
 import { Currency } from '../places/Place';
 
 /** MANUAL = typed by the user from their bill (HU-054). CATALOG = preloaded for the city and stratum (HU-066). */
@@ -80,33 +82,41 @@ export const STRATA = [1, 2, 3, 4, 5, 6];
 export const MAX_UNIT_PRICE = 1_000_000;
 export const MAX_FIXED_CHARGE = 10_000_000;
 
-/** "$ 162.800" for pesos (no cents), "US$ 12,50" for dollars. */
+/** "$ 162.800" for pesos (no cents) and "US$ 12,50" for dollars in Spanish and Portuguese, "$ 162,800" and "US$ 12.50" in English, "$ 162 800" and "US$ 12,50" in French. */
 export const formatMoney = (amount: number, currency: Currency): string => {
+  const { group, decimal } = numberMarks();
   const decimals = currency === 'COP' ? 0 : 2;
   const fixed = Math.abs(amount).toFixed(decimals);
   const [whole, fraction] = fixed.split('.');
-  const grouped = whole.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  const grouped = whole.replace(/\B(?=(\d{3})+(?!\d))/g, group);
   const sign = amount < 0 ? '-' : '';
   const prefix = currency === 'COP' ? '$' : 'US$';
-  return `${sign}${prefix} ${grouped}${fraction ? `,${fraction}` : ''}`;
+  return `${sign}${prefix} ${grouped}${fraction ? `${decimal}${fraction}` : ''}`;
 };
 
 /**
  * What the user typed in a price field -> number, or null when it is not a number.
- * "5.234" and "5234" are 5234 (a dot followed by exactly 3 digits groups thousands, as on the bill);
- * "5234,5" and "5234.5" are 5234.5 (a comma, or a dot with 1-2 digits, is the decimal mark).
+ * Spanish, Portuguese and French: "5.234" is 5234 (dot = thousands, as on the bill) and "5234,5" is 5234.5 (comma = decimal);
+ * spaces are ignored, so the French "5 234" works too.
+ * English: "5,234" is 5234 (comma = thousands) and "5234.5" is 5234.5 (dot = decimal).
+ * A lone mark followed by 1-2 digits is always the decimal mark in every language.
  */
 export const parseMoneyInput = (text: string): number | null => {
-  const clean = text.replace(/\s|\$/g, '');
+  const clean = text.replace(/\s|\$|US/g, '');
   if (!clean || !/^[\d.,]+$/.test(clean)) return null;
 
+  const english = localeTag().startsWith('en');
+  const thousands = english ? ',' : '.';
+  const decimal = english ? '.' : ',';
+  const groupedOnly = new RegExp(`^\\d{1,3}(\\${thousands}\\d{3})+$`);
+
   let normalized: string;
-  if (clean.includes(',')) {
-    normalized = clean.replace(/\./g, '').replace(',', '.');
-  } else if (/^\d{1,3}(\.\d{3})+$/.test(clean)) {
-    normalized = clean.replace(/\./g, '');
+  if (clean.includes(decimal)) {
+    normalized = clean.split(thousands).join('').replace(decimal, '.');
+  } else if (groupedOnly.test(clean)) {
+    normalized = clean.split(thousands).join('');
   } else {
-    normalized = clean;
+    normalized = clean.replace(thousands, '.');
   }
   if ((normalized.match(/\./g) ?? []).length > 1) return null;
   const value = Number(normalized);
@@ -128,17 +138,17 @@ export const validateManualTariff = (form: ManualTariffForm): ManualTariffValida
   const errors: ManualTariffValidation['errors'] = {};
 
   const price = parseMoneyInput(form.price);
-  if (!form.price.trim()) errors.price = 'Escribe el valor por metro cúbico de tu recibo.';
-  else if (price === null) errors.price = 'Escribe solo números, por ejemplo 5.234.';
-  else if (price <= 0) errors.price = 'El valor debe ser mayor que cero.';
-  else if (price > MAX_UNIT_PRICE) errors.price = 'Ese valor es demasiado alto. Revisa tu recibo.';
+  if (!form.price.trim()) errors.price = i18n.t('tariff.priceRequired');
+  else if (price === null) errors.price = i18n.t('tariff.priceNotNumber');
+  else if (price <= 0) errors.price = i18n.t('tariff.pricePositive');
+  else if (price > MAX_UNIT_PRICE) errors.price = i18n.t('tariff.priceTooHigh');
 
   let fixedCharge: number | null = null;
   if (form.fixedCharge.trim()) {
     fixedCharge = parseMoneyInput(form.fixedCharge);
-    if (fixedCharge === null) errors.fixedCharge = 'Escribe solo números, por ejemplo 12.000.';
-    else if (fixedCharge < 0) errors.fixedCharge = 'El cargo fijo no puede ser negativo.';
-    else if (fixedCharge > MAX_FIXED_CHARGE) errors.fixedCharge = 'Ese valor es demasiado alto. Revisa tu recibo.';
+    if (fixedCharge === null) errors.fixedCharge = i18n.t('tariff.fixedNotNumber');
+    else if (fixedCharge < 0) errors.fixedCharge = i18n.t('tariff.fixedNegative');
+    else if (fixedCharge > MAX_FIXED_CHARGE) errors.fixedCharge = i18n.t('tariff.fixedTooHigh');
   }
 
   if (Object.keys(errors).length > 0 || price === null) return { errors, value: null };
@@ -147,14 +157,13 @@ export const validateManualTariff = (form: ManualTariffForm): ManualTariffValida
 
 /** HU-069: where the numbers come from, in words. */
 export const sourceLabel = (source: TariffSource, stratum: number | null): string =>
-  source === 'MANUAL' ? 'Ingresada por ti' : `Precargada para tu ciudad · estrato ${stratum ?? '?'}`;
+  source === 'MANUAL' ? i18n.t('tariff.sourceManual') : i18n.t('tariff.sourceCatalog', { stratum: stratum ?? '?' });
 
-/** "1 de enero de 2026" for a YYYY-MM-DD date (the day the official prices were last updated). */
+/** "1 de enero de 2026" / "January 1, 2026" for a YYYY-MM-DD date (the day the official prices were last updated). */
 export const formatCatalogDate = (date: string): string => {
   const [year, month, day] = date.split('-').map(Number);
   if (!year || !month || !day) return date;
-  const months = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
-  return `${day} de ${months[month - 1]} de ${year}`;
+  return new Date(Date.UTC(year, month - 1, day)).toLocaleDateString(localeTag(), { dateStyle: 'long', timeZone: 'UTC' });
 };
 
 export const API_PERIOD: Record<'DAY' | 'WEEK' | 'MONTH', string> = { DAY: 'day', WEEK: 'week', MONTH: 'month' };

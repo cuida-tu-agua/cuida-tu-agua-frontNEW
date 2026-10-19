@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { authService } from '../../../core/di/container';
 import { toAppError } from '../../../infrastructure/http/httpError';
@@ -14,6 +15,7 @@ import { validateCode, validatePassword, validatePasswordConfirmation } from '..
 type Props = NativeStackScreenProps<AuthStackParamList, 'ResetPassword'>;
 
 export const ResetPasswordScreen: React.FC<Props> = ({ navigation, route }) => {
+  const { t } = useTranslation();
   const { identifier } = route.params;
   const cooldown = useCountdown(route.params.cooldownSeconds ?? 0);
 
@@ -31,8 +33,8 @@ export const ResetPasswordScreen: React.FC<Props> = ({ navigation, route }) => {
   const [resending, setResending] = useState(false);
   const [banner, setBanner] = useState<{ tone: BannerTone; message: string } | null>(
     route.params.maskedEmail
-      ? { tone: 'info', message: `Enviamos un código de 6 dígitos a ${route.params.maskedEmail}. Vence en 15 minutos.` }
-      : { tone: 'info', message: 'Te enviamos un código hace un momento. Revisa tu correo (y la carpeta de spam).' },
+      ? { tone: 'info', message: t('auth.reset.codeSentTo', { email: route.params.maskedEmail }) }
+      : { tone: 'info', message: t('auth.reset.codeSentRecently') },
   );
 
   const handleSubmit = async () => {
@@ -50,7 +52,7 @@ export const ResetPasswordScreen: React.FC<Props> = ({ navigation, route }) => {
       const fieldErrors = password ? { ...rest, newPassword: password } : rest;
       form.setServerErrors(fieldErrors);
       if (appError.code === 'auth.invalid_code' && appError.details.remainingAttempts === 0) {
-        form.setServerErrors({ code: 'Agotaste los intentos de este código. Pide uno nuevo.' });
+        form.setServerErrors({ code: t('auth.attemptsExhausted') });
       }
       if (!Object.keys(fieldErrors).some(form.hasField)) setBanner({ tone: 'error', message: appError.message });
       setSubmitting(false);
@@ -62,7 +64,7 @@ export const ResetPasswordScreen: React.FC<Props> = ({ navigation, route }) => {
     try {
       const sent = await authService.forgotPassword(identifier);
       setValue('code', '');
-      setBanner({ tone: 'success', message: `Enviamos un código nuevo a ${sent.maskedEmail}. El anterior ya no sirve.` });
+      setBanner({ tone: 'success', message: t('auth.reset.newCodeSentTo', { email: sent.maskedEmail }) });
       cooldown.start(60);
     } catch (err) {
       const appError = toAppError(err);
@@ -74,13 +76,13 @@ export const ResetPasswordScreen: React.FC<Props> = ({ navigation, route }) => {
   };
 
   return (
-    <AuthLayout title="Crea una contraseña nueva" onBack={() => navigation.goBack()}>
+    <AuthLayout title={t('auth.reset.title')} onBack={() => navigation.goBack()}>
       {banner && <Banner {...banner} onClose={() => setBanner(null)} />}
 
       <CodeInput value={values.code} onChange={(v) => setValue('code', v)} error={errors.code} />
 
       <PasswordField
-        label="Contraseña nueva"
+        label={t('auth.reset.newPasswordLabel')}
         purpose="new"
         value={values.newPassword}
         onChangeText={(t) => setValue('newPassword', t)}
@@ -90,7 +92,7 @@ export const ResetPasswordScreen: React.FC<Props> = ({ navigation, route }) => {
       <PasswordStrengthMeter password={values.newPassword} />
 
       <PasswordField
-        label="Confirmar contraseña nueva"
+        label={t('auth.reset.confirmLabel')}
         purpose="new"
         value={values.confirmPassword}
         onChangeText={(t) => setValue('confirmPassword', t)}
@@ -100,9 +102,9 @@ export const ResetPasswordScreen: React.FC<Props> = ({ navigation, route }) => {
         onSubmitEditing={handleSubmit}
       />
 
-      <Button label="Guardar contraseña" onPress={handleSubmit} loading={submitting} />
+      <Button label={t('auth.reset.submit')} onPress={handleSubmit} loading={submitting} />
       <Button
-        label={cooldown.secondsLeft > 0 ? `Reenviar código en ${formatCountdown(cooldown.secondsLeft)}` : 'Reenviar código'}
+        label={cooldown.secondsLeft > 0 ? t('auth.resendCodeIn', { time: formatCountdown(cooldown.secondsLeft) }) : t('auth.resendCode')}
         variant="ghost"
         onPress={resend}
         loading={resending}

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import i18n from '../../i18n';
 import { adminTipRepository } from '../../core/di/container';
 import { AppError } from '../../domain/common/AppError';
 import { AdminTip, TipCategory, TipInput } from '../../domain/tips/Tip';
@@ -66,13 +67,13 @@ export const useAdminTips = (repository: AdminTipRepository = adminTipRepository
     setCategory,
     setIncludeInactive,
     reload: load,
-    create: (input: TipInput) => run(null, () => repository.create(input), 'Publicamos el consejo: ya lo ven todos los usuarios.'),
-    edit: (id: string, input: TipInput) => run(id, () => repository.edit(id, input), 'Guardamos los cambios.'),
+    create: (input: TipInput) => run(null, () => repository.create(input), i18n.t('adminTips.published')),
+    edit: (id: string, input: TipInput) => run(id, () => repository.edit(id, input), i18n.t('adminTips.saved')),
     setActive: (tip: AdminTip, active: boolean) =>
       run(
         tip.id,
         () => repository.setActive(tip.id, active),
-        active ? 'El consejo vuelve a mostrarse a los usuarios.' : 'El consejo ya no se muestra a los usuarios (no se borró).',
+        active ? i18n.t('adminTips.reactivated') : i18n.t('adminTips.deactivated'),
       ),
     dismissNotice: () => setNotice(null),
     dismissError: () => setError(null),

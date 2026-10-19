@@ -1,6 +1,7 @@
 import { useCallback, useRef, useState } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { consumptionRepository } from '../../core/di/container';
+import i18n from '../../i18n';
 import { AppError } from '../../domain/common/AppError';
 import { Consumption, ConsumptionPeriod } from '../../domain/consumption/Consumption';
 import { ConsumptionRepository } from '../../domain/consumption/ConsumptionRepository';
@@ -15,7 +16,7 @@ interface ConsumptionState {
 }
 
 const asAppError = (error: unknown) =>
-  error instanceof AppError ? error : new AppError('server', 'No se pudo consultar el consumo.');
+  error instanceof AppError ? error : new AppError('server', i18n.t('consumption.loadFailed'));
 
 export const useConsumption = (
   placeId: string,

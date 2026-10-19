@@ -1,6 +1,7 @@
 import React from 'react';
 import { ActivityIndicator, Pressable, Text, TextStyle, View, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import {
   AdminDeviceBadge,
@@ -38,6 +39,7 @@ export const AdminDevicesScreen: React.FC<Props> = ({ navigation }) => (
 );
 
 const Devices: React.FC<{ onCreate: () => void; onOpen: (row: AdminDeviceRow) => void }> = ({ onCreate, onOpen }) => {
+  const { t } = useTranslation();
   const { isCompact } = useLayout();
   const devices = useAdminDevices();
   const rows = devices.data?.items ?? [];
@@ -46,11 +48,11 @@ const Devices: React.FC<{ onCreate: () => void; onOpen: (row: AdminDeviceRow) =>
     <PageContainer gap={theme.spacing.md}>
       <PageHeader
         webOnly={false}
-        title="Medidores"
-        subtitle="Equipos registrados en la plataforma y su estado."
+        title={t('adminDevices.title')}
+        subtitle={t('adminDevices.subtitle')}
         right={
           <Button
-            label="Alta de fábrica"
+            label={t('adminDevices.create')}
             size="medium"
             onPress={onCreate}
             icon={<Ionicons name="add" size={20} color={theme.colors.textOnPrimary} />}
@@ -61,7 +63,7 @@ const Devices: React.FC<{ onCreate: () => void; onOpen: (row: AdminDeviceRow) =>
       <Counters counts={devices.data?.counts} />
 
       <Input
-        placeholder="Buscar por serial (SW-ESP32-...)"
+        placeholder={t('adminDevices.searchPlaceholder')}
         value={devices.search}
         onChangeText={devices.setSearch}
         maxLength={32}
@@ -69,11 +71,11 @@ const Devices: React.FC<{ onCreate: () => void; onOpen: (row: AdminDeviceRow) =>
         leftIcon={<Ionicons name="search" size={18} color={theme.colors.textMuted} />}
         style={{ marginBottom: 0 }}
       />
-      <FilterChips options={STATUS_FILTERS} value={devices.status} onChange={devices.setStatus} accessibilityLabel="Filtrar por estado" />
-      <FilterChips options={LINK_FILTERS} value={devices.link} onChange={devices.setLink} accessibilityLabel="Filtrar por vínculo" />
+      <FilterChips options={STATUS_FILTERS} value={devices.status} onChange={devices.setStatus} accessibilityLabel={t('adminDevices.filterByStatus')} />
+      <FilterChips options={LINK_FILTERS} value={devices.link} onChange={devices.setLink} accessibilityLabel={t('adminDevices.filterByLink')} />
 
       {!!devices.error && (
-        <Banner tone="error" message={devices.error.message} action={{ label: 'Reintentar', onPress: () => void devices.reload() }} onClose={devices.dismissError} />
+        <Banner tone="error" message={devices.error.message} action={{ label: t('adminCommon.retry'), onPress: () => void devices.reload() }} onClose={devices.dismissError} />
       )}
 
       {!devices.data && devices.loading ? (
@@ -82,18 +84,18 @@ const Devices: React.FC<{ onCreate: () => void; onOpen: (row: AdminDeviceRow) =>
         <View style={emptyStyle}>
           <Ionicons name="hardware-chip-outline" size={44} color={theme.colors.textMuted} />
           <Text style={emptyTextStyle}>
-            {devices.search || devices.status !== 'ALL' || devices.link !== 'ALL' ? 'No hay medidores con ese filtro.' : 'Todavía no hay medidores registrados.'}
+            {devices.search || devices.status !== 'ALL' || devices.link !== 'ALL' ? t('adminDevices.emptyFiltered') : t('adminDevices.empty')}
           </Text>
         </View>
       ) : (
         <View style={[tableStyle, devices.loading && { opacity: 0.6 }]}>
           {!isCompact && (
             <View style={[rowStyle, headStyle]}>
-              <Text style={[headCellStyle, serialCol]}>Serial</Text>
-              <Text style={[headCellStyle, statusCol]}>Estado</Text>
-              <Text style={[headCellStyle, placeCol]}>Lugar</Text>
-              <Text style={[headCellStyle, reportCol]}>Último reporte</Text>
-              <Text style={[headCellStyle, firmwareCol]}>Firmware</Text>
+              <Text style={[headCellStyle, serialCol]}>{t('adminDevices.columns.serial')}</Text>
+              <Text style={[headCellStyle, statusCol]}>{t('adminDevices.columns.status')}</Text>
+              <Text style={[headCellStyle, placeCol]}>{t('adminDevices.columns.place')}</Text>
+              <Text style={[headCellStyle, reportCol]}>{t('adminDevices.columns.lastReport')}</Text>
+              <Text style={[headCellStyle, firmwareCol]}>{t('adminDevices.columns.firmware')}</Text>
               <View style={chevronCol} />
             </View>
           )}
@@ -106,12 +108,12 @@ const Devices: React.FC<{ onCreate: () => void; onOpen: (row: AdminDeviceRow) =>
       {devices.data && devices.data.totalItems > 0 && (
         <View style={pagerStyle}>
           <Text style={mutedStyle}>
-            {devices.data.totalItems} en total · página {devices.data.page + 1} de {Math.max(devices.data.totalPages, 1)}
+            {t('adminDevices.totalAndPage', { total: devices.data.totalItems, page: devices.data.page + 1, pages: Math.max(devices.data.totalPages, 1) })}
           </Text>
           <View style={pagerButtonsStyle}>
-            <Button label="Anterior" size="small" variant="secondary" disabled={devices.page <= 0 || devices.loading} onPress={() => devices.goTo(devices.page - 1)} />
+            <Button label={t('adminCommon.previous')} size="small" variant="secondary" disabled={devices.page <= 0 || devices.loading} onPress={() => devices.goTo(devices.page - 1)} />
             <Button
-              label="Siguiente"
+              label={t('adminCommon.next')}
               size="small"
               variant="secondary"
               disabled={devices.page + 1 >= devices.data.totalPages || devices.loading}
@@ -125,12 +127,13 @@ const Devices: React.FC<{ onCreate: () => void; onOpen: (row: AdminDeviceRow) =>
 };
 
 const Counters: React.FC<{ counts?: AdminDeviceCounts }> = ({ counts }) => {
+  const { t } = useTranslation();
   const cards: { title: string; value?: number; detail?: string; tone?: 'good' | 'warn' | 'bad' }[] = [
-    { title: 'Registrados', value: counts?.registered, detail: counts ? `${counts.linked} vinculados` : undefined },
-    { title: 'Conectados', value: counts?.connected, tone: 'good' },
-    { title: 'Desconectados', value: counts?.disconnected, tone: 'warn' },
-    { title: 'Nunca han reportado', value: counts?.neverReported },
-    { title: 'Dados de baja', value: counts?.decommissioned, tone: 'bad' },
+    { title: t('adminDevices.counters.registered'), value: counts?.registered, detail: counts ? t('adminDevices.counters.linked', { count: counts.linked }) : undefined },
+    { title: t('adminDevices.counters.connected'), value: counts?.connected, tone: 'good' },
+    { title: t('adminDevices.counters.disconnected'), value: counts?.disconnected, tone: 'warn' },
+    { title: t('adminDevices.counters.neverReported'), value: counts?.neverReported },
+    { title: t('adminDevices.counters.decommissioned'), value: counts?.decommissioned, tone: 'bad' },
   ];
   return (
     <View style={countersStyle}>
@@ -172,19 +175,20 @@ const StatusPill: React.FC<{ row: AdminDeviceRow }> = ({ row }) => {
 };
 
 const DeviceRow: React.FC<{ row: AdminDeviceRow; compact: boolean; onPress: () => void }> = ({ row, compact, onPress }) => {
-  const report = row.lastReportAt ? formatLastReport(row.lastReportAt) : 'nunca';
+  const { t } = useTranslation();
+  const report = row.lastReportAt ? formatLastReport(row.lastReportAt) : t('adminDevices.never');
   const firmware = row.firmwareVersion ?? '—';
 
   if (compact) {
     return (
-      <Pressable onPress={onPress} style={cardRowStyle} accessibilityRole="button" accessibilityLabel={`Abrir el medidor ${row.serialNumber}`}>
+      <Pressable onPress={onPress} style={cardRowStyle} accessibilityRole="button" accessibilityLabel={t('adminDevices.open', { serial: row.serialNumber })}>
         <View style={{ flex: 1, gap: 4 }}>
           <Text style={serialStyle}>{row.serialNumber}</Text>
           <View style={cardMetaStyle}>
             <StatusPill row={row} />
-            <Text style={cellStyle}>{row.linked ? 'Vinculado' : 'Libre'}</Text>
+            <Text style={cellStyle}>{row.linked ? t('adminDevices.linked') : t('adminDevices.free')}</Text>
           </View>
-          <Text style={mutedStyle}>Último reporte: {report} · Firmware {firmware}</Text>
+          <Text style={mutedStyle}>{t('adminDevices.lastReportLine', { report, firmware })}</Text>
         </View>
         <Ionicons name="chevron-forward" size={20} color={theme.colors.textMuted} />
       </Pressable>
@@ -192,12 +196,12 @@ const DeviceRow: React.FC<{ row: AdminDeviceRow; compact: boolean; onPress: () =
   }
 
   return (
-    <Pressable onPress={onPress} style={[rowStyle, bodyStyle]} accessibilityRole="button" accessibilityLabel={`Abrir el medidor ${row.serialNumber}`}>
+    <Pressable onPress={onPress} style={[rowStyle, bodyStyle]} accessibilityRole="button" accessibilityLabel={t('adminDevices.open', { serial: row.serialNumber })}>
       <Text style={[serialStyle, serialCol]}>{row.serialNumber}</Text>
       <View style={statusCol}>
         <StatusPill row={row} />
       </View>
-      <Text style={[cellStyle, placeCol]}>{row.linked ? 'Vinculado' : 'Libre'}</Text>
+      <Text style={[cellStyle, placeCol]}>{row.linked ? t('adminDevices.linked') : t('adminDevices.free')}</Text>
       <Text style={[cellStyle, reportCol]}>{report}</Text>
       <Text style={[cellStyle, firmwareCol]}>{firmware}</Text>
       <View style={chevronCol}>

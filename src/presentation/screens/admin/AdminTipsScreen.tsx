@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { ActivityIndicator, ScrollView, Switch, Text, TextStyle, View, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
+import i18n from '../../../i18n';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AdminTip, CATEGORY_LABELS, TIP_CATEGORIES, TipCategory, TipInput } from '../../../domain/tips/Tip';
 import { RequireAdmin } from '../../components/admin/RequireAdmin';
@@ -20,9 +22,20 @@ type Props = NativeStackScreenProps<MainStackParamList, 'AdminTips'>;
 
 type CategoryFilter = TipCategory | 'ALL';
 
+/** The labels are getters, so they follow the language active when they are read. */
 const FILTERS: { value: CategoryFilter; label: string }[] = [
-  { value: 'ALL', label: 'Todos' },
-  ...TIP_CATEGORIES.map((value) => ({ value, label: CATEGORY_LABELS[value] })),
+  {
+    value: 'ALL',
+    get label() {
+      return i18n.t('adminTips.filterAll');
+    },
+  },
+  ...TIP_CATEGORIES.map((value) => ({
+    value,
+    get label() {
+      return CATEGORY_LABELS[value];
+    },
+  })),
 ];
 
 /** HU-063 + HU-064: the administrator publishes, edits and deactivates tips. A deactivated tip is hidden, never deleted. */
@@ -33,6 +46,7 @@ export const AdminTipsScreen: React.FC<Props> = () => (
 );
 
 const Tips: React.FC = () => {
+  const { t } = useTranslation();
   const admin = useAdminTips();
   const [editing, setEditing] = useState<AdminTip | null>(null);
   const [formOpen, setFormOpen] = useState(false);
@@ -59,11 +73,11 @@ const Tips: React.FC = () => {
     <PageContainer gap={theme.spacing.md}>
       <PageHeader
         webOnly={false}
-        title="Recomendaciones de ahorro"
-        subtitle="Consejos que ven todos los usuarios según el tipo de su lugar. Cada usuario ve 3 al azar por sesión."
+        title={t('adminTips.title')}
+        subtitle={t('adminTips.subtitle')}
         right={
           <Button
-            label="Nueva recomendación"
+            label={t('adminTips.create')}
             size="medium"
             onPress={openNew}
             icon={<Ionicons name="add" size={20} color={theme.colors.textOnPrimary} />}
@@ -81,14 +95,14 @@ const Tips: React.FC = () => {
           value={admin.includeInactive}
           onValueChange={admin.setIncludeInactive}
           trackColor={{ false: theme.colors.grayMedium, true: theme.colors.primary }}
-          accessibilityLabel="Mostrar también los consejos desactivados"
+          accessibilityLabel={t('adminTips.showInactiveA11y')}
         />
-        <Text style={switchLabelStyle}>Mostrar también los desactivados</Text>
+        <Text style={switchLabelStyle}>{t('adminTips.showInactive')}</Text>
       </View>
 
       {!!admin.notice && <Banner tone="success" message={admin.notice} onClose={admin.dismissNotice} />}
       {!!admin.error && !formOpen && (
-        <Banner tone="error" message={admin.error.message} action={{ label: 'Reintentar', onPress: () => void admin.reload() }} onClose={admin.dismissError} />
+        <Banner tone="error" message={admin.error.message} action={{ label: t('adminCommon.retry'), onPress: () => void admin.reload() }} onClose={admin.dismissError} />
       )}
 
       {!admin.tips && admin.loading ? (
@@ -96,7 +110,7 @@ const Tips: React.FC = () => {
       ) : (admin.tips ?? []).length === 0 ? (
         <View style={emptyStyle}>
           <Ionicons name="bulb-outline" size={44} color={theme.colors.textMuted} />
-          <Text style={mutedStyle}>No hay consejos con ese filtro.</Text>
+          <Text style={mutedStyle}>{t('adminTips.empty')}</Text>
         </View>
       ) : (
         <View style={listStyle}>
@@ -122,33 +136,36 @@ const Tips: React.FC = () => {
   );
 };
 
-const TipRow: React.FC<{ tip: AdminTip; busy: boolean; onEdit: () => void; onToggle: () => void }> = ({ tip, busy, onEdit, onToggle }) => (
-  <Card variant="outlined" style={[rowStyle, !tip.isActive && inactiveRowStyle]}>
-    <View style={{ flexGrow: 1, flexBasis: 240, gap: theme.spacing.xs }}>
-      <View style={pillsStyle}>
-        <View style={categoryPillStyle}>
-          <Text style={pillTextStyle}>{CATEGORY_LABELS[tip.category]}</Text>
+const TipRow: React.FC<{ tip: AdminTip; busy: boolean; onEdit: () => void; onToggle: () => void }> = ({ tip, busy, onEdit, onToggle }) => {
+  const { t } = useTranslation();
+  return (
+    <Card variant="outlined" style={[rowStyle, !tip.isActive && inactiveRowStyle]}>
+      <View style={{ flexGrow: 1, flexBasis: 240, gap: theme.spacing.xs }}>
+        <View style={pillsStyle}>
+          <View style={categoryPillStyle}>
+            <Text style={pillTextStyle}>{CATEGORY_LABELS[tip.category]}</Text>
+          </View>
+          <View style={[statePillStyle, tip.isActive ? activePillStyle : inactivePillStyle]}>
+            <Ionicons name={tip.isActive ? 'checkmark-circle-outline' : 'eye-off-outline'} size={14} color={theme.colors.textPrimary} />
+            <Text style={pillTextStyle}>{tip.isActive ? t('adminTips.active') : t('adminTips.inactive')}</Text>
+          </View>
         </View>
-        <View style={[statePillStyle, tip.isActive ? activePillStyle : inactivePillStyle]}>
-          <Ionicons name={tip.isActive ? 'checkmark-circle-outline' : 'eye-off-outline'} size={14} color={theme.colors.textPrimary} />
-          <Text style={pillTextStyle}>{tip.isActive ? 'Activo' : 'Desactivado'}</Text>
-        </View>
+        <Text style={tipTitleStyle}>{tip.title}</Text>
+        <Text style={tipBodyStyle} numberOfLines={3}>{tip.body}</Text>
       </View>
-      <Text style={tipTitleStyle}>{tip.title}</Text>
-      <Text style={tipBodyStyle} numberOfLines={3}>{tip.body}</Text>
-    </View>
-    <View style={actionsStyle}>
-      <Button label="Editar" size="small" variant="secondary" onPress={onEdit} disabled={busy} />
-      <Button
-        label={tip.isActive ? 'Desactivar' : 'Activar'}
-        size="small"
-        variant={tip.isActive ? 'danger' : 'secondary'}
-        onPress={onToggle}
-        loading={busy}
-      />
-    </View>
-  </Card>
-);
+      <View style={actionsStyle}>
+        <Button label={t('adminTips.edit')} size="small" variant="secondary" onPress={onEdit} disabled={busy} />
+        <Button
+          label={tip.isActive ? t('adminTips.deactivate') : t('adminTips.activate')}
+          size="small"
+          variant={tip.isActive ? 'danger' : 'secondary'}
+          onPress={onToggle}
+          loading={busy}
+        />
+      </View>
+    </Card>
+  );
+};
 
 const mutedStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, color: theme.colors.textMuted }));
 const switchRowStyle: ViewStyle = { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.md };

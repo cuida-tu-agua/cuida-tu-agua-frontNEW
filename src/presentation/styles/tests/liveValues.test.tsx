@@ -8,7 +8,9 @@ import { jsxDEV } from '../jsx/jsx-dev-runtime';
 import { jsx } from '../jsx/jsx-runtime';
 
 // The same function React Native runs on the props of every native view in development (Android / iOS)
-const deepFreeze: <T>(value: T) => T = require('react-native/Libraries/Utilities/deepFreezeAndThrowOnMutationInDev');
+// (in React Native 0.86 the module exports the function as `default`; older versions export it directly)
+const freezeModule = require('react-native/Libraries/Utilities/deepFreezeAndThrowOnMutationInDev');
+const deepFreeze: <T>(value: T) => T = freezeModule.default ?? freezeModule;
 
 afterEach(() => {
   setThemeName('classic-light');
@@ -17,7 +19,7 @@ afterEach(() => {
 describe('the bug on the phone', () => {
   it('a theme Proxy cannot be frozen the way React Native freezes native props', () => {
     const card = themed(() => ({ backgroundColor: colors.surface, padding: 8 }));
-    expect(() => deepFreeze({ style: card })).toThrow(/non-configurable/);
+    expect(() => deepFreeze({ style: card })).toThrow(/non-configurable|Cannot redefine property/);
   });
 });
 

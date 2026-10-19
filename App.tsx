@@ -1,4 +1,5 @@
 import React from 'react';
+import './src/i18n'; // starts the translations before the first screen is drawn
 import { AppRegistry } from 'react-native';
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -11,6 +12,7 @@ import { SplashScreen } from './src/presentation/screens/SplashScreen';
 import { FONT_ASSETS } from './src/presentation/styles/fontAssets';
 import { installFontPatch } from './src/presentation/styles/fonts';
 import { ThemeProvider, useAppTheme } from './src/presentation/theme/ThemeProvider';
+import { LanguageProvider, useLanguage } from './src/i18n/LanguageProvider';
 
 // Every Text of the app uses the brand fonts (Manrope / IBM Plex Mono), whatever weight each screen asks for
 installFontPatch();
@@ -18,9 +20,10 @@ installFontPatch();
 /** The navigation library draws its own backgrounds and borders: it gets the colors of the current theme. */
 const Root: React.FC<{ fontsReady: boolean }> = ({ fontsReady }) => {
   const { palette, dark, ready } = useAppTheme();
+  const { ready: languageReady } = useLanguage();
 
-  // Until the saved theme and the fonts are known nothing is drawn with the wrong ones
-  if (!ready || !fontsReady) return <SplashScreen />;
+  // Until the saved theme, language and fonts are known nothing is drawn with the wrong ones
+  if (!ready || !languageReady || !fontsReady) return <SplashScreen />;
 
   return (
     <NavigationContainer
@@ -52,9 +55,11 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <ThemeProvider>
-        <AuthProvider>
-          <Root fontsReady={loaded || !!error} />
-        </AuthProvider>
+        <LanguageProvider>
+          <AuthProvider>
+            <Root fontsReady={loaded || !!error} />
+          </AuthProvider>
+        </LanguageProvider>
       </ThemeProvider>
     </SafeAreaProvider>
   );
