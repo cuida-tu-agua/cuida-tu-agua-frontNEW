@@ -1,6 +1,6 @@
 import React from 'react';
 import { act, create } from 'react-test-renderer';
-import { changeLanguage } from '../../../../i18n';
+import { changeLanguage as setLanguage } from '../../../../i18n';
 import { PasswordStrengthMeter } from '../PasswordStrengthMeter';
 
 /** Every accessibility label and text drawn by the meter, in order. */
@@ -20,8 +20,11 @@ const textsOf = (password: string): string[] => {
     (node.children ?? []).forEach((child) => visit(child as never));
   };
   visit(tree.toJSON() as never);
+  act(() => tree.unmount()); // a tree left mounted would re-render (outside act) on the next language change
   return found;
 };
+
+const changeLanguage = (language: 'es' | 'en') => act(async () => void (await setLanguage(language)));
 
 describe('PasswordStrengthMeter language (HU-072)', () => {
   it('shows the level and the rules in Spanish', async () => {
