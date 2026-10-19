@@ -96,20 +96,26 @@ export const formatMoney = (amount: number, currency: Currency): string => {
 
 /**
  * What the user typed in a price field -> number, or null when it is not a number.
- * "5.234" and "5234" are 5234 (a dot followed by exactly 3 digits groups thousands, as on the bill);
- * "5234,5" and "5234.5" are 5234.5 (a comma, or a dot with 1-2 digits, is the decimal mark).
+ * Spanish: "5.234" is 5234 (dot = thousands, as on the bill) and "5234,5" is 5234.5 (comma = decimal).
+ * English: "5,234" is 5234 (comma = thousands) and "5234.5" is 5234.5 (dot = decimal).
+ * A lone mark followed by 1-2 digits is always the decimal mark in either language.
  */
 export const parseMoneyInput = (text: string): number | null => {
-  const clean = text.replace(/\s|\$/g, '');
+  const clean = text.replace(/\s|\$|US/g, '');
   if (!clean || !/^[\d.,]+$/.test(clean)) return null;
 
+  const english = localeTag().startsWith('en');
+  const thousands = english ? ',' : '.';
+  const decimal = english ? '.' : ',';
+  const groupedOnly = new RegExp(`^\\d{1,3}(\\${thousands}\\d{3})+$`);
+
   let normalized: string;
-  if (clean.includes(',')) {
-    normalized = clean.replace(/\./g, '').replace(',', '.');
-  } else if (/^\d{1,3}(\.\d{3})+$/.test(clean)) {
-    normalized = clean.replace(/\./g, '');
+  if (clean.includes(decimal)) {
+    normalized = clean.split(thousands).join('').replace(decimal, '.');
+  } else if (groupedOnly.test(clean)) {
+    normalized = clean.split(thousands).join('');
   } else {
-    normalized = clean;
+    normalized = clean.replace(thousands, '.');
   }
   if ((normalized.match(/\./g) ?? []).length > 1) return null;
   const value = Number(normalized);
