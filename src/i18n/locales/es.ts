@@ -817,6 +817,31 @@ export const es = {
     blocked: 'Bloqueaste a {{name}}. Sus sesiones se cerraron.',
     unblocked: '{{name}} puede volver a entrar.',
   },
+  adminDevices: {
+    title: 'Medidores',
+    subtitle: 'Equipos registrados en la plataforma y su estado.',
+    create: 'Alta de fábrica',
+    searchPlaceholder: 'Buscar por serial (SW-ESP32-...)',
+    filterByStatus: 'Filtrar por estado',
+    filterByLink: 'Filtrar por vínculo',
+    emptyFiltered: 'No hay medidores con ese filtro.',
+    empty: 'Todavía no hay medidores registrados.',
+    columns: { serial: 'Serial', status: 'Estado', place: 'Lugar', lastReport: 'Último reporte', firmware: 'Firmware' },
+    totalAndPage: '{{total}} en total · página {{page}} de {{pages}}',
+    counters: {
+      registered: 'Registrados',
+      linked: '{{count}} vinculados',
+      connected: 'Conectados',
+      disconnected: 'Desconectados',
+      neverReported: 'Nunca han reportado',
+      decommissioned: 'Dados de baja',
+    },
+    linked: 'Vinculado',
+    free: 'Libre',
+    never: 'nunca',
+    open: 'Abrir el medidor {{serial}}',
+    lastReportLine: 'Último reporte: {{report}} · Firmware {{firmware}}',
+  },
 };
 
 /** The shape of a dictionary: same keys as Spanish, any text as value. */
