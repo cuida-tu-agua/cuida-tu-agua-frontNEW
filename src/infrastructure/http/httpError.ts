@@ -42,6 +42,12 @@ const DOMAIN_MESSAGES: Record<string, string> = {
   'notification.not_found': 'Esa notificación ya no existe.',
   'preferences.critical_requires_in_app': 'Las alertas críticas siempre se muestran en la app: no se puede apagar.',
   // ms-iam: login and session
+  // ms-iam: Continuar con Google (HU-004)
+  'auth.google_failed': 'No pudimos completar el inicio con Google. Inténtalo de nuevo.',
+  'auth.google_cancelled': 'Cancelaste el inicio con Google.',
+  'auth.google_disabled': 'El inicio con Google no está disponible en este momento.',
+  'auth.google_account_conflict': 'Este correo ya está vinculado a otra cuenta de Google.',
+  'auth.invalid_redirect': 'No pudimos volver a la app después de Google. Inténtalo de nuevo.',
   'auth.email_not_found': 'No encontramos una cuenta con este correo.',
   'auth.wrong_password': 'Contraseña incorrecta.',
   'auth.account_not_verified': 'Tu cuenta aún no está verificada. Confirma tu correo para entrar.',
@@ -203,6 +209,9 @@ export const toAppError = (error: unknown): AppError => {
 
   return new AppError(kind, message, fieldErrors, { code: body.title, details });
 };
+
+/** The message of a Problem Details code that did not come in an HTTP answer (e.g. "google_error" in a URL). */
+export const messageForCode = (code: string): string => DOMAIN_MESSAGES[code] ?? FALLBACK_BY_KIND.server;
 
 const parseRetryAfter = (value: unknown): number | undefined => {
   const seconds = Number(value);

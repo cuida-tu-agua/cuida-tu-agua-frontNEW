@@ -51,6 +51,10 @@ export const AUTH_ENDPOINTS = {
   LOGOUT: '/api/auth/logout',
   FORGOT_PASSWORD: '/api/auth/password/forgot',
   RESET_PASSWORD: '/api/auth/password/reset',
+  /** HU-004 "Continuar con Google": status (show the button?), start (opened in the browser), exchange (code → session). */
+  GOOGLE_STATUS: '/api/auth/google/status',
+  GOOGLE_START: '/api/auth/google/start',
+  GOOGLE_EXCHANGE: '/api/auth/google/exchange',
 };
 
 /** Endpoints that work WITHOUT a token (the same list as SecurityConfig.PUBLIC_POSTS in ms-iam). */
@@ -61,6 +65,7 @@ export const PUBLIC_AUTH_PATHS = [
   AUTH_ENDPOINTS.REFRESH,
   AUTH_ENDPOINTS.FORGOT_PASSWORD,
   AUTH_ENDPOINTS.RESET_PASSWORD,
+  '/api/auth/google', // status, start, callback and exchange
 ];
 
 export const PROFILE_ENDPOINTS = {

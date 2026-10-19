@@ -5,7 +5,7 @@ import { useAuth } from '../../../core/auth/AuthContext';
 import { authService } from '../../../core/di/container';
 import { AppError } from '../../../domain/common/AppError';
 import { toAppError } from '../../../infrastructure/http/httpError';
-import { AuthFooterLink, AuthLayout, PasswordField, UIcon } from '../../components/auth';
+import { AuthFooterLink, AuthLayout, GoogleSignInButton, PasswordField, UIcon } from '../../components/auth';
 import { Banner, BannerTone } from '../../components/common/Banner';
 import { Button } from '../../components/common/Button';
 import { Input } from '../../components/common/Input';
@@ -180,6 +180,8 @@ export const LoginScreen: React.FC<Props> = ({ navigation, route }) => {
         loading={submitting}
         disabled={locked}
       />
+
+      <GoogleSignInButton onError={(message) => setBanner({ tone: 'error', message })} />
     </AuthLayout>
   );
 };

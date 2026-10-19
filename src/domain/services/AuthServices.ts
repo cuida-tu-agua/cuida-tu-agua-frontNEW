@@ -9,6 +9,10 @@ export interface AuthService {
   logout(refreshToken: string | null): Promise<void>;
   forgotPassword(identifier: string): Promise<CodeSent>;
   resetPassword(input: ResetPasswordInput): Promise<void>;
+  /** HU-004: true when the server has "Continuar con Google" configured. */
+  googleEnabled(): Promise<boolean>;
+  /** HU-004: trades the single-use code that comes back from Google for the session. */
+  exchangeGoogleCode(code: string): Promise<Session>;
 }
 
 export interface ProfileService {

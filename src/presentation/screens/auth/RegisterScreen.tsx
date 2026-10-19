@@ -3,7 +3,7 @@ import { Text, TextStyle, View, ViewStyle } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { authService } from '../../../core/di/container';
 import { toAppError } from '../../../infrastructure/http/httpError';
-import { AuthFooterLink, AuthLayout, PasswordField, PasswordStrengthMeter, UIcon } from '../../components/auth';
+import { AuthFooterLink, AuthLayout, GoogleSignInButton, PasswordField, PasswordStrengthMeter, UIcon } from '../../components/auth';
 import { Banner, BannerTone } from '../../components/common/Banner';
 import { Button } from '../../components/common/Button';
 import { Checkbox } from '../../components/common/Checkbox';
@@ -197,6 +197,8 @@ export const RegisterScreen: React.FC<Props> = ({ navigation }) => {
       </Checkbox>
 
       <Button label="Crear cuenta" onPress={handleSubmit} loading={submitting} />
+
+      <GoogleSignInButton onError={(message) => setBanner({ tone: 'error', message })} />
     </AuthLayout>
   );
 };
