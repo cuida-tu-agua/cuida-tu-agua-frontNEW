@@ -436,11 +436,16 @@ Suggested order: HU-070, HU-079, HU-071, HU-072, HU-073, HU-074, HU-075, HU-077,
 
 ## Status
 
-All stories are implemented in branch `traduccion`. Two tests guard the result:
+All stories are implemented in branch `traduccion`: the app speaks Spanish (default), English, French and
+Portuguese (Brazil). A device whose language is one of the four opens in it; any other language opens in Spanish.
+Two tests guard the result:
 
-- `src/i18n/tests/dictionaries.test.ts` compares both dictionaries key by key (HU-079).
+- `src/i18n/tests/dictionaries.test.ts` compares every dictionary with Spanish key by key and placeholder by placeholder (HU-079).
 - `src/i18n/tests/noHardcodedSpanish.test.ts` scans the source and fails if a text with Spanish
   letters is written outside the dictionary.
+
+The French and Portuguese texts were written without a native review: before a public release a native speaker
+should read them (tone, tariff and strata vocabulary).
 
 Known limits: the text of server notifications, the tariff disclaimer and the content of the tips
 are produced by the services or by the administrator, so they are shown as they were written.
