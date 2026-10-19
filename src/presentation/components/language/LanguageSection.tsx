@@ -12,6 +12,7 @@ const OPTIONS: { value: Language; label: string }[] = [
   { value: 'es', label: 'Español' },
   { value: 'en', label: 'English' },
   { value: 'fr', label: 'Français' },
+  { value: 'pt', label: 'Português' },
 ];
 
 /** Language selector of the profile: the change is immediate and remembered on the device. */
