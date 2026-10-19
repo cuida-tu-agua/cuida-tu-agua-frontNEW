@@ -1,6 +1,8 @@
 import React from 'react';
 import { ActivityIndicator, RefreshControl, Text, TextStyle, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
+import i18n from '../../../i18n';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { PlatformMetrics, unavailableLabels } from '../../../domain/admin/Admin';
 import { Banner } from '../../components/common/Banner';
@@ -31,6 +33,7 @@ export const AdminMetricsScreen: React.FC<Props> = ({ navigation }) => (
 );
 
 const Metrics: React.FC<{ onUsers: () => void }> = ({ onUsers }) => {
+  const { t } = useTranslation();
   const { metrics, error, loading, reload } = useAdminMetrics();
 
   if (!metrics) {
@@ -39,7 +42,7 @@ const Metrics: React.FC<{ onUsers: () => void }> = ({ onUsers }) => {
         {error ? (
           <>
             <Banner tone="error" message={error.message} />
-            <Button label="Reintentar" onPress={() => void reload()} />
+            <Button label={t('adminCommon.retry')} onPress={() => void reload()} />
           </>
         ) : (
           <ActivityIndicator size="large" color={theme.colors.primary} />
@@ -55,11 +58,11 @@ const Metrics: React.FC<{ onUsers: () => void }> = ({ onUsers }) => {
     <PageContainer gap={theme.spacing.lg} refreshControl={<RefreshControl refreshing={loading} onRefresh={() => void reload()} tintColor={theme.colors.primary} />}>
       <PageHeader
         webOnly={false}
-        title="Resumen de la plataforma"
-        subtitle={`Datos actualizados a las ${formatTime(metrics.generatedAt)}`}
+        title={t('adminMetrics.title')}
+        subtitle={t('adminMetrics.updatedAt', { time: formatTime(metrics.generatedAt) })}
         right={
           <Button
-            label="Actualizar"
+            label={t('adminMetrics.refresh')}
             size="small"
             variant="secondary"
             loading={loading}
@@ -69,42 +72,42 @@ const Metrics: React.FC<{ onUsers: () => void }> = ({ onUsers }) => {
         }
       />
 
-      {!!error && <Banner tone="warning" message={`No pudimos actualizar. ${error.message}`} />}
+      {!!error && <Banner tone="warning" message={t('adminMetrics.updateFailed', { message: error.message })} />}
       {down.length > 0 && (
-        <Banner tone="warning" title="Datos incompletos" message={`No respondió: ${down.join(', ')}. Los demás números sí están al día.`} />
+        <Banner tone="warning" title={t('adminMetrics.incompleteTitle')} message={t('adminMetrics.incompleteMessage', { names: down.join(', ') })} />
       )}
 
       <View style={gridStyle}>
-        <Stat title="Cuentas activas" value={users.active} detail={`de ${users.total} cuentas`} flag={users.blocked > 0 ? `${users.blocked} bloqueada${users.blocked === 1 ? '' : 's'}` : undefined} flagTone="bad" />
+        <Stat title={t('adminMetrics.activeAccounts')} value={users.active} detail={t('adminMetrics.ofAccounts', { total: users.total })} flag={users.blocked > 0 ? t('adminMetrics.blockedFlag', { count: users.blocked }) : undefined} flagTone="bad" />
         <Stat
-          title="Medidores conectados"
+          title={t('adminMetrics.connectedMeters')}
           value={devices?.active}
-          detail={devices ? `de ${devices.total} registrados` : undefined}
-          flag={devices && devices.inactive > 0 ? `${devices.inactive} sin conexión` : undefined}
+          detail={devices ? t('adminMetrics.ofRegistered', { total: devices.total }) : undefined}
+          flag={devices && devices.inactive > 0 ? t('adminMetrics.offlineFlag', { count: devices.inactive }) : undefined}
           flagTone="warn"
         />
-        <Stat title="Lugares registrados" value={places?.total} detail={places ? `${places.active} con medidor` : undefined} />
+        <Stat title={t('adminMetrics.registeredPlaces')} value={places?.total} detail={places ? t('adminMetrics.withMeter', { count: places.active }) : undefined} />
         <Stat
-          title="Sin verificar"
+          title={t('adminMetrics.unverified')}
           value={users.unverified}
-          detail="cuentas esperando su código"
-          flag={users.unverified > 0 ? 'Pendientes de verificar' : undefined}
+          detail={t('adminMetrics.waitingCode')}
+          flag={users.unverified > 0 ? t('adminMetrics.pendingFlag') : undefined}
           flagTone="warn"
         />
       </View>
 
       <View style={gridStyle}>
         <Section
-          title="Usuarios"
-          action={{ label: 'Ver usuarios', onPress: onUsers }}
+          title={t('adminMetrics.usersSection')}
+          action={{ label: t('adminMetrics.seeUsers'), onPress: onUsers }}
           lines={[
-            { label: 'Cuentas en total', value: users.total },
-            { label: 'Activas', value: users.active, tone: 'good' },
-            { label: 'Sin verificar el correo', value: users.unverified, tone: users.unverified > 0 ? 'warn' : undefined },
-            { label: 'Bloqueadas', value: users.blocked, tone: users.blocked > 0 ? 'warn' : undefined },
+            { label: t('adminMetrics.totalAccounts'), value: users.total },
+            { label: t('adminMetrics.active'), value: users.active, tone: 'good' },
+            { label: t('adminMetrics.emailUnverified'), value: users.unverified, tone: users.unverified > 0 ? 'warn' : undefined },
+            { label: t('adminMetrics.blocked'), value: users.blocked, tone: users.blocked > 0 ? 'warn' : undefined },
           ]}
         />
-        <Section title="Medidores" lines={devicesLines(metrics)} />
+        <Section title={t('adminMetrics.metersSection')} lines={devicesLines(metrics)} />
       </View>
     </PageContainer>
   );
@@ -112,69 +115,75 @@ const Metrics: React.FC<{ onUsers: () => void }> = ({ onUsers }) => {
 
 const devicesLines = (metrics: PlatformMetrics): Line[] | null =>
   metrics.devices && [
-    { label: 'Registrados', value: metrics.devices.total },
-    { label: 'Conectados', value: metrics.devices.active, tone: 'good' },
-    { label: 'Desconectados', value: metrics.devices.inactive, tone: metrics.devices.inactive > 0 ? 'warn' : undefined },
-    { label: 'Vinculados a un lugar', value: metrics.devices.linked },
+    { label: i18n.t('adminMetrics.registered'), value: metrics.devices.total },
+    { label: i18n.t('adminMetrics.connected'), value: metrics.devices.active, tone: 'good' },
+    { label: i18n.t('adminMetrics.disconnected'), value: metrics.devices.inactive, tone: metrics.devices.inactive > 0 ? 'warn' : undefined },
+    { label: i18n.t('adminMetrics.linkedToPlace'), value: metrics.devices.linked },
   ];
 
 /** One number of the top row. A service that did not answer shows a dash and says why, never a zero. */
-const Stat: React.FC<{ title: string; value?: number; detail?: string; flag?: string; flagTone?: 'warn' | 'bad' }> = ({ title, value, detail, flag, flagTone }) => (
-  <Card variant="outlined" style={statStyle}>
-    <Text style={statTitleStyle}>{title}</Text>
-    {typeof value === 'number' ? (
-      <>
-        <Text style={bigNumberStyle}>{value}</Text>
-        {!!detail && <Text style={mutedStyle}>{detail}</Text>}
-        {!!flag && (
-          <View style={flagRowStyle}>
-            <Ionicons
-              name={flagTone === 'bad' ? 'alert-circle' : 'alert-circle-outline'}
-              size={16}
-              color={flagTone === 'bad' ? theme.colors.error : theme.colors.warning}
-            />
-            <Text style={flagTextStyle}>{flag}</Text>
-          </View>
-        )}
-      </>
-    ) : (
-      <>
-        <Text style={bigNumberStyle}>–</Text>
-        <Text style={mutedStyle}>No disponible: el servicio no respondió.</Text>
-      </>
-    )}
-  </Card>
-);
-
-const Section: React.FC<{ title: string; lines: Line[] | null; action?: { label: string; onPress: () => void } }> = ({ title, lines, action }) => (
-  <Card variant="outlined" style={sectionStyle}>
-    <View style={sectionHeaderStyle}>
-      <Text style={sectionTitleStyle} accessibilityRole="header">
-        {title}
-      </Text>
-      {!!action && (
-        <TouchableOpacity onPress={action.onPress} accessibilityRole="link" hitSlop={8}>
-          <Text style={linkStyle}>{action.label}</Text>
-        </TouchableOpacity>
+const Stat: React.FC<{ title: string; value?: number; detail?: string; flag?: string; flagTone?: 'warn' | 'bad' }> = ({ title, value, detail, flag, flagTone }) => {
+  const { t } = useTranslation();
+  return (
+    <Card variant="outlined" style={statStyle}>
+      <Text style={statTitleStyle}>{title}</Text>
+      {typeof value === 'number' ? (
+        <>
+          <Text style={bigNumberStyle}>{value}</Text>
+          {!!detail && <Text style={mutedStyle}>{detail}</Text>}
+          {!!flag && (
+            <View style={flagRowStyle}>
+              <Ionicons
+                name={flagTone === 'bad' ? 'alert-circle' : 'alert-circle-outline'}
+                size={16}
+                color={flagTone === 'bad' ? theme.colors.error : theme.colors.warning}
+              />
+              <Text style={flagTextStyle}>{flag}</Text>
+            </View>
+          )}
+        </>
+      ) : (
+        <>
+          <Text style={bigNumberStyle}>–</Text>
+          <Text style={mutedStyle}>{t('adminMetrics.unavailable')}</Text>
+        </>
       )}
-    </View>
-    {lines ? (
-      lines.map((line) => (
-        <View key={line.label} style={lineStyle}>
-          <Text style={lineLabelStyle}>{line.label}</Text>
-          <Text style={[lineValueStyle, line.tone === 'good' && { color: theme.colors.success }, line.tone === 'warn' && { color: theme.colors.warning }]}>
-            {line.value}
-          </Text>
-        </View>
-      ))
-    ) : (
-      <View style={unavailableStyle}>
-        <Ionicons name="cloud-offline-outline" size={28} color={theme.colors.textMuted} />
-        <Text style={mutedStyle}>No disponible: el servicio no respondió.</Text>
+    </Card>
+  );
+};
+
+const Section: React.FC<{ title: string; lines: Line[] | null; action?: { label: string; onPress: () => void } }> = ({ title, lines, action }) => {
+  const { t } = useTranslation();
+  return (
+    <Card variant="outlined" style={sectionStyle}>
+      <View style={sectionHeaderStyle}>
+        <Text style={sectionTitleStyle} accessibilityRole="header">
+          {title}
+        </Text>
+        {!!action && (
+          <TouchableOpacity onPress={action.onPress} accessibilityRole="link" hitSlop={8}>
+            <Text style={linkStyle}>{action.label}</Text>
+          </TouchableOpacity>
+        )}
       </View>
-    )}
-  </Card>
-);
+      {lines ? (
+        lines.map((line) => (
+          <View key={line.label} style={lineStyle}>
+            <Text style={lineLabelStyle}>{line.label}</Text>
+            <Text style={[lineValueStyle, line.tone === 'good' && { color: theme.colors.success }, line.tone === 'warn' && { color: theme.colors.warning }]}>
+              {line.value}
+            </Text>
+          </View>
+        ))
+      ) : (
+        <View style={unavailableStyle}>
+          <Ionicons name="cloud-offline-outline" size={28} color={theme.colors.textMuted} />
+          <Text style={mutedStyle}>{t('adminMetrics.unavailable')}</Text>
+        </View>
+      )}
+    </Card>
+  );
+};
 
 const centerStyle: ViewStyle = themed(() => ({
   flex: 1,
