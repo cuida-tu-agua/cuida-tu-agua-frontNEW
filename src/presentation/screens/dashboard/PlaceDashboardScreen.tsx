@@ -26,11 +26,13 @@ import { useLayout } from '../../layout/breakpoints';
 import { MainStackParamList } from '../../navigation/types';
 import { theme } from '../../styles/theme';
 import { themed } from '../../styles/themeRuntime';
+import { useTranslation } from 'react-i18next';
 
 type Props = NativeStackScreenProps<MainStackParamList, 'PlaceDashboard'>;
 
 export const PlaceDashboardScreen: React.FC<Props> = ({ navigation, route }) => {
-  const { placeId, placeName = 'Mi lugar' } = route.params;
+  const { t } = useTranslation();
+  const { placeId, placeName = t('dashboard.defaultPlaceName') } = route.params;
   const { isCompact } = useLayout();
   const [period, setPeriod] = useState<ConsumptionPeriod>('DAY');
   const [unit, setUnit] = useState<MeasurementUnit>('LITERS');
@@ -80,7 +82,7 @@ export const PlaceDashboardScreen: React.FC<Props> = ({ navigation, route }) => 
 
   const isWeb = Platform.OS === 'web';
   const status = device.device?.status;
-  const back = { label: 'Mis lugares', onPress: () => navigation.navigate('Places') };
+  const back = { label: t('places.list.title'), onPress: () => navigation.navigate('Places') };
   const tipsPanel = isWeb ? <TipsPanel placeId={placeId} onOpenFavorites={() => navigation.navigate('Tips', { placeId })} /> : null;
 
   if (!device.loaded) {
@@ -94,14 +96,14 @@ export const PlaceDashboardScreen: React.FC<Props> = ({ navigation, route }) => 
   if (!device.device && !device.error) {
     return (
       <PageContainer>
-        <PageHeader back={back} caption="Panel del lugar" title={placeName} webOnly={false} />
+        <PageHeader back={back} caption={t('dashboard.caption')} title={placeName} webOnly={false} />
         <View style={isCompact ? stackedStyle : splitStyle}>
         <View style={isCompact ? stackedStyle : mainColumnStyle}>
         <Card variant="outlined" style={emptyCardStyle}>
           <Ionicons name="speedometer-outline" size={44} color={theme.colors.primary} />
-          <Text style={emptyTitleStyle}>Vincula un medidor para ver tu consumo</Text>
-          <Text style={mutedStyle}>Con el medidor verás cuánta agua usas y podrás abrir o cerrar el paso desde aquí.</Text>
-          <Button label="Vincular medidor" onPress={goToDevice} style={{ alignSelf: 'stretch' }} />
+          <Text style={emptyTitleStyle}>{t('dashboard.emptyTitle')}</Text>
+          <Text style={mutedStyle}>{t('dashboard.emptyText')}</Text>
+          <Button label={t('dashboard.linkMeter')} onPress={goToDevice} style={{ alignSelf: 'stretch' }} />
         </Card>
         </View>
         {!!tipsPanel && <View style={isCompact ? stackedStyle : sideColumnStyle}>{tipsPanel}</View>}
@@ -114,7 +116,7 @@ export const PlaceDashboardScreen: React.FC<Props> = ({ navigation, route }) => 
     <PageContainer refreshControl={<RefreshControl refreshing={false} onRefresh={refreshAll} tintColor={theme.colors.primary} />}>
       <PageHeader
         back={back}
-        caption="Panel del lugar"
+        caption={t('dashboard.caption')}
         title={placeName}
         webOnly={false}
         right={
@@ -124,19 +126,19 @@ export const PlaceDashboardScreen: React.FC<Props> = ({ navigation, route }) => 
                 onPress={goToDevice}
                 style={chipStyle}
                 accessibilityRole="button"
-                accessibilityLabel={`Medidor: ${DEVICE_STATUS_LABELS[status]}. Ver el medidor`}
+                accessibilityLabel={t('dashboard.meterA11y', { status: DEVICE_STATUS_LABELS[status] })}
               >
                 <Ionicons
                   name={status === 'CONNECTED' ? 'wifi' : 'cloud-offline-outline'}
                   size={16}
                   color={status === 'CONNECTED' ? theme.colors.success : theme.colors.warning}
                 />
-                <Text style={chipTextStyle}>Medidor: {DEVICE_STATUS_LABELS[status]}</Text>
+                <Text style={chipTextStyle}>{t('dashboard.meterChip', { status: DEVICE_STATUS_LABELS[status] })}</Text>
               </Pressable>
             )}
             {isWeb && (
               <Button
-                label="Actualizar"
+                label={t('dashboard.refresh')}
                 variant="ghost"
                 size="small"
                 onPress={refreshAll}
@@ -150,8 +152,8 @@ export const PlaceDashboardScreen: React.FC<Props> = ({ navigation, route }) => 
       {status === 'DISCONNECTED' && (
         <Banner
           tone="warning"
-          message="El medidor no está reportando: el consumo y la válvula pueden no estar al día."
-          action={{ label: 'Revisar conexión', onPress: goToDevice }}
+          message={t('dashboard.disconnected')}
+          action={{ label: t('dashboard.reviewConnection'), onPress: goToDevice }}
         />
       )}
 
@@ -176,7 +178,7 @@ export const PlaceDashboardScreen: React.FC<Props> = ({ navigation, route }) => 
         <View style={isCompact ? stackedStyle : sideColumnStyle}>
 
       {!!actionError && <Banner tone="error" message={actionError} onClose={() => setActionError(null)} />}
-      {!!valve.error && <Banner tone="warning" message={`No pudimos consultar la válvula. ${valve.error.message}`} />}
+      {!!valve.error && <Banner tone="warning" message={t('dashboard.valveFailed', { reason: valve.error.message })} />}
 
       {valve.valve ? (
         <ValveCard
@@ -195,7 +197,7 @@ export const PlaceDashboardScreen: React.FC<Props> = ({ navigation, route }) => 
         !valve.loaded && <ActivityIndicator color={theme.colors.primary} />
       )}
       {valve.noDevice && (
-        <Text style={mutedStyle}>La válvula aparecerá en cuanto el servicio de válvulas registre el medidor.</Text>
+        <Text style={mutedStyle}>{t('dashboard.valveSoon')}</Text>
       )}
       {tipsPanel}
         </View>
@@ -215,7 +217,7 @@ export const PlaceDashboardScreen: React.FC<Props> = ({ navigation, route }) => 
 
       <SuccessModal
         visible={orderSent}
-        message="Orden enviada. Esperando que el medidor cierre la válvula."
+        message={t('dashboard.orderSent')}
         onDismiss={handleOrderSent}
         autoCloseDuration={1500}
       />
