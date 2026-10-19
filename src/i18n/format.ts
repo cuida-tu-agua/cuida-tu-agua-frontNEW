@@ -1,7 +1,21 @@
 import i18n from 'i18next';
 
-/** BCP 47 tag for Intl and toLocale*String: English uses en-US, anything else Colombian Spanish. */
-export const localeTag = (): string => (i18n.language === 'en' ? 'en-US' : 'es-CO');
+/** BCP 47 tag of each language for Intl and toLocale*String. Spanish is the Colombian one; Portuguese is the Brazilian one. */
+const LOCALE_TAGS: Record<string, string> = { es: 'es-CO', en: 'en-US', fr: 'fr-FR', pt: 'pt-BR' };
+
+export const localeTag = (): string => LOCALE_TAGS[i18n.language] ?? LOCALE_TAGS.es;
+
+/** The marks that separate thousands and decimals: "1.234,5" (es, pt), "1,234.5" (en), "1 234,5" (fr, with a no-break space). */
+export const numberMarks = (): { group: string; decimal: string } => {
+  switch (i18n.language) {
+    case 'en':
+      return { group: ',', decimal: '.' };
+    case 'fr':
+      return { group: '\u00a0', decimal: ',' };
+    default:
+      return { group: '.', decimal: ',' };
+  }
+};
 
 type DateInput = string | number | Date;
 
