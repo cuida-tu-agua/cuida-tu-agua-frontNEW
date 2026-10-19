@@ -1,5 +1,6 @@
 import React from 'react';
 import { Text, TextStyle, View, ViewStyle } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { theme } from '../../styles/theme';
 import { Button } from '../common/Button';
 import { Card } from '../common/Card';
@@ -9,8 +10,8 @@ import { SelectField } from '../common/SelectField';
 import { PlaceFormController } from '../../hooks/usePlaceForm';
 import {
   cityLabel,
-  MEASUREMENT_UNIT_OPTIONS,
-  PLACE_TYPE_OPTIONS,
+  measurementUnitOptions,
+  placeTypeOptions,
   subdivisionLabel,
 } from './placeLabels';
 import { themed } from '../../styles/themeRuntime';
@@ -67,6 +68,7 @@ export const PlaceForm: React.FC<PlaceFormProps> = ({
   submitError,
   submitDisabled = false,
 }) => {
+  const { t } = useTranslation();
   const { values, errors, catalog, loading, selectedCountry } = form;
 
   return (
@@ -76,7 +78,7 @@ export const PlaceForm: React.FC<PlaceFormProps> = ({
           <Text style={bannerTextStyle}>{submitError ?? form.catalogError}</Text>
           {form.catalogError && catalog.countries.length === 0 && (
             <Button
-              label="Reintentar"
+              label={t('common.retry')}
               variant="ghost"
               size="small"
               onPress={form.reloadCountries}
@@ -86,11 +88,11 @@ export const PlaceForm: React.FC<PlaceFormProps> = ({
       )}
 
       <Card style={cardStyle}>
-        <Text style={sectionTitleStyle}>Datos del lugar</Text>
+        <Text style={sectionTitleStyle}>{t('places.form.dataTitle')}</Text>
 
         <Input
-          label="NOMBRE"
-          placeholder="Ej: Casa, Local centro, Bodega"
+          label={t('places.form.nameLabel')}
+          placeholder={t('places.form.namePlaceholder')}
           value={values.name}
           onChangeText={(text) => form.setField('name', text)}
           error={errors.name}
@@ -98,8 +100,8 @@ export const PlaceForm: React.FC<PlaceFormProps> = ({
         />
 
         <SegmentedControl
-          label="TIPO"
-          options={PLACE_TYPE_OPTIONS}
+          label={t('places.form.typeLabel')}
+          options={placeTypeOptions()}
           value={values.type}
           onChange={(type) => form.setField('type', type)}
           error={errors.type}
@@ -108,11 +110,11 @@ export const PlaceForm: React.FC<PlaceFormProps> = ({
       </Card>
 
       <Card style={cardStyle}>
-        <Text style={sectionTitleStyle}>Ubicación</Text>
+        <Text style={sectionTitleStyle}>{t('places.form.locationTitle')}</Text>
 
         <SelectField
-          label="PAÍS"
-          placeholder="Elige el país"
+          label={t('places.form.countryLabel')}
+          placeholder={t('places.form.countryPlaceholder')}
           value={values.countryCode}
           options={catalog.countries.map((c) => ({ value: c.code, label: c.name }))}
           onSelect={form.selectCountry}
@@ -123,7 +125,7 @@ export const PlaceForm: React.FC<PlaceFormProps> = ({
 
         <SelectField
           label={subdivisionLabel(values.countryCode).toUpperCase()}
-          placeholder={values.countryCode ? 'Elige una opción' : 'Primero elige el país'}
+          placeholder={values.countryCode ? t('places.form.chooseOption') : t('places.form.chooseCountryFirst')}
           value={values.subdivisionId}
           options={catalog.subdivisions.map((s) => ({ value: s.id, label: s.name }))}
           onSelect={form.selectSubdivision}
@@ -135,7 +137,7 @@ export const PlaceForm: React.FC<PlaceFormProps> = ({
 
         <SelectField
           label={cityLabel(values.countryCode).toUpperCase()}
-          placeholder={values.subdivisionId ? 'Elige una opción' : 'Primero elige el departamento'}
+          placeholder={values.subdivisionId ? t('places.form.chooseOption') : t('places.form.chooseSubdivisionFirst')}
           value={values.cityId}
           options={catalog.cities.map((c) => ({ value: c.id, label: c.name }))}
           onSelect={form.selectCity}
@@ -146,8 +148,8 @@ export const PlaceForm: React.FC<PlaceFormProps> = ({
         />
 
         <Input
-          label="DIRECCIÓN"
-          placeholder="Ej: Cra 7 # 12-34"
+          label={t('places.form.addressLabel')}
+          placeholder={t('places.form.addressPlaceholder')}
           value={values.address}
           onChangeText={(text) => form.setField('address', text)}
           error={errors.address}
@@ -156,11 +158,11 @@ export const PlaceForm: React.FC<PlaceFormProps> = ({
       </Card>
 
       <Card style={cardStyle}>
-        <Text style={sectionTitleStyle}>Medición</Text>
+        <Text style={sectionTitleStyle}>{t('places.form.measurementTitle')}</Text>
 
         <SegmentedControl
-          label="UNIDAD PARA VER EL CONSUMO"
-          options={MEASUREMENT_UNIT_OPTIONS}
+          label={t('places.form.unitLabel')}
+          options={measurementUnitOptions()}
           value={values.measurementUnit}
           onChange={(unit) => form.setField('measurementUnit', unit)}
           error={errors.measurementUnit}
@@ -169,8 +171,9 @@ export const PlaceForm: React.FC<PlaceFormProps> = ({
 
         {selectedCountry && (
           <Text style={hintStyle}>
-            Moneda: <Text style={currencyStyle}>{selectedCountry.defaultCurrency}</Text> (la define el
-            país)
+            {t('places.form.currencyPrefix')}
+            <Text style={currencyStyle}>{selectedCountry.defaultCurrency}</Text>
+            {t('places.form.currencySuffix')}
           </Text>
         )}
       </Card>
