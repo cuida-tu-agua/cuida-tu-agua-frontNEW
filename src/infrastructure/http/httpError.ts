@@ -27,6 +27,7 @@ const DOMAIN_MESSAGES: Record<string, string> = {
   // ms-consumption
   'consumption.invalid_period': 'Periodo no válido.',
   'consumption.invalid_time_zone': 'La zona horaria del teléfono no es válida.',
+  'goal.invalid_target': 'La meta debe ser mayor que cero y no superar 10.000 m³ al mes.',
   // ms-valve
   'valve.not_found': 'Este lugar no tiene un medidor con válvula.',
   'valve.command_in_progress': 'Ya hay una orden en curso. Espera la confirmación del medidor.',

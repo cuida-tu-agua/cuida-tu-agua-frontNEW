@@ -27,6 +27,11 @@ const UNIT_SYMBOL: Record<MeasurementUnit, string> = {
 
 export const toUnit = (liters: number, unit: MeasurementUnit): number => liters / LITERS_PER_UNIT[unit];
 
+/** The inverse of toUnit: a value typed in the unit of the place → liters (what the services store). */
+export const toLiters = (value: number, unit: MeasurementUnit): number => value * LITERS_PER_UNIT[unit];
+
+export const unitSymbol = (unit: MeasurementUnit): string => UNIT_SYMBOL[unit];
+
 export const formatVolume = (liters: number, unit: MeasurementUnit = 'LITERS'): string => {
   const value = toUnit(liters, unit);
   const digits = unit === 'CUBIC_METERS' ? 3 : value < 10 ? 2 : value < 100 ? 1 : 0;

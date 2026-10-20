@@ -15,12 +15,15 @@ import { PageHeader } from '../../components/common/PageHeader';
 import { TipsPanel } from '../../components/tips/TipsPanel';
 import { SuccessModal } from '../../components/common/SuccessModal';
 import { ConsumptionCard } from '../../components/consumption/ConsumptionCard';
+import { GoalCard } from '../../components/goals/GoalCard';
+import { GoalDialog } from '../../components/goals/GoalDialog';
 import { CostCard } from '../../components/tariffs/CostCard';
 import { CloseValveDialog } from '../../components/valve/CloseValveDialog';
 import { ValveCard } from '../../components/valve/ValveCard';
 import { useConsumption } from '../../hooks/useConsumption';
 import { usePlaceCost } from '../../hooks/usePlaceCost';
 import { usePlaceDevice } from '../../hooks/usePlaceDevice';
+import { usePlaceGoal } from '../../hooks/usePlaceGoal';
 import { useValve } from '../../hooks/useValve';
 import { useLayout } from '../../layout/breakpoints';
 import { MainStackParamList } from '../../navigation/types';
@@ -38,7 +41,10 @@ export const PlaceDashboardScreen: React.FC<Props> = ({ navigation, route }) => 
   const device = usePlaceDevice(placeId);
   const consumption = useConsumption(placeId, period);
   const cost = usePlaceCost(placeId, period);
+  const goal = usePlaceGoal(placeId);
   const valve = useValve(placeId);
+  const [editingGoal, setEditingGoal] = useState(false);
+  const [goalSaved, setGoalSaved] = useState(false);
 
   const [closing, setClosing] = useState(false);
   const [opening, setOpening] = useState(false);
@@ -60,6 +66,7 @@ export const PlaceDashboardScreen: React.FC<Props> = ({ navigation, route }) => 
     device.reload();
     consumption.reload();
     void cost.reload();
+    void goal.reload();
     valve.reload();
   };
 
@@ -76,6 +83,7 @@ export const PlaceDashboardScreen: React.FC<Props> = ({ navigation, route }) => 
   };
 
   const handleOrderSent = useCallback(() => setOrderSent(false), []);
+  const handleGoalSaved = useCallback(() => setGoalSaved(false), []);
   const goToDevice = () => navigation.navigate('PlaceDevice', { placeId, placeName });
 
   const isWeb = Platform.OS === 'web';
@@ -165,6 +173,7 @@ export const PlaceDashboardScreen: React.FC<Props> = ({ navigation, route }) => 
             error={consumption.error}
             unit={unit}
           />
+          <GoalCard goal={goal.data} loading={goal.loading} error={goal.error} unit={unit} onEdit={() => setEditingGoal(true)} />
           <CostCard
             period={period}
             cost={cost.data}
@@ -211,6 +220,25 @@ export const PlaceDashboardScreen: React.FC<Props> = ({ navigation, route }) => 
           setOrderSent(true);
         }}
         onCancel={() => setClosing(false)}
+      />
+
+      <GoalDialog
+        visible={editingGoal}
+        goal={goal.data}
+        unit={unit}
+        save={goal.save}
+        onDone={() => {
+          setEditingGoal(false);
+          setGoalSaved(true);
+        }}
+        onCancel={() => setEditingGoal(false)}
+      />
+
+      <SuccessModal
+        visible={goalSaved}
+        message="Meta guardada."
+        onDismiss={handleGoalSaved}
+        autoCloseDuration={1200}
       />
 
       <SuccessModal
