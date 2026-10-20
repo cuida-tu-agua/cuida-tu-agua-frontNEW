@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, ScrollView, Text, TextStyle, View, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -20,7 +21,8 @@ import { themed } from '../../styles/themeRuntime';
 type Props = NativeStackScreenProps<MainStackParamList, 'PlaceDevice'>;
 
 export const PlaceDeviceScreen: React.FC<Props> = ({ navigation, route }) => {
-  const { placeId, placeName = 'Mi lugar' } = route.params;
+  const { t } = useTranslation();
+  const { placeId, placeName = t('dashboard.defaultPlaceName') } = route.params;
   const { loaded, device, error, checkedAt, reload, unlink } = usePlaceDevice(placeId);
 
   const [confirming, setConfirming] = useState(false);
@@ -57,7 +59,7 @@ export const PlaceDeviceScreen: React.FC<Props> = ({ navigation, route }) => {
     return (
       <View style={centeredStyle}>
         <ActivityIndicator size="large" color={theme.colors.primary} />
-        <Text style={mutedStyle}>Consultando el medidor...</Text>
+        <Text style={mutedStyle}>{t('deviceScreens.place.loading')}</Text>
       </View>
     );
   }
@@ -68,9 +70,9 @@ export const PlaceDeviceScreen: React.FC<Props> = ({ navigation, route }) => {
       <View style={centeredStyle}>
         <Banner tone="error" message={error.message} />
         {placeGone ? (
-          <Button label="Volver a mis lugares" onPress={() => navigation.popTo('Places')} />
+          <Button label={t('deviceScreens.place.backToPlaces')} onPress={() => navigation.popTo('Places')} />
         ) : (
-          <Button label="Reintentar" onPress={reload} />
+          <Button label={t('common.retry')} onPress={reload} />
         )}
       </View>
     );
@@ -79,12 +81,14 @@ export const PlaceDeviceScreen: React.FC<Props> = ({ navigation, route }) => {
   const hint = device ? DEVICE_STATUS_HINTS[device.status] : null;
 
   return (
-    <PageContainer medium gap={theme.spacing.lg}>
-      <PageHeader back={{ label: 'Volver', onPress: () => navigation.goBack() }} title="Medidor" />
-      <Text style={eyebrowStyle}>Lugar</Text>
+    <PageContainer>
+      <PageHeader back={{ label: t('common.back'), onPress: () => navigation.goBack() }} title={t('deviceScreens.place.title')} />
+      {/* the title stays on the left; the content is centered in a 720 px column */}
+      <View style={formColumnStyle}>
+      <Text style={eyebrowStyle}>{t('deviceScreens.place.eyebrow')}</Text>
       <Text style={placeNameStyle}>{placeName}</Text>
 
-      {!!error && <Banner tone="warning" message={`No pudimos actualizar el estado. ${error.message}`} />}
+      {!!error && <Banner tone="warning" message={t('deviceScreens.place.updateFailed', { reason: error.message })} />}
 
       {device ? (
         <>
@@ -93,28 +97,28 @@ export const PlaceDeviceScreen: React.FC<Props> = ({ navigation, route }) => {
             <Banner
               tone={device.status === 'DISCONNECTED' ? 'warning' : 'info'}
               message={hint}
-              action={{ label: 'Configurar WiFi del medidor', onPress: goToWifi }}
+              action={{ label: t('deviceScreens.link.setupWifi'), onPress: goToWifi }}
             />
           )}
           <Button
-            label="Ver consumo y válvula"
+            label={t('deviceScreens.place.viewPanel')}
             icon={<Ionicons name="stats-chart" size={18} color={theme.colors.textOnPrimary} />}
             onPress={goToPanel}
           />
           <Button
-            label="Actualizar estado"
+            label={t('deviceScreens.place.refresh')}
             variant="secondary"
             icon={<Ionicons name="refresh" size={18} color={theme.colors.textPrimary} />}
             onPress={reload}
           />
-          <Text style={footnoteStyle}>El estado se actualiza solo cada 30 segundos.</Text>
+          <Text style={footnoteStyle}>{t('deviceScreens.place.autoRefresh')}</Text>
 
           <View style={dangerZoneStyle}>
-            <Text style={dangerTitleStyle}>Desvincular</Text>
+            <Text style={dangerTitleStyle}>{t('deviceScreens.place.unlinkTitle')}</Text>
             <Text style={dangerTextStyle}>
-              Úsalo si vas a cambiar el medidor de lugar o lo vas a reemplazar. El historial de consumo se conserva.
+              {t('deviceScreens.place.unlinkText')}
             </Text>
-            <Button label="Desvincular medidor" variant="danger" onPress={() => setConfirming(true)} />
+            <Button label={t('deviceScreens.place.unlinkButton')} variant="danger" onPress={() => setConfirming(true)} />
           </View>
         </>
       ) : (
@@ -122,13 +126,13 @@ export const PlaceDeviceScreen: React.FC<Props> = ({ navigation, route }) => {
           <View style={emptyIconStyle}>
             <Ionicons name="speedometer-outline" size={40} color={theme.colors.primary} />
           </View>
-          <Text style={emptyTitleStyle}>Este lugar aún no tiene medidor</Text>
+          <Text style={emptyTitleStyle}>{t('deviceScreens.place.emptyTitle')}</Text>
           <Text style={emptyTextStyle}>
-            Primero conecta el medidor a tu WiFi y después vincúlalo con el serial y el código de la etiqueta.
+            {t('deviceScreens.place.emptyText')}
           </Text>
-          <Button label="Empezar" onPress={goToLink} style={fullWidthStyle} />
+          <Button label={t('deviceScreens.place.start')} onPress={goToLink} style={fullWidthStyle} />
           <Button
-            label="Mi medidor ya está en el WiFi"
+            label={t('deviceScreens.place.alreadyOnWifi')}
             variant="ghost"
             onPress={() => navigation.navigate('LinkDevice', { placeId, placeName })}
             style={fullWidthStyle}
@@ -139,10 +143,10 @@ export const PlaceDeviceScreen: React.FC<Props> = ({ navigation, route }) => {
       <ConfirmDialog
         visible={confirming}
         tone="danger"
-        title="¿Desvincular el medidor?"
-        message={`El medidor dejará de enviar datos a "${placeName}". El historial de consumo del lugar se conserva.`}
-        confirmLabel="Sí, desvincular"
-        cancelLabel="No, mantenerlo"
+        title={t('deviceScreens.place.confirmTitle')}
+        message={t('deviceScreens.place.confirmBody', { name: placeName })}
+        confirmLabel={t('deviceScreens.place.confirmYes')}
+        cancelLabel={t('deviceScreens.place.confirmNo')}
         loading={unlinking}
         onConfirm={handleUnlink}
         onCancel={closeConfirm}
@@ -152,14 +156,16 @@ export const PlaceDeviceScreen: React.FC<Props> = ({ navigation, route }) => {
 
       <SuccessModal
         visible={unlinked}
-        message="El medidor se desvinculó del lugar."
+        message={t('deviceScreens.place.unlinked')}
         onDismiss={handleUnlinkedDismiss}
         autoCloseDuration={1500}
       />
+      </View>
     </PageContainer>
   );
 };
 
+const formColumnStyle: ViewStyle = { width: '100%', maxWidth: 720, alignSelf: 'center', gap: theme.spacing.lg };
 const screenStyle: ViewStyle = themed(() => ({ flex: 1, backgroundColor: theme.colors.background }));
 
 const contentStyle: ViewStyle = {

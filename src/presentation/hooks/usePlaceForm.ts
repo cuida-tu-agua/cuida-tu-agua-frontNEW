@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { geographyRepository } from '../../core/di/container';
+import i18n from '../../i18n';
 import { AppError } from '../../domain/common/AppError';
 import { City, Country, GeographyRepository, Subdivision } from '../../domain/geography/Geography';
 import { Place } from '../../domain/places/Place';
@@ -27,7 +28,7 @@ interface LoadingState {
 }
 
 const errorMessage = (error: unknown) =>
-  error instanceof AppError ? error.message : 'No se pudo cargar el catálogo.';
+  error instanceof AppError ? error.message : i18n.t('places.form.catalogFailed');
 
 
 export const usePlaceForm = (geography: GeographyRepository = geographyRepository) => {

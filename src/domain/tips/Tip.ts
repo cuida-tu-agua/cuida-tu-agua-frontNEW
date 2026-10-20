@@ -1,10 +1,15 @@
+import i18n from '../../i18n';
 export type TipCategory = 'RESIDENTIAL' | 'COMMERCIAL';
 
 export const TIP_CATEGORIES: TipCategory[] = ['RESIDENTIAL', 'COMMERCIAL'];
 
 export const CATEGORY_LABELS: Record<TipCategory, string> = {
-  RESIDENTIAL: 'Residencial',
-  COMMERCIAL: 'Comercial',
+  get RESIDENTIAL() {
+    return i18n.t('tips.categories.RESIDENTIAL');
+  },
+  get COMMERCIAL() {
+    return i18n.t('tips.categories.COMMERCIAL');
+  },
 };
 
 export const TITLE_MAX = 150;
@@ -68,13 +73,13 @@ export const validateTip = (form: TipForm): TipValidation => {
   const title = form.title.trim();
   const body = form.body.trim();
 
-  if (!title) errors.title = 'Escribe un título.';
-  else if (title.length > TITLE_MAX) errors.title = `El título tiene máximo ${TITLE_MAX} caracteres.`;
+  if (!title) errors.title = i18n.t('tips.validation.titleRequired');
+  else if (title.length > TITLE_MAX) errors.title = i18n.t('tips.validation.titleTooLong', { max: TITLE_MAX });
 
-  if (!body) errors.body = 'Escribe el consejo.';
-  else if (body.length > BODY_MAX) errors.body = `El consejo tiene máximo ${BODY_MAX} caracteres.`;
+  if (!body) errors.body = i18n.t('tips.validation.bodyRequired');
+  else if (body.length > BODY_MAX) errors.body = i18n.t('tips.validation.bodyTooLong', { max: BODY_MAX });
 
-  if (!form.category) errors.category = 'Elige para qué tipo de lugar es.';
+  if (!form.category) errors.category = i18n.t('tips.validation.categoryRequired');
 
   if (Object.keys(errors).length > 0 || !form.category) return { errors, value: null };
   return { errors, value: { title, body, category: form.category } };

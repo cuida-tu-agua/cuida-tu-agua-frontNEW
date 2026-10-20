@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { placeRepository, tariffRepository } from '../../core/di/container';
+import i18n from '../../i18n';
 import { AppError } from '../../domain/common/AppError';
 import { Place } from '../../domain/places/Place';
 import { PlaceRepository } from '../../domain/places/PlaceRepository';
@@ -78,9 +79,9 @@ export const usePlaceTariffs = (
     saving,
     notice,
     reload: load,
-    saveManual: (input: ManualTariffInput) => run(() => repository.setManual(placeId, input), 'Guardamos tu tarifa.'),
+    saveManual: (input: ManualTariffInput) => run(() => repository.setManual(placeId, input), i18n.t('tariff.screen.saved')),
     chooseStratum: (stratum: number) =>
-      run(() => repository.setCatalog(placeId, stratum), `Usaremos la tarifa de tu ciudad para el estrato ${stratum}.`),
+      run(() => repository.setCatalog(placeId, stratum), i18n.t('tariff.screen.stratumSaved', { n: stratum })),
     dismissNotice: () => setNotice(null),
     dismissError: () => setError(null),
   };

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Linking, ScrollView, Text, TextStyle, View, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -13,31 +14,18 @@ import { themed } from '../../styles/themeRuntime';
 
 type Props = NativeStackScreenProps<MainStackParamList, 'DeviceWifiSetup'>;
 
-const STEPS: { icon: keyof typeof Ionicons.glyphMap; text: string }[] = [
-  {
-    icon: 'power',
-    text: 'Enciende el medidor. Si es nuevo, su luz azul parpadea rápido. Si ya tenía otra red, mantén presionado el botón BOOT 5 segundos.',
-  },
-  {
-    icon: 'wifi',
-    text: 'En los ajustes WiFi de tu teléfono conéctate a la red "CuidaTuAgua-XXXX" (los 4 últimos dígitos del serial). La contraseña es el código de emparejamiento de la etiqueta, sin el guion.',
-  },
-  {
-    icon: 'globe-outline',
-    text: 'Si el teléfono dice "Sin internet", elige mantener la conexión. Luego toca "Abrir configuración".',
-  },
-  {
-    icon: 'home-outline',
-    text: 'Elige la red WiFi de tu casa (2.4 GHz), escribe su contraseña y toca "Guardar y conectar".',
-  },
-  {
-    icon: 'arrow-undo-outline',
-    text: 'Vuelve a conectar el teléfono a tu WiFi de siempre y regresa a esta app. En menos de un minuto el medidor aparecerá Conectado.',
-  },
+const formColumnStyle: ViewStyle = { width: '100%', maxWidth: 720, alignSelf: 'center', gap: theme.spacing.md };
+const STEPS: { icon: keyof typeof Ionicons.glyphMap; key: 'power' | 'connect' | 'noInternet' | 'home' | 'back' }[] = [
+  { icon: 'power', key: 'power' },
+  { icon: 'wifi', key: 'connect' },
+  { icon: 'globe-outline', key: 'noInternet' },
+  { icon: 'home-outline', key: 'home' },
+  { icon: 'arrow-undo-outline', key: 'back' },
 ];
 
 export const DeviceWifiSetupScreen: React.FC<Props> = ({ navigation, route }) => {
-  const { placeId, placeName = 'Mi lugar', next } = route.params;
+  const { t } = useTranslation();
+  const { placeId, placeName = t('dashboard.defaultPlaceName'), next } = route.params;
   const [openError, setOpenError] = useState(false);
 
   const openSetupPage = async () => {
@@ -55,39 +43,42 @@ export const DeviceWifiSetupScreen: React.FC<Props> = ({ navigation, route }) =>
       : navigation.goBack(); // PlaceDeviceScreen reloads the status on focus
 
   return (
-    <PageContainer medium gap={theme.spacing.md}>
-      <PageHeader back={{ label: 'Volver', onPress: () => navigation.goBack() }} title="WiFi del medidor" />
-      <Text style={titleStyle}>Conectar el medidor a tu WiFi</Text>
-      <Text style={mutedStyle}>Solo se hace una vez, o cuando cambies de router o de contraseña.</Text>
+    <PageContainer>
+      <PageHeader back={{ label: t('common.back'), onPress: () => navigation.goBack() }} title={t('deviceScreens.wifi.title')} />
+      {/* the title stays on the left; the content is centered in a 720 px column */}
+      <View style={formColumnStyle}>
+      <Text style={titleStyle}>{t('deviceScreens.wifi.heading')}</Text>
+      <Text style={mutedStyle}>{t('deviceScreens.wifi.once')}</Text>
 
       {STEPS.map((step, index) => (
-        <View key={step.text} style={stepStyle}>
+        <View key={step.key} style={stepStyle}>
           <View style={numberStyle}>
             <Text style={numberTextStyle}>{index + 1}</Text>
           </View>
           <Ionicons name={step.icon} size={20} color={theme.colors.primary} />
-          <Text style={stepTextStyle}>{step.text}</Text>
+          <Text style={stepTextStyle}>{t(`deviceScreens.wifi.steps.${step.key}`)}</Text>
         </View>
       ))}
 
       {openError && (
         <Banner
           tone="warning"
-          message={`No se pudo abrir el navegador. Abre ${DEVICE_SETUP_URL} en Safari o Chrome mientras estás conectado a la red del medidor.`}
+          message={t('deviceScreens.wifi.openError', { url: DEVICE_SETUP_URL })}
         />
       )}
 
       <Button
-        label="Abrir configuración del medidor"
+        label={t('deviceScreens.wifi.openSetup')}
         onPress={openSetupPage}
         icon={<Ionicons name="open-outline" size={20} color={theme.colors.textOnPrimary} />}
       />
-      <Button label={next === 'link' ? 'Listo, vincular medidor' : 'Listo'} variant="secondary" onPress={done} />
+      <Button label={next === 'link' ? t('deviceScreens.wifi.doneLink') : t('deviceScreens.wifi.done')} variant="secondary" onPress={done} />
 
       <Banner
         tone="info"
-        message="El medidor solo funciona con redes de 2.4 GHz. Si escribiste mal la contraseña, en un minuto vuelve a crear su red CuidaTuAgua para que lo intentes de nuevo."
+        message={t('deviceScreens.wifi.note')}
       />
+      </View>
     </PageContainer>
   );
 };

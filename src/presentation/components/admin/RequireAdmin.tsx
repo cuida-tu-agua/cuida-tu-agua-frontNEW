@@ -1,6 +1,7 @@
 import React from 'react';
 import { Text, TextStyle, View, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../../core/auth/AuthContext';
 import { isAdmin } from '../../../domain/admin/Admin';
 import { theme } from '../../styles/theme';
@@ -13,13 +14,14 @@ import { themed } from '../../styles/themeRuntime';
  */
 export const RequireAdmin: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
+  const { t } = useTranslation();
   if (isAdmin(user?.roles)) return <>{children}</>;
 
   return (
     <View style={centerStyle}>
       <Ionicons name="lock-closed-outline" size={44} color={theme.colors.textMuted} />
-      <Text style={titleStyle}>Solo para administradores</Text>
-      <Text style={textStyle}>Tu cuenta no tiene permisos para ver esta sección.</Text>
+      <Text style={titleStyle}>{t('adminCommon.requiredTitle')}</Text>
+      <Text style={textStyle}>{t('adminCommon.requiredText')}</Text>
     </View>
   );
 };

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Platform, RefreshControl, Text, TextStyle, View, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -17,16 +18,16 @@ import { themed } from '../../styles/themeRuntime';
 
 type Props = NativeStackScreenProps<MainStackParamList, 'Tips'>;
 
-const VIEW_OPTIONS: { value: TipsView; label: string }[] = [
-  { value: 'forYou', label: 'Para ti' },
-  { value: 'favorites', label: 'Mis favoritos' },
-];
-
 /**
  * HU-065: general water saving tips for a home or a business (not personalised), at least 3 different ones, and the ones the
  * user marked as favorite.
  */
-export const TipsScreen: React.FC<Props> = ({ route }) => {
+export const TipsScreen: React.FC<Props> = ({ navigation, route }) => {
+  const { t } = useTranslation();
+  const viewOptions: { value: TipsView; label: string }[] = [
+    { value: 'forYou', label: t('tips.forYou') },
+    { value: 'favorites', label: t('tips.favorites') },
+  ];
   const tips = useTips(route.params?.placeId);
   const { columns } = useLayout();
   // Web (Figma "Consejos favoritos"): only the ones you kept; the day's tips live in the panel of each place
@@ -38,7 +39,7 @@ export const TipsScreen: React.FC<Props> = ({ route }) => {
     return (
       <View style={centerStyle}>
         <ActivityIndicator size="large" color={theme.colors.primary} />
-        <Text style={mutedStyle}>Buscando consejos para ti...</Text>
+        <Text style={mutedStyle}>{t('tips.searching')}</Text>
       </View>
     );
   }
@@ -46,8 +47,8 @@ export const TipsScreen: React.FC<Props> = ({ route }) => {
   if (!tips.session) {
     return (
       <View style={centerStyle}>
-        <Banner tone="error" message={tips.error?.message ?? 'No pudimos cargar los consejos.'} />
-        <Button label="Reintentar" onPress={() => void tips.reload()} />
+        <Banner tone="error" message={tips.error?.message ?? t('tips.loadFailed')} />
+        <Button label={t('common.retry')} onPress={() => void tips.reload()} />
       </View>
     );
   }
@@ -60,14 +61,19 @@ export const TipsScreen: React.FC<Props> = ({ route }) => {
       refreshControl={<RefreshControl refreshing={tips.loading} onRefresh={() => void tips.reload()} tintColor={theme.colors.primary} />}
     >
       {isWeb ? (
-        <PageHeader title="Consejos favoritos" subtitle="Los consejos de ahorro que guardaste desde el panel de tus lugares." />
+        <PageHeader
+          // Opened from a place's panel: a way back to that same panel (no detour through "Mis lugares")
+          back={route.params?.placeId ? { label: t('tips.backToPanel'), onPress: () => navigation.goBack() } : undefined}
+          title={t('tips.favoritesTitle')}
+          subtitle={t('tips.favoritesSubtitle')}
+        />
       ) : (
         <>
-          <Text style={titleStyle}>Consejos para ahorrar agua</Text>
+          <Text style={titleStyle}>{t('tips.screenTitle')}</Text>
           <Text style={mutedStyle}>
-            Buenas prácticas para {CATEGORY_LABELS[tips.session.category] === 'Comercial' ? 'tu negocio' : 'tu hogar'}. Marca con el corazón los que quieras tener a la mano.
+            {tips.session.category === 'COMMERCIAL' ? t('tips.introBusiness') : t('tips.introHome')}
           </Text>
-          <SegmentedControl options={VIEW_OPTIONS} value={tips.view} onChange={tips.setView} />
+          <SegmentedControl options={viewOptions} value={tips.view} onChange={tips.setView} />
         </>
       )}
 
@@ -77,12 +83,10 @@ export const TipsScreen: React.FC<Props> = ({ route }) => {
         <View style={emptyStyle}>
           <Ionicons name={view === 'favorites' ? 'heart-outline' : 'bulb-outline'} size={44} color={theme.colors.textMuted} />
           <Text style={emptyTitleStyle}>
-            {view === 'favorites' ? 'Todavía no tienes favoritos' : 'Por ahora no hay consejos'}
+            {view === 'favorites' ? t('tips.noFavoritesTitle') : t('tips.noTipsTitle')}
           </Text>
           <Text style={mutedStyle}>
-            {view === 'favorites'
-              ? 'Toca el corazón de un consejo en el panel de tu lugar y lo encontrarás aquí.'
-              : 'Vuelve más tarde: estamos preparando nuevos consejos.'}
+            {view === 'favorites' ? t('tips.noFavoritesText') : t('tips.noTipsText')}
           </Text>
         </View>
       ) : (
@@ -97,7 +101,7 @@ export const TipsScreen: React.FC<Props> = ({ route }) => {
 
       {view === 'forYou' && tips.session.total > tips.tips.length && (
         <Text style={mutedStyle}>
-          Hoy te mostramos {tips.tips.length} de {tips.session.total} consejos. Mañana verás otros.
+          {t('tips.todayCount', { shown: tips.tips.length, total: tips.session.total })}
         </Text>
       )}
     </PageContainer>

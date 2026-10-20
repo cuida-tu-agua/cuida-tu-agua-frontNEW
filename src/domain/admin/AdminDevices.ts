@@ -1,21 +1,30 @@
+import i18n from '../../i18n';
 import { DeviceStatus } from '../devices/Device';
 
 /** Admin panel of meters (ms-device, ADMIN role). Dates arrive in ISO 8601, UTC. */
 export type AdminStatusFilter = 'ALL' | 'CONNECTED' | 'DISCONNECTED' | 'NEVER_REPORTED' | 'DECOMMISSIONED';
 export type AdminLinkFilter = 'ALL' | 'LINKED' | 'FREE';
 
+/** The label is a getter, so it follows the language active when it is read. */
+const option = <T extends string>(group: string, value: T): { value: T; label: string } => ({
+  value,
+  get label() {
+    return i18n.t(`admin.${group}.${value}`);
+  },
+});
+
 export const STATUS_FILTERS: { value: AdminStatusFilter; label: string }[] = [
-  { value: 'ALL', label: 'Todos' },
-  { value: 'CONNECTED', label: 'Conectados' },
-  { value: 'DISCONNECTED', label: 'Desconectados' },
-  { value: 'NEVER_REPORTED', label: 'Nunca han reportado' },
-  { value: 'DECOMMISSIONED', label: 'Dados de baja' },
+  option('statusFilter', 'ALL'),
+  option('statusFilter', 'CONNECTED'),
+  option('statusFilter', 'DISCONNECTED'),
+  option('statusFilter', 'NEVER_REPORTED'),
+  option('statusFilter', 'DECOMMISSIONED'),
 ];
 
 export const LINK_FILTERS: { value: AdminLinkFilter; label: string }[] = [
-  { value: 'ALL', label: 'Vinculados y libres' },
-  { value: 'LINKED', label: 'Vinculados' },
-  { value: 'FREE', label: 'Libres' },
+  option('linkFilter', 'ALL'),
+  option('linkFilter', 'LINKED'),
+  option('linkFilter', 'FREE'),
 ];
 
 export interface AdminDeviceQuery {
@@ -98,23 +107,29 @@ export interface FactoryDevice {
 export const MAX_BATCH = 50;
 
 export const ACTION_LABELS: Record<AdminAction, string> = {
-  REGISTERED: 'Registrado en fábrica',
-  CREDENTIALS_REGENERATED: 'Credenciales nuevas',
-  DECOMMISSIONED: 'Dado de baja',
+  get REGISTERED() {
+    return i18n.t('admin.action.REGISTERED');
+  },
+  get CREDENTIALS_REGENERATED() {
+    return i18n.t('admin.action.CREDENTIALS_REGENERATED');
+  },
+  get DECOMMISSIONED() {
+    return i18n.t('admin.action.DECOMMISSIONED');
+  },
 };
 
 export type AdminDeviceBadge = { label: string; tone: 'good' | 'warn' | 'bad' | 'neutral' };
 
 /** Decommissioned wins over the connection status: a device that was withdrawn is not "connected" whatever it reported. */
 export const badgeOf = (device: Pick<AdminDeviceRow, 'status' | 'decommissioned'>): AdminDeviceBadge => {
-  if (device.decommissioned) return { label: 'Dado de baja', tone: 'bad' };
+  if (device.decommissioned) return { label: i18n.t('admin.badge.decommissioned'), tone: 'bad' };
   switch (device.status) {
     case 'CONNECTED':
-      return { label: 'Conectado', tone: 'good' };
+      return { label: i18n.t('admin.badge.connected'), tone: 'good' };
     case 'DISCONNECTED':
-      return { label: 'Desconectado', tone: 'warn' };
+      return { label: i18n.t('admin.badge.disconnected'), tone: 'warn' };
     default:
-      return { label: 'Nunca ha reportado', tone: 'neutral' };
+      return { label: i18n.t('admin.badge.neverReported'), tone: 'neutral' };
   }
 };
 
@@ -123,9 +138,9 @@ export type CountParseResult = { ok: true; count: number } | { ok: false; error:
 /** The quantity field of the factory form: a whole number from 1 to 50. */
 export const parseCount = (text: string): CountParseResult => {
   const value = text.trim();
-  if (!/^\d+$/.test(value)) return { ok: false, error: `Escribe un número entero de 1 a ${MAX_BATCH}.` };
+  if (!/^\d+$/.test(value)) return { ok: false, error: i18n.t('admin.count.integer', { max: MAX_BATCH }) };
   const count = Number(value);
-  return count >= 1 && count <= MAX_BATCH ? { ok: true, count } : { ok: false, error: `Debe ser de 1 a ${MAX_BATCH}.` };
+  return count >= 1 && count <= MAX_BATCH ? { ok: true, count } : { ok: false, error: i18n.t('admin.count.range', { max: MAX_BATCH }) };
 };
 
 /** The serial typed by hand, like the server normalizes it ("sw-esp32-000100" → "SW-ESP32-000100"); null if it is not valid. */

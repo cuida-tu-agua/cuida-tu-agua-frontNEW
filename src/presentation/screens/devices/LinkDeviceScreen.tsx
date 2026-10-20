@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -31,15 +32,13 @@ import { themed } from '../../styles/themeRuntime';
 
 type Props = NativeStackScreenProps<MainStackParamList, 'LinkDevice'>;
 
-const STEPS = [
-  'Instala el medidor y conéctalo a la corriente.',
-  'Conéctalo a tu WiFi (la luz azul queda fija cuando está en línea).',
-  'Escribe el serial y el código que vienen en la etiqueta.',
-];
-
+const formColumnStyle: ViewStyle = { width: '100%', maxWidth: 720, alignSelf: 'center' };
 /** HU-012: link a meter to the place (serial + pairing code printed on the box). */
+const STEP_KEYS = ['install', 'wifi', 'label'] as const;
+
 export const LinkDeviceScreen: React.FC<Props> = ({ navigation, route }) => {
-  const { placeId, placeName = 'Mi lugar' } = route.params;
+  const { t } = useTranslation();
+  const { placeId, placeName = t('dashboard.defaultPlaceName') } = route.params;
 
   // Same rules as the domain (and as DeviceSecrets in ms-devices)
   const form = useForm(EMPTY_LINK_DEVICE_FORM, {
@@ -82,18 +81,20 @@ export const LinkDeviceScreen: React.FC<Props> = ({ navigation, route }) => {
 
   return (
     <KeyboardAvoidingView style={screenStyle} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <PageContainer medium>
-        <PageHeader back={{ label: 'Volver', onPress: () => navigation.goBack() }} title="Vincular medidor" />
-        <Text style={titleStyle}>Vincular medidor a {placeName}</Text>
+      <PageContainer>
+        <PageHeader back={{ label: t('common.back'), onPress: () => navigation.goBack() }} title={t('deviceScreens.link.title')} />
+      {/* the title stays on the left; the content is centered in a 720 px column */}
+      <View style={formColumnStyle}>
+        <Text style={titleStyle}>{t('deviceScreens.link.heading', { name: placeName })}</Text>
 
         <View style={stepsStyle}>
-          <Text style={stepsTitleStyle}>Antes de empezar</Text>
-          {STEPS.map((step, index) => (
+          <Text style={stepsTitleStyle}>{t('deviceScreens.link.stepsTitle')}</Text>
+          {STEP_KEYS.map((step, index) => (
             <View key={step} style={stepRowStyle}>
               <View style={stepNumberStyle}>
                 <Text style={stepNumberTextStyle}>{index + 1}</Text>
               </View>
-              <Text style={stepTextStyle}>{step}</Text>
+              <Text style={stepTextStyle}>{t(`deviceScreens.link.steps.${step}`)}</Text>
             </View>
           ))}
         </View>
@@ -105,14 +106,14 @@ export const LinkDeviceScreen: React.FC<Props> = ({ navigation, route }) => {
             onClose={() => setBannerMessage(null)}
             action={
               offlineError
-                ? { label: 'Configurar WiFi del medidor', onPress: () => navigation.navigate('DeviceWifiSetup', { placeId, placeName }) }
+                ? { label: t('deviceScreens.link.setupWifi'), onPress: () => navigation.navigate('DeviceWifiSetup', { placeId, placeName }) }
                 : undefined
             }
           />
         )}
 
         <Input
-          label="Serial del medidor"
+          label={t('deviceScreens.link.serialLabel')}
           placeholder="SW-ESP32-000001"
           value={form.values.serialNumber}
           onChangeText={(text) => form.setValue('serialNumber', formatSerialInput(text))}
@@ -125,13 +126,13 @@ export const LinkDeviceScreen: React.FC<Props> = ({ navigation, route }) => {
         />
 
         <Input
-          label="Código de emparejamiento"
+          label={t('deviceScreens.link.pairingLabel')}
           placeholder="ABCD-EFGH"
           value={form.values.pairingCode}
           onChangeText={(text) => form.setValue('pairingCode', formatPairingCodeInput(text))}
           onBlur={() => form.blur('pairingCode')}
           error={form.errors.pairingCode}
-          hint="8 caracteres. No usa 0, O, 1, I ni L."
+          hint={t('deviceScreens.link.pairingHint')}
           autoCapitalize="characters"
           maxLength={9}
           editable={!submitting}
@@ -139,12 +140,13 @@ export const LinkDeviceScreen: React.FC<Props> = ({ navigation, route }) => {
           onSubmitEditing={handleSubmit}
         />
 
-        <Button label="Vincular medidor" onPress={handleSubmit} loading={submitting} />
-      </PageContainer>
+        <Button label={t('deviceScreens.link.title')} onPress={handleSubmit} loading={submitting} />
+        </View>
+    </PageContainer>
 
       <SuccessModal
         visible={linked}
-        message="Medidor vinculado. Ya puedes ver su estado."
+        message={t('deviceScreens.link.linked')}
         onDismiss={handleLinkedDismiss}
         autoCloseDuration={1500}
       />

@@ -1,5 +1,8 @@
+import { changeLanguage } from '../../../i18n';
 import {
   daysLeftLabel,
+  formatPercent,
+  GOAL_STATUS_LABELS,
   goalInputValue,
   GoalProgress,
   MAX_GOAL_LITERS,
@@ -88,5 +91,42 @@ describe('goal texts and bar', () => {
     expect(overLiters(goal())).toBe(0);
     expect(overLiters(goal({ consumedLiters: 11000, status: 'EXCEEDED' }))).toBe(1500);
     expect(overLiters(goal({ hasGoal: false, targetLiters: null }))).toBe(0);
+  });
+});
+
+describe('goals in English (i18n)', () => {
+  beforeEach(async () => {
+    await changeLanguage('en');
+  });
+  afterAll(async () => {
+    await changeLanguage('es');
+  });
+
+  it('reads numbers typed the English way', () => {
+    expect(parseVolumeInput('12,000')).toBe(12000);
+    expect(parseVolumeInput('12.5')).toBe(12.5);
+    expect(parseVolumeInput('1,234.5')).toBe(1234.5);
+    expect(parseVolumeInput('1,2')).toBeNull();          // not a thousands group
+    expect(validateGoalInput('12', 'CUBIC_METERS')).toEqual({ error: null, liters: 12000 });
+    expect(validateGoalInput('0', 'LITERS').error).toBe('The goal must be greater than zero.');
+  });
+
+  it('shows the saved goal with a dot as decimal mark', () => {
+    expect(goalInputValue(12500, 'CUBIC_METERS')).toBe('12.5');
+  });
+
+  it('names the month, counts the days and writes the percentage in English', () => {
+    expect(monthName('2026-10-01')).toBe('October');
+    expect(daysLeftLabel(1)).toBe('1 day left this month');
+    expect(daysLeftLabel(12)).toBe('12 days left this month');
+    expect(formatPercent(87.5)).toBe('87.5%');
+    expect(GOAL_STATUS_LABELS.WARNING).toBe('Close to the goal');
+  });
+});
+
+describe('goal percentage in Spanish', () => {
+  it('uses a comma and a space before %', () => {
+    expect(formatPercent(87.5)).toBe('87,5 %');
+    expect(formatPercent(null)).toBe('0 %');
   });
 });

@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   ActivityIndicator,
   FlatList,
@@ -14,13 +15,11 @@ import { useFocusEffect } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import * as Haptics from 'expo-haptics';
 import { useAuth } from '../../../core/auth/AuthContext';
 import { placeRepository } from '../../../core/di/container';
 import { avatarUri } from '../../../config/api';
 import { AppError } from '../../../domain/common/AppError';
 import { Place } from '../../../domain/places/Place';
-import { markSelected } from '../../../domain/places/selection';
 import { toAppError } from '../../../infrastructure/http/httpError';
 import { Avatar } from '../../components/common/Avatar';
 import { Banner } from '../../components/common/Banner';
@@ -37,6 +36,7 @@ import { themed } from '../../styles/themeRuntime';
 type Props = NativeStackScreenProps<MainStackParamList, 'Places'>;
 
 export const PlacesScreen: React.FC<Props> = ({ navigation, route }) => {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const { user } = useAuth();
   const { columns } = useLayout();
@@ -44,8 +44,6 @@ export const PlacesScreen: React.FC<Props> = ({ navigation, route }) => {
   const [places, setPlaces] = useState<Place[] | null>(null); // null = first load
   const [loadError, setLoadError] = useState<AppError | null>(null);
   const [refreshing, setRefreshing] = useState(false);
-  const [selectingId, setSelectingId] = useState<string | null>(null);
-  const [actionError, setActionError] = useState<string | null>(null);
   const notice = route.params?.notice;
 
   useFocusEffect(
@@ -79,38 +77,21 @@ export const PlacesScreen: React.FC<Props> = ({ navigation, route }) => {
     }
   };
 
-  const select = async (place: Place) => {
-    if (!places || selectingId) return;
-    const previous = places;
-    setActionError(null);
-    setSelectingId(place.id);
-    setPlaces(markSelected(places, place.id)); // optimistic: the mark moves right away
-    Haptics.selectionAsync().catch(() => undefined);
-    try {
-      await placeRepository.select(place.id);
-    } catch (error) {
-      setPlaces(previous); // undo
-      setActionError(`No pudimos seleccionar "${place.name}". ${toAppError(error).message}`);
-    } finally {
-      setSelectingId(null);
-    }
-  };
-
   const isWeb = Platform.OS === 'web';
   // Web: the header, the empty state and the list share one centered column, the same width as Notificaciones
   const webColumn = isWeb ? listContentStyle() : undefined;
-  const welcome = places && places.length > 0 ? 'Elige el lugar que quieres monitorear o abre su panel para ver el consumo y la válvula.' : 'Empecemos a cuidar el agua.';
+  const welcome = places && places.length > 0 ? t('places.list.welcome') : t('places.list.welcomeEmpty');
 
   // Web: the Figma page header inside the content (the menu already has the bell and the profile). Phone: the bar with bell + avatar.
   const webHeader = (
     <PageHeader
-      caption={`Hola, ${user?.firstName ?? ''}`}
-      title="Mis lugares"
+      caption={t('places.list.greeting', { name: user?.firstName ?? '' })}
+      title={t('places.list.title')}
       subtitle={welcome}
       right={
         places && places.length > 0 ? (
           <Button
-            label="Registrar lugar"
+            label={t('places.list.register')}
             size="medium"
             onPress={() => navigation.navigate('CreatePlace')}
             icon={<Ionicons name="add" size={20} color={theme.colors.textOnPrimary} />}
@@ -123,16 +104,16 @@ export const PlacesScreen: React.FC<Props> = ({ navigation, route }) => {
   const header = isWeb ? null : (
     <View style={[headerStyle, { paddingTop: insets.top + theme.spacing.lg }]}>
       <View style={headerTextStyle}>
-        <Text style={helloStyle}>Hola, {user?.firstName ?? ''}</Text>
+        <Text style={helloStyle}>{t('places.list.greeting', { name: user?.firstName ?? '' })}</Text>
         <Text style={subtitleStyle}>
-          {places && places.length > 0 ? 'Elige el lugar que quieres monitorear' : 'Empecemos a cuidar el agua'}
+          {places && places.length > 0 ? t('places.list.pickOne') : t('places.list.welcomeEmpty').replace(/\.$/, '')}
         </Text>
       </View>
       <NotificationBell onPress={() => navigation.navigate('Notifications')} />
       <TouchableOpacity
         onPress={() => navigation.navigate('Profile')}
         accessibilityRole="button"
-        accessibilityLabel="Abrir mi perfil"
+        accessibilityLabel={t('places.list.openProfile')}
         hitSlop={8}
       >
         {user && <Avatar uri={avatarUri(user.avatarUrl)} firstName={user.firstName} lastName={user.lastName} size={44} />}
@@ -143,7 +124,6 @@ export const PlacesScreen: React.FC<Props> = ({ navigation, route }) => {
   const banners = (
     <>
       {!!notice && <Banner tone="success" message={notice} onClose={() => navigation.setParams({ notice: undefined })} />}
-      {!!actionError && <Banner tone="error" message={actionError} onClose={() => setActionError(null)} />}
     </>
   );
 
@@ -156,12 +136,12 @@ export const PlacesScreen: React.FC<Props> = ({ navigation, route }) => {
           {loadError ? (
             <>
               <Banner tone="error" message={loadError.message} />
-              <Button label="Reintentar" onPress={refresh} loading={refreshing} />
+              <Button label={t('common.retry')} onPress={refresh} loading={refreshing} />
             </>
           ) : (
             <>
               <ActivityIndicator size="large" color={theme.colors.primary} />
-              <Text style={mutedStyle}>Cargando tus lugares...</Text>
+              <Text style={mutedStyle}>{t('places.list.loading')}</Text>
             </>
           )}
         </View>
@@ -175,12 +155,12 @@ export const PlacesScreen: React.FC<Props> = ({ navigation, route }) => {
         <View style={emptyIconStyle}>
           <Ionicons name="water-outline" size={isWeb ? 34 : 48} color={theme.colors.primary} />
         </View>
-        <Text style={emptyTitleStyle}>Aún no tienes lugares</Text>
+        <Text style={emptyTitleStyle}>{t('places.list.emptyTitle')}</Text>
         <Text style={emptyTextStyle}>
-          Registra tu casa, tu local o tu finca. Después podrás vincular un medidor y ver cuánta agua consumes.
+          {t('places.list.emptyText')}
         </Text>
         <Button
-          label="Registrar mi primer lugar"
+          label={t('places.list.registerFirst')}
           size={isWeb ? 'medium' : 'large'}
           onPress={() => navigation.navigate('CreatePlace')}
           style={isWeb ? undefined : fullWidthStyle}
@@ -223,9 +203,9 @@ export const PlacesScreen: React.FC<Props> = ({ navigation, route }) => {
           <>
             {isWeb && webHeader}
             {banners}
-            {!!loadError && <Banner tone="warning" message={`No pudimos actualizar la lista. ${loadError.message}`} />}
+            {!!loadError && <Banner tone="warning" message={t('places.list.refreshFailed', { reason: loadError.message })} />}
             <Text style={isWeb ? webCountStyle : sectionTitleStyle}>
-              {isWeb ? `${places.length} ${places.length === 1 ? 'lugar' : 'lugares'}` : `Mis lugares (${places.length})`}
+              {isWeb ? t('places.list.count', { count: places.length }) : t('places.list.mobileTitle', { count: places.length })}
             </Text>
           </>
         }
@@ -233,18 +213,15 @@ export const PlacesScreen: React.FC<Props> = ({ navigation, route }) => {
           <View style={columns > 1 ? { flex: 1, maxWidth: `${100 / columns}%` } : undefined}>
             <PlaceCard
               place={item}
-              onSelect={() => select(item)}
               onEdit={() => navigation.navigate('EditPlace', { placeId: item.id })}
               onOpenPanel={() => navigation.navigate('PlaceDashboard', { placeId: item.id, placeName: item.name })}
-              selecting={selectingId === item.id}
-              disabled={!!selectingId}
             />
           </View>
         )}
         ListFooterComponent={
           isWeb ? null : (
           <Button
-            label="Registrar otro lugar"
+            label={t('places.list.registerAnother')}
             variant="secondary"
             icon={<Ionicons name="add" size={20} color={theme.colors.textPrimary} />}
             onPress={() => navigation.navigate('CreatePlace')}

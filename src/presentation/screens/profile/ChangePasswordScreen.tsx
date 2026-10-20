@@ -14,16 +14,18 @@ import { MainStackParamList } from '../../navigation/types';
 import { theme } from '../../styles/theme';
 import { validatePassword, validatePasswordConfirmation, validateRequired } from '../../utils/validation';
 import { themed } from '../../styles/themeRuntime';
+import { useTranslation } from 'react-i18next';
 
 type Props = NativeStackScreenProps<MainStackParamList, 'ChangePassword'>;
 
 export const ChangePasswordScreen: React.FC<Props> = ({ navigation }) => {
+  const { t } = useTranslation();
   const form = useForm(
     { currentPassword: '', newPassword: '', confirmPassword: '' },
     {
-      currentPassword: (v) => validateRequired(v, 'Escribe tu contraseña actual.'),
+      currentPassword: (v) => validateRequired(v, t('changePassword.currentRequired')),
       newPassword: (v, all) =>
-        validatePassword(v) ?? (v === all.currentPassword ? 'La nueva contraseña debe ser diferente a la actual.' : undefined),
+        validatePassword(v) ?? (v === all.currentPassword ? t('changePassword.mustDiffer') : undefined),
       confirmPassword: (v, all) => validatePasswordConfirmation(all.newPassword, v),
     },
   );
@@ -54,19 +56,19 @@ export const ChangePasswordScreen: React.FC<Props> = ({ navigation }) => {
   return (
     <KeyboardAvoidingView style={screenStyle} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <PageContainer>
-        <PageHeader back={{ label: 'Volver', onPress: () => navigation.goBack() }} title="Cambiar contraseña" />
+        <PageHeader back={{ label: t('common.back'), onPress: () => navigation.goBack() }} title={t('changePassword.title')} />
         {/* the title stays on the left; the form is centered in a 720 px column */}
         <View style={formColumnStyle}>
         {bannerMessage && <Banner tone="error" message={bannerMessage} onClose={() => setBannerMessage(null)} />}
 
         <PasswordField
-          label="Contraseña actual"
+          label={t('changePassword.currentLabel')}
           value={values.currentPassword}
           onChangeText={(t) => setValue('currentPassword', t)}
           error={errors.currentPassword}
         />
         <PasswordField
-          label="Contraseña nueva"
+          label={t('changePassword.newLabel')}
           purpose="new"
           value={values.newPassword}
           onChangeText={(t) => setValue('newPassword', t)}
@@ -75,7 +77,7 @@ export const ChangePasswordScreen: React.FC<Props> = ({ navigation }) => {
         />
         <PasswordStrengthMeter password={values.newPassword} />
         <PasswordField
-          label="Confirmar contraseña nueva"
+          label={t('changePassword.confirmLabel')}
           purpose="new"
           value={values.confirmPassword}
           onChangeText={(t) => setValue('confirmPassword', t)}
@@ -83,13 +85,13 @@ export const ChangePasswordScreen: React.FC<Props> = ({ navigation }) => {
           error={errors.confirmPassword}
         />
 
-        <Button label="Cambiar contraseña" onPress={save} loading={saving} />
+        <Button label={t('changePassword.title')} onPress={save} loading={saving} />
         </View>
       </PageContainer>
 
       <SuccessModal
         visible={done}
-        message="Tu contraseña cambió. Te enviamos un correo de aviso."
+        message={t('changePassword.done')}
         onDismiss={() => navigation.goBack()}
         autoCloseDuration={1800}
       />

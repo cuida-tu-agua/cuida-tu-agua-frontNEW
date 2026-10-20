@@ -1,3 +1,5 @@
+import i18n from '../../i18n';
+
 /** Account state as an administrator sees it (HU-059). A temporary lock after failed logins is still ACTIVE. */
 export type UserStatus = 'ACTIVE' | 'BLOCKED' | 'UNVERIFIED';
 
@@ -67,24 +69,38 @@ export interface PlatformMetrics {
 export const ADMIN_ROLE = 'ADMIN';
 
 /** What the Rol column says: an account that has the ADMIN role is an administrator, any other is a user. */
-export const roleLabel = (roles: readonly string[] | undefined | null): 'Administrador' | 'Usuario' =>
-  isAdmin(roles) ? 'Administrador' : 'Usuario';
+export const roleLabel = (roles: readonly string[] | undefined | null): string =>
+  i18n.t(isAdmin(roles) ? 'admin.role.ADMIN' : 'admin.role.USER');
 
 export const isAdmin = (roles: readonly string[] | undefined | null): boolean => !!roles && roles.includes(ADMIN_ROLE);
 
+/** Getters, so the text follows the language active when it is read. */
 export const STATUS_LABELS: Record<UserStatus, string> = {
-  ACTIVE: 'Activa',
-  BLOCKED: 'Bloqueada',
-  UNVERIFIED: 'Sin verificar',
+  get ACTIVE() {
+    return i18n.t('admin.userStatus.ACTIVE');
+  },
+  get BLOCKED() {
+    return i18n.t('admin.userStatus.BLOCKED');
+  },
+  get UNVERIFIED() {
+    return i18n.t('admin.userStatus.UNVERIFIED');
+  },
 };
 
 export type StatusFilter = UserStatus | 'ALL';
 
+const statusFilter = (value: StatusFilter): { value: StatusFilter; label: string } => ({
+  value,
+  get label() {
+    return i18n.t(`admin.userFilter.${value}`);
+  },
+});
+
 export const STATUS_FILTERS: { value: StatusFilter; label: string }[] = [
-  { value: 'ALL', label: 'Todas' },
-  { value: 'ACTIVE', label: 'Activas' },
-  { value: 'BLOCKED', label: 'Bloqueadas' },
-  { value: 'UNVERIFIED', label: 'Sin verificar' },
+  statusFilter('ALL'),
+  statusFilter('ACTIVE'),
+  statusFilter('BLOCKED'),
+  statusFilter('UNVERIFIED'),
 ];
 
 export const SEARCH_MAX = 100;
@@ -99,19 +115,20 @@ export const userAction = (user: Pick<AdminUser, 'id' | 'status'>, adminId: stri
   return user.status === 'BLOCKED' ? 'unblock' : 'block';
 };
 
-/** "1–20 de 54", "0 resultados". Pages start at 0 in the API. */
+/** "1–20 de 54" / "1–20 of 54", "0 resultados" / "0 results". Pages start at 0 in the API. */
 export const rangeLabel = (page: Page<unknown>): string => {
-  if (page.totalItems === 0) return '0 resultados';
+  if (page.totalItems === 0) return i18n.t('admin.noResults');
   const from = page.page * page.size + 1;
   const to = Math.min(from + page.items.length - 1, page.totalItems);
-  return `${from}–${to} de ${page.totalItems}`;
+  return i18n.t('admin.range', { from, to, total: page.totalItems });
 };
 
 /** Share of active ones as a whole percent for the bars of the dashboard (0 when there is nothing). */
 export const percent = (part: number, total: number): number =>
   total <= 0 ? 0 : Math.max(0, Math.min(100, Math.round((part / total) * 100)));
 
-export const SECTION_LABELS: Record<string, string> = { places: 'Lugares', devices: 'Dispositivos' };
+const SECTION_KEYS = ['places', 'devices'];
 
-/** Names, in Spanish, of the sections that did not answer. */
-export const unavailableLabels = (names: string[]): string[] => names.map((n) => SECTION_LABELS[n] ?? n);
+/** Names, in the current language, of the sections that did not answer. */
+export const unavailableLabels = (names: string[]): string[] =>
+  names.map((n) => (SECTION_KEYS.includes(n) ? i18n.t(`admin.section.${n}`) : n));

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { formatVolume, unitSymbol } from '../../../domain/consumption/consumptionFormat';
-import { goalInputValue, GoalProgress, monthName, validateGoalInput } from '../../../domain/goals/Goal';
+import { goalInputValue, goalPlaceholder, GoalProgress, monthName, validateGoalInput } from '../../../domain/goals/Goal';
 import { MeasurementUnit } from '../../../domain/places/Place';
 import { toAppError } from '../../../infrastructure/http/httpError';
 import { Banner } from '../common/Banner';
@@ -19,6 +20,7 @@ interface GoalDialogProps {
 
 /** HU-023: set or change the goal of the current month, typed in the unit of the place. */
 export const GoalDialog: React.FC<GoalDialogProps> = ({ visible, goal, unit, save, onDone, onCancel }) => {
+  const { t } = useTranslation();
   const [text, setText] = useState('');
   const [fieldError, setFieldError] = useState<string | undefined>(undefined);
   const [error, setError] = useState<string | null>(null);
@@ -57,23 +59,22 @@ export const GoalDialog: React.FC<GoalDialogProps> = ({ visible, goal, unit, sav
     }
   };
 
-  const month = goal ? monthName(goal.monthStart) : 'este mes';
+  const month = (goal && monthName(goal.monthStart)) || t('goals.thisMonth');
+  const soFar = goal ? t('goals.dialogSoFar', { consumed: formatVolume(goal.consumedLiters, unit) }) : '';
 
   return (
     <ConfirmDialog
       visible={visible}
-      title={editing ? 'Cambiar la meta' : 'Definir la meta'}
-      message={`¿Cuánta agua quieres gastar como máximo en ${month}? ${
-        goal ? `Hasta ahora van ${formatVolume(goal.consumedLiters, unit)}.` : ''
-      }`.trim()}
-      confirmLabel="Guardar meta"
+      title={editing ? t('goals.dialogTitleEdit') : t('goals.dialogTitleNew')}
+      message={`${t('goals.dialogQuestion', { month })} ${soFar}`.trim()}
+      confirmLabel={t('goals.save')}
       loading={busy}
       onConfirm={submit}
       onCancel={onCancel}
     >
       <Input
-        label={`Meta del mes (${unitSymbol(unit)})`}
-        placeholder={unit === 'CUBIC_METERS' ? 'Por ejemplo 12' : unit === 'GALLONS' ? 'Por ejemplo 3.000' : 'Por ejemplo 12.000'}
+        label={t('goals.fieldLabel', { unit: unitSymbol(unit) })}
+        placeholder={goalPlaceholder(unit)}
         value={text}
         onChangeText={(value) => {
           setText(value);

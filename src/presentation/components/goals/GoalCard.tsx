@@ -1,10 +1,13 @@
 import React from 'react';
 import { ActivityIndicator, Text, TextStyle, View, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
+import { formatNumber } from '../../../i18n/format';
 import { AppError } from '../../../domain/common/AppError';
 import { formatVolume } from '../../../domain/consumption/consumptionFormat';
 import {
   daysLeftLabel,
+  formatPercent,
   GOAL_STATUS_LABELS,
   GoalProgress,
   GoalStatus,
@@ -41,6 +44,7 @@ const statusColors = (status: GoalStatus) =>
  * with a goal it shows "used of goal", a bar that turns yellow at 80 % and red at 100 %, and the days left.
  */
 export const GoalCard: React.FC<GoalCardProps> = ({ goal, loading, error, unit, onEdit }) => {
+  const { t } = useTranslation();
   const month = goal ? monthName(goal.monthStart) : '';
 
   return (
@@ -49,7 +53,7 @@ export const GoalCard: React.FC<GoalCardProps> = ({ goal, loading, error, unit, 
         <View style={iconStyle}>
           <Ionicons name="flag-outline" size={22} color={theme.colors.primary} />
         </View>
-        <Text style={titleStyle}>{month ? `Meta de ${month}` : 'Meta del mes'}</Text>
+        <Text style={titleStyle}>{month ? t('goals.titleMonth', { month }) : t('goals.title')}</Text>
         {goal?.hasGoal && goal.status && (
           <View style={[pillStyle, { backgroundColor: statusColors(goal.status).bg, borderColor: statusColors(goal.status).fg }]}>
             <Text style={pillTextStyle}>{GOAL_STATUS_LABELS[goal.status]}</Text>
@@ -57,34 +61,37 @@ export const GoalCard: React.FC<GoalCardProps> = ({ goal, loading, error, unit, 
         )}
       </View>
 
-      {!!error && <Banner tone="warning" message={`No pudimos consultar la meta. ${error.message}`} />}
+      {!!error && <Banner tone="warning" message={t('goals.failed', { reason: error.message })} />}
 
       {!goal ? (
-        <View style={centerStyle}>{loading ? <ActivityIndicator color={theme.colors.primary} /> : <Text style={mutedStyle}>Sin datos</Text>}</View>
+        <View style={centerStyle}>
+          {loading ? <ActivityIndicator color={theme.colors.primary} /> : <Text style={mutedStyle}>{t('consumption.noData')}</Text>}
+        </View>
       ) : !goal.hasGoal || goal.targetLiters === null ? (
         <View style={inviteStyle}>
-          <Text style={inviteTitleStyle}>Aún no tienes una meta para {month}</Text>
-          <Text style={mutedStyle}>
-            Ponte un límite de agua para el mes y te mostramos cuánto llevas. Este mes van {formatVolume(goal.consumedLiters, unit)}.
-          </Text>
-          <Button label="Definir meta" onPress={onEdit} size="medium" />
+          <Text style={inviteTitleStyle}>{t('goals.noGoalTitle', { month })}</Text>
+          <Text style={mutedStyle}>{t('goals.noGoalText', { consumed: formatVolume(goal.consumedLiters, unit) })}</Text>
+          <Button label={t('goals.define')} onPress={onEdit} size="medium" />
         </View>
       ) : (
         <>
           <View
             style={amountRowStyle}
             accessible
-            accessibilityLabel={`Llevas ${formatVolume(goal.consumedLiters, unit)} de ${formatVolume(goal.targetLiters, unit)}`}
+            accessibilityLabel={t('goals.usedA11y', {
+              consumed: formatVolume(goal.consumedLiters, unit),
+              target: formatVolume(goal.targetLiters, unit),
+            })}
           >
             <Text style={amountStyle}>{formatVolume(goal.consumedLiters, unit)}</Text>
-            <Text style={ofStyle}>de {formatVolume(goal.targetLiters, unit)}</Text>
+            <Text style={ofStyle}>{t('goals.usedOf', { target: formatVolume(goal.targetLiters, unit) })}</Text>
           </View>
 
           <View
             style={trackStyle}
             accessibilityRole="progressbar"
             accessibilityValue={{ min: 0, max: 100, now: Math.min(goal.percentage ?? 0, 100) }}
-            accessibilityLabel={`${goal.percentage ?? 0} % de la meta`}
+            accessibilityLabel={t('goals.percentA11y', { value: formatNumber(goal.percentage ?? 0, 1) })}
           >
             <View
               style={[
@@ -98,17 +105,17 @@ export const GoalCard: React.FC<GoalCardProps> = ({ goal, loading, error, unit, 
           </View>
 
           <View style={rowStyle}>
-            <Text style={percentStyle}>{(goal.percentage ?? 0).toLocaleString('es-CO', { maximumFractionDigits: 1 })} %</Text>
+            <Text style={percentStyle}>{formatPercent(goal.percentage)}</Text>
             <Text style={mutedStyle}>{daysLeftLabel(goal.daysLeft)}</Text>
           </View>
 
           <Text style={detailStyle}>
             {goal.status === 'EXCEEDED'
-              ? `Te pasaste por ${formatVolume(overLiters(goal), unit)}.`
-              : `Te quedan ${formatVolume(goal.remainingLiters ?? 0, unit)} para llegar a la meta.`}
+              ? t('goals.over', { volume: formatVolume(overLiters(goal), unit) })
+              : t('goals.remaining', { volume: formatVolume(goal.remainingLiters ?? 0, unit) })}
           </Text>
 
-          <Button label="Cambiar meta" onPress={onEdit} variant="secondary" size="small" style={{ alignSelf: 'flex-start' }} />
+          <Button label={t('goals.change')} onPress={onEdit} variant="secondary" size="small" style={{ alignSelf: 'flex-start' }} />
         </>
       )}
     </Card>

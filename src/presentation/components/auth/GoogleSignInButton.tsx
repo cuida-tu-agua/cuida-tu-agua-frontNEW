@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Text, TextStyle, View, ViewStyle } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { FontAwesome } from '@expo/vector-icons';
 import { useAuth } from '../../../core/auth/AuthContext';
 import { GoogleResult, openGoogleSignIn, takeWebGoogleResult } from '../../../core/auth/googleSignIn';
@@ -20,6 +21,7 @@ interface Props {
  * back from Google with ?google_code=... in the address.
  */
 export const GoogleSignInButton: React.FC<Props> = ({ onError }) => {
+  const { t } = useTranslation();
   const { loginWithGoogleCode } = useAuth();
   // Web: the page may be loading again after Google, with the result in the address (read once, then removed)
   const [returning] = useState(takeWebGoogleResult);
@@ -71,11 +73,11 @@ export const GoogleSignInButton: React.FC<Props> = ({ onError }) => {
     <View>
       <View style={dividerStyle}>
         <View style={lineStyle} />
-        <Text style={dividerTextStyle}>o</Text>
+        <Text style={dividerTextStyle}>{t('auth.google.or')}</Text>
         <View style={lineStyle} />
       </View>
       <Button
-        label="Continuar con Google"
+        label={t('auth.google.continue')}
         variant="secondary"
         onPress={handlePress}
         loading={busy}

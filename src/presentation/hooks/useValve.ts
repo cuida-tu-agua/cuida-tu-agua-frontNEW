@@ -5,6 +5,7 @@ import { AppError } from '../../domain/common/AppError';
 import { CodeSent, Valve, ValveCommand } from '../../domain/valve/Valve';
 import { ValveRepository } from '../../domain/valve/ValveRepository';
 import { COMMAND_POLL_MS, COMMAND_WAIT_MS, isFinished } from '../../domain/valve/valveRules';
+import i18n from '../../i18n';
 
 export const VALVE_POLL_MS = 15_000;
 
@@ -17,7 +18,7 @@ interface ValveHookState {
 }
 
 const asAppError = (error: unknown) =>
-  error instanceof AppError ? error : new AppError('server', 'No se pudo consultar la válvula.');
+  error instanceof AppError ? error : new AppError('server', i18n.t('valve.loadFailed'));
 
 export const useValve = (placeId: string, repository: ValveRepository = valveRepository) => {
   const [state, setState] = useState<ValveHookState>({

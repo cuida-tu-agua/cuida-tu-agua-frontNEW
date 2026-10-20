@@ -1,16 +1,31 @@
+import i18n from '../../i18n';
+import { localeTag } from '../../i18n/format';
 import { MeasurementUnit } from '../places/Place';
 import { ConsumptionBucket, ConsumptionPeriod } from './Consumption';
 
+/** Getters: the text follows the language active when it is read. */
 export const PERIOD_LABELS: Record<ConsumptionPeriod, string> = {
-  DAY: 'Hoy',
-  WEEK: 'Semana',
-  MONTH: 'Mes',
+  get DAY() {
+    return i18n.t('consumption.periods.DAY');
+  },
+  get WEEK() {
+    return i18n.t('consumption.periods.WEEK');
+  },
+  get MONTH() {
+    return i18n.t('consumption.periods.MONTH');
+  },
 };
 
 export const PERIOD_TITLES: Record<ConsumptionPeriod, string> = {
-  DAY: 'Consumo de hoy',
-  WEEK: 'Últimos 7 días',
-  MONTH: 'Este mes',
+  get DAY() {
+    return i18n.t('consumption.periodTitles.DAY');
+  },
+  get WEEK() {
+    return i18n.t('consumption.periodTitles.WEEK');
+  },
+  get MONTH() {
+    return i18n.t('consumption.periodTitles.MONTH');
+  },
 };
 
 const LITERS_PER_UNIT: Record<MeasurementUnit, number> = {
@@ -35,20 +50,18 @@ export const unitSymbol = (unit: MeasurementUnit): string => UNIT_SYMBOL[unit];
 export const formatVolume = (liters: number, unit: MeasurementUnit = 'LITERS'): string => {
   const value = toUnit(liters, unit);
   const digits = unit === 'CUBIC_METERS' ? 3 : value < 10 ? 2 : value < 100 ? 1 : 0;
-  return `${value.toLocaleString('es-CO', { minimumFractionDigits: 0, maximumFractionDigits: digits })} ${UNIT_SYMBOL[unit]}`;
+  return `${value.toLocaleString(localeTag(), { minimumFractionDigits: 0, maximumFractionDigits: digits })} ${UNIT_SYMBOL[unit]}`;
 };
 
 export const formatFlow = (lpm: number | null): string =>
   lpm === null || lpm < 0.05
-    ? 'Sin flujo'
-    : `${lpm.toLocaleString('es-CO', { maximumFractionDigits: 1 })} L/min`;
-
-const WEEKDAYS = ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'];
+    ? i18n.t('consumption.noFlow')
+    : `${lpm.toLocaleString(localeTag(), { maximumFractionDigits: 1 })} L/min`;
 
 export const bucketLabel = (bucket: ConsumptionBucket, period: ConsumptionPeriod): string => {
   const date = new Date(bucket.start);
   if (period === 'DAY') return `${date.getHours()}h`;
-  if (period === 'WEEK') return WEEKDAYS[date.getDay()];
+  if (period === 'WEEK') return i18n.t(`consumption.weekdays.d${date.getDay()}`);
   return String(date.getDate());
 };
 

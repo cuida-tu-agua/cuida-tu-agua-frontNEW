@@ -1,4 +1,5 @@
 import { AxiosInstance } from 'axios';
+import { Platform } from 'react-native';
 import { PROFILE_ENDPOINTS } from '../../config/api';
 import { AvatarFile, SignInMethods, UpdateProfileInput, User } from '../../domain/entities/User';
 import { ProfileService } from '../../domain/services/AuthServices';
@@ -19,9 +20,18 @@ export class HttpProfileService implements ProfileService {
     await this.call(() => this.http.put(PROFILE_ENDPOINTS.PASSWORD, { currentPassword, newPassword }));
   }
 
-  changeAvatar(file: AvatarFile): Promise<User> {
-    // React Native's FormData accepts { uri, name, type } for a local file
+  async changeAvatar(file: AvatarFile): Promise<User> {
     const form = new FormData();
+    if (Platform.OS === 'web') {
+      // The browser needs a real File; a { uri } object would be sent as plain text
+      const blob = await (await fetch(file.uri)).blob();
+      form.append('file', blob, file.fileName);
+      // The client's default is JSON: drop it so the browser writes multipart/form-data with its boundary
+      return this.call(() =>
+        this.http.put<User>(PROFILE_ENDPOINTS.AVATAR, form, { headers: { 'Content-Type': false }, timeout: 30000 }),
+      );
+    }
+    // React Native's FormData accepts { uri, name, type } for a local file
     form.append('file', { uri: file.uri, name: file.fileName, type: file.mimeType } as unknown as Blob);
 
     return this.call(() =>
