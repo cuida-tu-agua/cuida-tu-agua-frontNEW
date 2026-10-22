@@ -85,20 +85,28 @@ export const CHANNEL_LABELS: Record<NotificationChannel, string> = {
 
 export const CHANNELS: NotificationChannel[] = ['inApp', 'push', 'email', 'sms'];
 
+/** HU-028: SMS / WhatsApp is only for critical alerts, so the other levels do not even show that switch. */
+export const channelsFor = (severity: NotificationSeverity): NotificationChannel[] =>
+  severity === 'CRITICAL' ? CHANNELS : CHANNELS.filter((channel) => channel !== 'sms');
+
 /**
  * Switches the user cannot turn off or on, and why:
  *  - a critical alert always keeps the in-app channel (the backend refuses to turn it off too);
- *  - SMS / WhatsApp is not available yet (HU-028).
+ *  - SMS / WhatsApp needs a verified phone first (HU-028); it does not exist below critical (see channelsFor).
  */
-export const lockOf = (severity: NotificationSeverity, channel: NotificationChannel): 'always' | 'soon' | null => {
-  if (channel === 'sms') return 'soon';
+export const lockOf = (
+  severity: NotificationSeverity,
+  channel: NotificationChannel,
+  phoneVerified = false,
+): 'always' | 'needsPhone' | 'criticalOnly' | null => {
+  if (channel === 'sms') return severity !== 'CRITICAL' ? 'criticalOnly' : phoneVerified ? null : 'needsPhone';
   if (channel === 'inApp' && severity === 'CRITICAL') return 'always';
   return null;
 };
 
 /** The preference after the user taps a switch. A locked switch does not change. */
-export const toggleChannel = (preference: LevelPreference, channel: NotificationChannel): LevelPreference =>
-  lockOf(preference.severity, channel) ? preference : { ...preference, [channel]: !preference[channel] };
+export const toggleChannel = (preference: LevelPreference, channel: NotificationChannel, phoneVerified = false): LevelPreference =>
+  lockOf(preference.severity, channel, phoneVerified) ? preference : { ...preference, [channel]: !preference[channel] };
 
 /** "99+" so the badge of the bell never grows out of its circle. Empty text = no badge. */
 export const badgeText = (count: number): string => (count <= 0 ? '' : count > 99 ? '99+' : String(count));
