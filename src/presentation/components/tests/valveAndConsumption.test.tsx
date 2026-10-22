@@ -122,5 +122,8 @@ describe('CloseValveDialog', () => {
     await act(async () => codeInput.props.onComplete('123456'));
     expect(confirm).toHaveBeenLastCalledWith('123456');
     expect(onDone).toHaveBeenCalled();
+
+    // The dialog's resend countdown keeps a timer running: unmount so it stops before Jest tears down
+    act(() => tree.unmount());
   });
 });
