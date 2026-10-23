@@ -2,8 +2,8 @@ import React from 'react';
 import { ActivityIndicator, ScrollView, Switch, Text, TextStyle, View, ViewStyle, Platform } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import {
-  CHANNELS,
   CHANNEL_LABELS,
+  channelsFor,
   LevelPreference,
   NotificationChannel,
   SEVERITY_HINTS,
@@ -20,6 +20,8 @@ import { MainStackParamList } from '../../navigation/types';
 import { theme } from '../../styles/theme';
 import { themed } from '../../styles/themeRuntime';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../../../core/auth/AuthContext';
+import { PHONE_CHANNEL_LABELS, maskPhone } from '../../../domain/phone/PhoneVerification';
 
 type Props = NativeStackScreenProps<MainStackParamList, 'NotificationPreferences'>;
 
@@ -27,6 +29,9 @@ type Props = NativeStackScreenProps<MainStackParamList, 'NotificationPreferences
 export const NotificationPreferencesScreen: React.FC<Props> = ({ navigation }) => {
   const { t } = useTranslation();
   const prefs = useNotificationPreferences();
+  const { user } = useAuth();
+  // HU-028: SMS / WhatsApp can only be turned on once the phone is verified; it goes by the mode chosen then
+  const phone = user?.phoneVerified && user.phoneChannel ? { channel: user.phoneChannel, number: user.phone } : null;
 
   if (!prefs.levels) {
     return (
@@ -61,7 +66,14 @@ export const NotificationPreferencesScreen: React.FC<Props> = ({ navigation }) =
       <View style={centeredColumnStyle}>
         <View style={gridStyle}>
           {prefs.levels.map((level) => (
-            <LevelCard key={level.severity} level={level} saving={prefs.saving} onToggle={(c) => void prefs.toggle(level.severity, c)} />
+            <LevelCard
+              key={level.severity}
+              level={level}
+              saving={prefs.saving}
+              phone={phone}
+              onToggle={(c) => void prefs.toggle(level.severity, c, !!phone)}
+              onVerifyPhone={() => navigation.navigate('Profile')}
+            />
           ))}
         </View>
       </View>
@@ -72,25 +84,37 @@ export const NotificationPreferencesScreen: React.FC<Props> = ({ navigation }) =
 const LevelCard: React.FC<{
   level: LevelPreference;
   saving: string | null;
+  phone: { channel: 'SMS' | 'WHATSAPP'; number: string | null } | null;
   onToggle: (channel: NotificationChannel) => void;
-}> = ({ level, saving, onToggle }) => {
+  onVerifyPhone: () => void;
+}> = ({ level, saving, phone, onToggle, onVerifyPhone }) => {
   const { t } = useTranslation();
   return (
     <Card variant="outlined" style={cardStyle}>
       <Text style={levelTitleStyle}>{SEVERITY_LABELS[level.severity]}</Text>
       <Text style={levelHintStyle}>{SEVERITY_HINTS[level.severity]}</Text>
 
-      {CHANNELS.map((channel) => {
-        const lock = lockOf(level.severity, channel);
+      {channelsFor(level.severity).map((channel) => {
+        const lock = lockOf(level.severity, channel, !!phone);
         return (
           <View key={channel} style={rowStyle}>
             <View style={{ flex: 1 }}>
               <Text style={channelStyle}>{CHANNEL_LABELS[channel]}</Text>
               {lock === 'always' && <Text style={noteStyle}>{t('notifications.alwaysOn')}</Text>}
-              {lock === 'soon' && <Text style={noteStyle}>{t('notifications.comingSoon')}</Text>}
+              {channel === 'sms' && phone && (
+                <Text style={noteStyle}>
+                  {t('notifications.smsVia', { channel: PHONE_CHANNEL_LABELS[phone.channel], phone: maskPhone(phone.number) })}
+                </Text>
+              )}
+              {lock === 'needsPhone' && (
+                <>
+                  <Text style={noteStyle}>{t('notifications.smsNeedsPhone')}</Text>
+                  <Button label={t('notifications.verifyPhone')} variant="ghost" size="small" onPress={onVerifyPhone} style={{ alignSelf: 'flex-start' }} />
+                </>
+              )}
             </View>
             <Switch
-              value={lock === 'soon' ? false : level[channel]} // a channel that does not exist yet never looks on
+              value={lock === 'needsPhone' ? false : level[channel]} // without a verified phone SMS never looks on
               onValueChange={() => onToggle(channel)}
               disabled={!!lock || saving === `${level.severity}.${channel}`}
               trackColor={{ false: theme.colors.grayMedium, true: theme.colors.primary }}

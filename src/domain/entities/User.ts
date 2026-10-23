@@ -4,6 +4,9 @@ export interface User {
   lastName: string;
   email: string;
   phone: string | null;
+  /** HU-028: the phone was proved with a code; critical alerts reach it by phoneChannel. */
+  phoneVerified?: boolean;
+  phoneChannel?: 'SMS' | 'WHATSAPP' | null;
   avatarUrl: string | null; // relative to ms-iam, e.g. "/api/avatars/abc.jpg"
   emailVerified: boolean;
   roles: string[];

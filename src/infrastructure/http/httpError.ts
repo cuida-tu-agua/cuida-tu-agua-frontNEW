@@ -19,6 +19,7 @@ const FIELD_OF_CODE: Record<string, string> = {
   'auth.wrong_password': 'password',
   'auth.email_already_registered': 'email',
   'auth.phone_already_registered': 'phone',
+  'phone.not_reachable': 'phone',
   'auth.invalid_code': 'code',
   'valve.code_required': 'code',
   'auth.code_expired': 'code',
