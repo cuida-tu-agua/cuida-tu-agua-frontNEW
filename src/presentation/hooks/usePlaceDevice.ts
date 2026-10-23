@@ -5,9 +5,10 @@ import { AppError } from '../../domain/common/AppError';
 import { Device } from '../../domain/devices/Device';
 import { DeviceRepository } from '../../domain/devices/DeviceRepository';
 import i18n from '../../i18n';
+import { onForeground } from './onForeground';
 
-/** HU-013: how often the screen asks for the status again while it is visible. */
-export const DEVICE_POLL_MS = 30_000;
+/** HU-013: how often the screen asks for the status again while it is visible ("disconnected" = 1 minute without reports). */
+export const DEVICE_POLL_MS = 10_000;
 
 interface PlaceDeviceState {
   /** false until the first answer arrives (show a spinner). */
@@ -58,7 +59,7 @@ export const usePlaceDevice = (placeId: string, repository: DeviceRepository = d
     [placeId, repository],
   );
 
-  // On focus: load now and every 30 s. On blur (or unmount): stop and ignore late answers.
+  // On focus: load now and every 10 s (and again when the app / tab comes back). On blur (or unmount): stop and ignore late answers.
   useFocusEffect(
     useCallback(() => {
       let active = true;
@@ -66,10 +67,12 @@ export const usePlaceDevice = (placeId: string, repository: DeviceRepository = d
 
       run();
       const timer = setInterval(run, DEVICE_POLL_MS);
+      const stopForeground = onForeground(() => void run());
 
       return () => {
         active = false;
         clearInterval(timer);
+        stopForeground();
       };
     }, [fetchDevice]),
   );

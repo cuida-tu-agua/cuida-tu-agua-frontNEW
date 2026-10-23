@@ -6,8 +6,10 @@ import { AppError } from '../../domain/common/AppError';
 import { Consumption, ConsumptionPeriod } from '../../domain/consumption/Consumption';
 import { ConsumptionRepository } from '../../domain/consumption/ConsumptionRepository';
 import { deviceTimeZone } from '../../domain/consumption/consumptionFormat';
+import { onForeground } from './onForeground';
 
-export const CONSUMPTION_POLL_MS = 60_000;
+/** Same pace as the meter (one reading every 10 s): the screen shows the liters almost as they happen. */
+export const CONSUMPTION_POLL_MS = 10_000;
 
 interface ConsumptionState {
   loading: boolean;
@@ -49,9 +51,11 @@ export const useConsumption = (
       setState((s) => ({ ...s, loading: true }));
       run();
       const timer = setInterval(run, CONSUMPTION_POLL_MS);
+      const stopForeground = onForeground(() => void run());
       return () => {
         active = false;
         clearInterval(timer);
+        stopForeground();
       };
     }, [fetchConsumption]),
   );
