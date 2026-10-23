@@ -1,5 +1,6 @@
 import { CodeSent, RegisterInput, ResetPasswordInput, Session } from '../entities/Auth';
 import { AvatarFile, SignInMethods, UpdateProfileInput, User } from '../entities/User';
+import { PhoneChannel, PhoneCodeSent, PhoneCountry } from '../phone/PhoneVerification';
 
 export interface AuthService {
   register(input: RegisterInput): Promise<CodeSent>;
@@ -26,4 +27,8 @@ export interface ProfileService {
   startGoogleReauth(redirect: string): Promise<string>;
   /** Pass the password, or the Google code of startGoogleReauth for accounts created with Google. */
   deleteAccount(password?: string, googleReauthCode?: string): Promise<void>;
+  /** HU-028: sends a 6-digit code to the phone by the chosen mode (SMS / WhatsApp). */
+  requestPhoneCode(country: PhoneCountry, phone: string, channel: PhoneChannel): Promise<PhoneCodeSent>;
+  /** HU-028: the code is right → the phone and its mode become the verified ones. Returns the profile. */
+  confirmPhone(code: string): Promise<User>;
 }
