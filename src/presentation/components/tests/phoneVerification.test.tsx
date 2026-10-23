@@ -29,11 +29,18 @@ const texts = (tree: ReactTestRenderer) =>
 
 const noop = () => undefined;
 
+const mounted: ReactTestRenderer[] = [];
+afterEach(() => {
+  act(() => mounted.splice(0).forEach((tree) => tree.unmount()));
+});
+
+
 const render = (element: React.ReactElement) => {
   let tree!: ReactTestRenderer;
   act(() => {
     tree = create(element);
   });
+  mounted.push(tree);
   return tree;
 };
 
