@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "258136296432",
+    "project_id": "cuida-tu-agua-9051f",
+    "storage_bucket": "cuida-tu-agua-9051f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:258136296432:android:a98d7a88fe5b80eab9eb35",
+        "android_client_info": {
+          "package_name": "com.cuidatuagua.saveyourwater"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBf1U3pQ7aeS6qjMaq5rIj5zZUAcHjVKVk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
