@@ -2,6 +2,7 @@ import {
   AppNotification,
   LevelPreference,
   badgeText,
+  channelsFor,
   lockOf,
   markedRead,
   mergePages,
@@ -61,12 +62,24 @@ describe('channel switches (HU-034)', () => {
   const critical: LevelPreference = { severity: 'CRITICAL', inApp: true, push: true, email: true, sms: false };
   const warning: LevelPreference = { severity: 'WARNING', inApp: true, push: true, email: false, sms: false };
 
-  it('a critical alert cannot lose the in-app channel, and SMS is not available yet', () => {
+  it('a critical alert cannot lose the in-app channel', () => {
     expect(lockOf('CRITICAL', 'inApp')).toBe('always');
-    expect(lockOf('INFO', 'sms')).toBe('soon');
     expect(lockOf('WARNING', 'push')).toBeNull();
     expect(toggleChannel(critical, 'inApp')).toBe(critical);
-    expect(toggleChannel(critical, 'sms')).toBe(critical);
+  });
+
+  it('SMS / WhatsApp only exists for critical alerts and needs a verified phone (HU-028)', () => {
+    expect(channelsFor('CRITICAL')).toEqual(['inApp', 'push', 'email', 'sms']);
+    expect(channelsFor('WARNING')).toEqual(['inApp', 'push', 'email']);
+    expect(channelsFor('INFO')).not.toContain('sms');
+
+    expect(lockOf('INFO', 'sms', true)).toBe('criticalOnly');
+    expect(lockOf('CRITICAL', 'sms')).toBe('needsPhone');
+    expect(lockOf('CRITICAL', 'sms', true)).toBeNull();
+
+    expect(toggleChannel(critical, 'sms')).toBe(critical);   // no verified phone: it does not move
+    expect(toggleChannel(critical, 'sms', true)).toEqual({ ...critical, sms: true });
+    expect(toggleChannel(warning, 'sms', true)).toBe(warning);
   });
 
   it('every other switch flips and leaves the rest alone', () => {
