@@ -44,9 +44,16 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "Cuida Tu Agua usa tus fotos solo para tu foto de perfil."
+          "photosPermission": "Cuida Tu Agua usa tus fotos solo para tu foto de perfil.",
+          "microphonePermission": false
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "3b6625ad-16b1-4d7e-b542-04c3cb65060d"
+      }
+    },
+    "owner": "save-your-water"
   }
 }
