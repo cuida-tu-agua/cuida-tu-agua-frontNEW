@@ -47,7 +47,8 @@
           "photosPermission": "Cuida Tu Agua usa tus fotos solo para tu foto de perfil.",
           "microphonePermission": false
         }
-      ]
+      ],
+      "expo-splash-screen"
     ],
     "extra": {
       "eas": {
