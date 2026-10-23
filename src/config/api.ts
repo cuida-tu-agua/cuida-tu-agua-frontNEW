@@ -97,6 +97,8 @@ export const DEVICES_ENDPOINTS = {
 /** ms-consumption (HU-015..018). period = day | week | month, tz = IANA zone of the phone. */
 export const CONSUMPTION_ENDPOINTS = {
   PLACE_CONSUMPTION: (placeId: string) => `/api/places/${placeId}/consumption`,
+  /** HU-023/024: GET progress / PUT { targetLiters } of the current month. tz = IANA zone of the phone. */
+  PLACE_GOAL: (placeId: string) => `/api/places/${placeId}/goals/current`,
 };
 
 /** ms-valve (HU-019..022). */
