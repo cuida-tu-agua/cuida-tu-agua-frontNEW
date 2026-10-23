@@ -30,6 +30,8 @@ import { PageContainer } from '../../components/common/PageContainer';
 import { PageHeader } from '../../components/common/PageHeader';
 import { ConfirmDialog } from '../../components/common/ConfirmDialog';
 import { Input } from '../../components/common/Input';
+import { PhoneVerificationDialog } from '../../components/profile/PhoneVerificationDialog';
+import { PHONE_CHANNEL_LABELS, maskPhone } from '../../../domain/phone/PhoneVerification';
 import { useForm } from '../../hooks/useForm';
 import { MainStackParamList } from '../../navigation/types';
 import { theme } from '../../styles/theme';
@@ -65,6 +67,7 @@ export const ProfileScreen: React.FC<Props> = ({ navigation }) => {
   const [uploading, setUploading] = useState(false);
   const [confirmingLogout, setConfirmingLogout] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
+  const [verifyingPhone, setVerifyingPhone] = useState(false);
   const [banner, setBanner] = useState<{ tone: BannerTone; message: string } | null>(null);
 
   useFocusEffect(
@@ -224,8 +227,33 @@ export const ProfileScreen: React.FC<Props> = ({ navigation }) => {
           error={errors.phone}
           keyboardType="phone-pad"
           maxLength={20}
-          hint={t('profile.phoneHint')}
+          hint={user.phoneVerified ? t('phone.changeResetsHint') : t('profile.phoneHint')}
         />
+        <View style={phoneStatusStyle}>
+          <Ionicons
+            name={user.phoneVerified ? 'shield-checkmark-outline' : 'alert-circle-outline'}
+            size={22}
+            color={user.phoneVerified ? theme.colors.success : theme.colors.warning}
+          />
+          <View style={{ flex: 1 }}>
+            <Text style={phoneStatusTitleStyle}>
+              {user.phoneVerified && user.phoneChannel
+                ? t('phone.verifiedTitle', { channel: PHONE_CHANNEL_LABELS[user.phoneChannel] })
+                : t('phone.notVerifiedTitle')}
+            </Text>
+            <Text style={phoneStatusTextStyle}>
+              {user.phoneVerified && user.phoneChannel
+                ? t('phone.verifiedText', { channel: PHONE_CHANNEL_LABELS[user.phoneChannel], phone: maskPhone(user.phone) })
+                : t('phone.notVerifiedText')}
+            </Text>
+          </View>
+          <Button
+            label={user.phoneVerified ? t('phone.change') : t('phone.verifyButton')}
+            size="small"
+            variant={user.phoneVerified ? 'ghost' : 'secondary'}
+            onPress={() => setVerifyingPhone(true)}
+          />
+        </View>
         <Input
           label={t('auth.emailLabel')}
           value={user.email}
@@ -272,6 +300,23 @@ export const ProfileScreen: React.FC<Props> = ({ navigation }) => {
         />
         </View>
       </PageContainer>
+
+      <PhoneVerificationDialog
+        visible={verifyingPhone}
+        user={user}
+        requestCode={(country, phone, channel) => profileService.requestPhoneCode(country, phone, channel)}
+        confirm={(code) => profileService.confirmPhone(code)}
+        onDone={(updated) => {
+          setVerifyingPhone(false);
+          edited.current = false;
+          setValues(toFormValues(updated));
+          void updateUser(updated);
+          if (updated.phoneChannel) {
+            setBanner({ tone: 'success', message: t('phone.verifiedBanner', { channel: PHONE_CHANNEL_LABELS[updated.phoneChannel] }) });
+          }
+        }}
+        onCancel={() => setVerifyingPhone(false)}
+      />
 
       <ConfirmDialog
         visible={confirmingLogout}
@@ -341,4 +386,18 @@ const rowStyle: ViewStyle = themed(() => ({
   borderColor: theme.colors.border,
 }));
 
+const phoneStatusStyle: ViewStyle = themed(() => ({
+  flexDirection: 'row',
+  alignItems: 'center',
+  flexWrap: 'wrap',
+  gap: theme.spacing.md,
+  padding: theme.spacing.md,
+  marginBottom: theme.spacing.lg,
+  borderRadius: theme.borderRadius.medium,
+  borderWidth: 1,
+  borderColor: theme.colors.border,
+  backgroundColor: theme.colors.surface,
+}));
+const phoneStatusTitleStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, fontWeight: '800', color: theme.colors.textPrimary }));
+const phoneStatusTextStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, color: theme.colors.textSecondary }));
 const rowTextStyle: TextStyle = themed(() => ({ ...theme.textStyles.button, flex: 1, color: theme.colors.textPrimary }));

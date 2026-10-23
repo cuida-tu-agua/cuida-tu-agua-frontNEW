@@ -40,11 +40,11 @@ export const useNotificationPreferences = (repository: NotificationRepository = 
   }, [load]);
 
   const toggle = useCallback(
-    async (severity: LevelPreference['severity'], channel: NotificationChannel) => {
+    async (severity: LevelPreference['severity'], channel: NotificationChannel, phoneVerified = false) => {
       const before = current.current;
       const level = before.find((l) => l.severity === severity);
       if (!level) return;
-      const changed = toggleChannel(level, channel);
+      const changed = toggleChannel(level, channel, phoneVerified);
       if (changed === level) return; // locked switch
       apply(before.map((l) => (l.severity === severity ? changed : l)));
       setSaving(`${severity}.${channel}`);

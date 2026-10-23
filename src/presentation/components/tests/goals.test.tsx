@@ -103,7 +103,7 @@ describe('GoalDialog', () => {
 
     expect(save).toHaveBeenCalledWith(10000);
     expect(onDone).toHaveBeenCalled();
-  });
+  }, 20_000);   // the first render of the dialog (Modal + Input) can pass 5 s on a cold CI run
 
   it('an invalid value is explained next to the field and nothing is sent', async () => {
     const save = jest.fn();

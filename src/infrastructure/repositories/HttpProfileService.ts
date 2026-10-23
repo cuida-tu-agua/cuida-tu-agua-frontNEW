@@ -2,6 +2,7 @@ import { AxiosInstance } from 'axios';
 import { Platform } from 'react-native';
 import { PROFILE_ENDPOINTS } from '../../config/api';
 import { AvatarFile, SignInMethods, UpdateProfileInput, User } from '../../domain/entities/User';
+import { PhoneChannel, PhoneCodeSent, PhoneCountry } from '../../domain/phone/PhoneVerification';
 import { ProfileService } from '../../domain/services/AuthServices';
 import { toAppError } from '../http/httpError';
 
@@ -60,6 +61,14 @@ export class HttpProfileService implements ProfileService {
 
   async deleteAccount(password?: string, googleReauthCode?: string): Promise<void> {
     await this.call(() => this.http.delete(PROFILE_ENDPOINTS.ME, { data: { password, googleReauthCode } }));
+  }
+
+  requestPhoneCode(country: PhoneCountry, phone: string, channel: PhoneChannel): Promise<PhoneCodeSent> {
+    return this.call(() => this.http.post<PhoneCodeSent>(PROFILE_ENDPOINTS.PHONE_VERIFICATION, { country, phone, channel }));
+  }
+
+  confirmPhone(code: string): Promise<User> {
+    return this.call(() => this.http.post<User>(PROFILE_ENDPOINTS.PHONE_VERIFICATION_CONFIRM, { code }));
   }
 
   private async call<T>(request: () => Promise<{ data: T }>): Promise<T> {

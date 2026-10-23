@@ -78,6 +78,9 @@ export const PROFILE_ENDPOINTS = {
   SIGN_IN_METHODS: '/api/users/me/sign-in-methods',
   /** HU-004: Google's consent page to confirm the account before deleting it. */
   GOOGLE_REAUTH: '/api/users/me/account/google-reauth',
+  /** HU-028: a code to verify the phone by SMS or WhatsApp, then its confirmation. */
+  PHONE_VERIFICATION: '/api/users/me/phone-verification',
+  PHONE_VERIFICATION_CONFIRM: '/api/users/me/phone-verification/confirm',
 };
 
 export const PLACES_ENDPOINTS = {
