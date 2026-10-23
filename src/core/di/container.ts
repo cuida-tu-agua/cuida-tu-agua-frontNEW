@@ -3,6 +3,7 @@ import { AdminRepository } from '../../domain/admin/AdminRepository';
 import { AuthService, ProfileService } from '../../domain/services/AuthServices';
 import { ConsumptionRepository } from '../../domain/consumption/ConsumptionRepository';
 import { DeviceRepository } from '../../domain/devices/DeviceRepository';
+import { GoalRepository } from '../../domain/goals/GoalRepository';
 import { GeographyRepository } from '../../domain/geography/Geography';
 import { NotificationRepository } from '../../domain/notifications/NotificationRepository';
 import { PlaceRepository } from '../../domain/places/PlaceRepository';
@@ -15,6 +16,7 @@ import { HttpAdminRepository } from '../../infrastructure/repositories/HttpAdmin
 import { HttpAuthService } from '../../infrastructure/repositories/HttpAuthService';
 import { HttpConsumptionRepository } from '../../infrastructure/repositories/HttpConsumptionRepository';
 import { HttpDeviceRepository } from '../../infrastructure/repositories/HttpDeviceRepository';
+import { HttpGoalRepository } from '../../infrastructure/repositories/HttpGoalRepository';
 import { HttpGeographyRepository } from '../../infrastructure/repositories/HttpGeographyRepository';
 import { HttpNotificationRepository } from '../../infrastructure/repositories/HttpNotificationRepository';
 import { HttpTariffRepository } from '../../infrastructure/repositories/HttpTariffRepository';
@@ -41,6 +43,7 @@ export const placeRepository: PlaceRepository = new HttpPlaceRepository(placesAp
 export const geographyRepository: GeographyRepository = new HttpGeographyRepository(placesApiClient);
 export const deviceRepository: DeviceRepository = new HttpDeviceRepository(devicesApiClient);
 export const consumptionRepository: ConsumptionRepository = new HttpConsumptionRepository(consumptionApiClient);
+export const goalRepository: GoalRepository = new HttpGoalRepository(consumptionApiClient);
 export const valveRepository: ValveRepository = new HttpValveRepository(valveApiClient, apiClient);
 export const notificationRepository: NotificationRepository = new HttpNotificationRepository(notificationsApiClient);
 export const pushRepository: PushRepository = new HttpPushRepository(notificationsApiClient);
