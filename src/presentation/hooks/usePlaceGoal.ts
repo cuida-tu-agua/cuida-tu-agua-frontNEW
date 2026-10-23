@@ -6,9 +6,10 @@ import { deviceTimeZone } from '../../domain/consumption/consumptionFormat';
 import { GoalProgress } from '../../domain/goals/Goal';
 import { GoalRepository } from '../../domain/goals/GoalRepository';
 import { toAppError } from '../../infrastructure/http/httpError';
+import { onForeground } from './onForeground';
 
 /** The progress follows the consumption: it is asked again at the same pace. */
-export const GOAL_POLL_MS = 60_000;
+export const GOAL_POLL_MS = 30_000;
 
 interface GoalState {
   loading: boolean;
@@ -47,9 +48,11 @@ export const usePlaceGoal = (placeId: string, repository: GoalRepository = goalR
       setState((s) => ({ ...s, loading: true }));
       void run();
       const timer = setInterval(run, GOAL_POLL_MS);
+      const stopForeground = onForeground(() => void run());
       return () => {
         active = false;
         clearInterval(timer);
+        stopForeground();
       };
     }, [fetchGoal]),
   );
