@@ -1227,6 +1227,7 @@ export const pt: Translations = {
       metaTemplate: 'O WhatsApp sai pela Meta com modelo aprovado: chega ao celular a qualquer hora.',
       simulated: '{{mode}} é simulado no Mailpit: não chega ao celular.',
       twilio: '{{mode}} sai pelo Twilio.',
+      twilioTemplate: '{{mode}} sai pelo Twilio com modelo aprovado: chega ao celular a qualquer hora.',
       off: '{{mode}} está desligado.',
     },
     errors: {

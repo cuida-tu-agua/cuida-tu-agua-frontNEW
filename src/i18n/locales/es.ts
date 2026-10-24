@@ -1229,6 +1229,7 @@ export const es = {
       metaTemplate: 'WhatsApp sale por Meta con plantilla aprobada: llega al celular a cualquier hora.',
       simulated: '{{mode}} se simula en Mailpit: no llega al celular.',
       twilio: '{{mode}} sale por Twilio.',
+      twilioTemplate: '{{mode}} sale por Twilio con plantilla aprobada: llega al celular a cualquier hora.',
       off: '{{mode}} está apagado.',
     },
     errors: {

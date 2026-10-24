@@ -191,7 +191,7 @@ const MessageCard: React.FC<MessageCardProps> = ({ template, busy, onSave, onRes
 const providerLine = (mode: string, provider: string, template = false): string => {
   if (provider === 'meta') return i18n.t(template ? 'messages.providers.metaTemplate' : 'messages.providers.meta');
   if (provider === 'mailpit') return i18n.t('messages.providers.simulated', { mode });
-  if (provider === 'twilio') return i18n.t('messages.providers.twilio', { mode });
+  if (provider === 'twilio') return i18n.t(template ? 'messages.providers.twilioTemplate' : 'messages.providers.twilio', { mode });
   return i18n.t('messages.providers.off', { mode });
 };
 

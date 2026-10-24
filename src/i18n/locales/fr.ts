@@ -1227,6 +1227,7 @@ export const fr: Translations = {
       metaTemplate: 'WhatsApp passe par Meta avec un modèle approuvé : il arrive sur le téléphone à toute heure.',
       simulated: '{{mode}} est simulé dans Mailpit : il n’arrive pas sur le téléphone.',
       twilio: '{{mode}} passe par Twilio.',
+      twilioTemplate: '{{mode}} passe par Twilio avec un modèle approuvé : il arrive sur le téléphone à toute heure.',
       off: '{{mode}} est désactivé.',
     },
     errors: {

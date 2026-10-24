@@ -1227,6 +1227,7 @@ export const en: Translations = {
       metaTemplate: 'WhatsApp goes by Meta with an approved template: it reaches the phone at any time.',
       simulated: '{{mode}} is simulated in Mailpit: it does not reach the phone.',
       twilio: '{{mode}} goes by Twilio.',
+      twilioTemplate: '{{mode}} goes by Twilio with an approved template: it reaches the phone at any time.',
       off: '{{mode}} is off.',
     },
     errors: {

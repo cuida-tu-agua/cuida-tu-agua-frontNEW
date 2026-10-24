@@ -183,6 +183,8 @@ export const NOTIFICATION_ENDPOINTS = {
   READ_ALL: '/api/notifications/read-all',
   PREFERENCES: '/api/notification-preferences',
   PREFERENCE: (severity: string) => `/api/notification-preferences/${severity}`,
+  /** HU-028: the modes (WHATSAPP / SMS) that can really reach a phone here. */
+  SHORT_MESSAGE_CHANNELS: '/api/short-messages/channels',
 };
 
 /** ms-notification (HU-026): the Expo push token of this phone. */
