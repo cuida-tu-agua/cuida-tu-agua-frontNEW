@@ -13,6 +13,8 @@ interface PlaceCardProps {
   onEdit: () => void;
   /** Opens the panel of the place. Tapping the card does the same. */
   onOpenPanel?: () => void;
+  /** Opens the screen to share the place (guest link, collaborators). HU-039, HU-042. */
+  onShare?: () => void;
   /** 'row' = the phone list (icons on the right); 'card' = the web card with its buttons. Default: by platform. */
   variant?: 'row' | 'card';
 }
@@ -26,7 +28,7 @@ const locationOf = (place: Place): string =>
   place.cityName === place.subdivisionName ? place.cityName : `${place.cityName}, ${place.subdivisionName}`;
 
 /** Web (Figma "Mis lugares"): icon, name, place, type and the buttons. Tapping the card opens its panel. */
-const WebCard: React.FC<PlaceCardProps> = ({ place, onEdit, onOpenPanel }) => {
+const WebCard: React.FC<PlaceCardProps> = ({ place, onEdit, onOpenPanel, onShare }) => {
   const { t } = useTranslation();
   const location = locationOf(place);
   const typeLabel = placeTypeLabel(place.type);
@@ -70,13 +72,22 @@ const WebCard: React.FC<PlaceCardProps> = ({ place, onEdit, onOpenPanel }) => {
           onPress={onEdit}
           icon={<Ionicons name="create-outline" size={16} color={theme.colors.primary} />}
         />
+        {!!onShare && (
+          <Button
+            label={t('sharing.share')}
+            size="small"
+            variant="secondary"
+            onPress={onShare}
+            icon={<Ionicons name="share-social-outline" size={16} color={theme.colors.primary} />}
+          />
+        )}
       </View>
     </Pressable>
   );
 };
 
 /** Phone (Figma mobile list): one row. Tapping it opens the panel; the edit button is on the right. */
-const RowCard: React.FC<PlaceCardProps> = ({ place, onEdit, onOpenPanel }) => {
+const RowCard: React.FC<PlaceCardProps> = ({ place, onEdit, onOpenPanel, onShare }) => {
   const { t } = useTranslation();
   const location = locationOf(place);
 
@@ -102,6 +113,18 @@ const RowCard: React.FC<PlaceCardProps> = ({ place, onEdit, onOpenPanel }) => {
           </Text>
         </View>
       </Pressable>
+
+      {!!onShare && (
+        <TouchableOpacity
+          onPress={onShare}
+          style={editButtonStyle}
+          accessibilityRole="button"
+          accessibilityLabel={t('sharing.shareA11y', { name: place.name })}
+          hitSlop={8}
+        >
+          <Ionicons name="share-social-outline" size={22} color={theme.colors.textSecondary} />
+        </TouchableOpacity>
+      )}
 
       <TouchableOpacity
         onPress={onEdit}

@@ -19,6 +19,8 @@ interface ValveCardProps {
   onDismissCommand: () => void;
   onHistory: () => void;
   opening?: boolean;
+  /** A collaborator who may see the valve but not operate it (HU-044): no close / open buttons. */
+  readOnly?: boolean;
 }
 
 const LOOK: Record<ValveState, { fg: string; bg: string; icon: keyof typeof Ionicons.glyphMap; textKey: string }> = themed(() => ({
@@ -40,6 +42,7 @@ export const ValveCard: React.FC<ValveCardProps> = ({
   onDismissCommand,
   onHistory,
   opening,
+  readOnly = false,
 }) => {
   const { t } = useTranslation();
   const look = LOOK[valve.state];
@@ -85,8 +88,9 @@ export const ValveCard: React.FC<ValveCardProps> = ({
       )}
 
       {!!outcome && <Banner tone={outcome.tone} message={outcome.text} onClose={onDismissCommand} />}
-      {!waiting && !!rules.reason && <Banner tone="warning" message={rules.reason} />}
+      {!waiting && !readOnly && !!rules.reason && <Banner tone="warning" message={rules.reason} />}
 
+      {!readOnly && (
       <View style={buttonsStyle}>
         <Button
           label={t('valve.card.close')}
@@ -107,6 +111,7 @@ export const ValveCard: React.FC<ValveCardProps> = ({
           icon={<Ionicons name="lock-open" size={18} color={theme.colors.textOnPrimary} />}
         />
       </View>
+      )}
       <Button label={t('valve.card.history')} variant="ghost" size="small" onPress={onHistory} />
     </Card>
   );
