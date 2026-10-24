@@ -59,6 +59,8 @@ const SECTION_OF_ROUTE: Partial<Record<keyof MainStackParamList, NavSection>> = 
   DeviceWifiSetup: 'places',
   PlaceDashboard: 'places',
   PlaceTariff: 'places',
+  PlaceSharing: 'places',
+  Invitations: 'places',
   Tips: 'tips',
   AdminTips: 'adminTips',
   ValveHistory: 'places',
