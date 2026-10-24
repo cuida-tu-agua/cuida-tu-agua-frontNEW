@@ -36,6 +36,7 @@ export const linking: LinkingOptions<ReactNavigation.RootParamList> = {
       DeleteAccount: 'profile/delete',
 
       AdminTips: 'admin/tips',
+      AdminMessages: 'admin/messages',
       AdminMetrics: 'admin/metrics',
       AdminUsers: 'admin/users',
       AdminDevices: 'admin/devices',

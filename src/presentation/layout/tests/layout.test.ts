@@ -36,8 +36,8 @@ describe('side menu', () => {
     expect(navItemsFor(['USER', 'ADMIN']).map((i) => i.route)).toEqual(['Places', 'Notifications', 'Tips', 'Profile', 'AdminMetrics']);
   });
 
-  it('the administration has its own menu: summary, users, meters and tips', () => {
-    expect(navItemsFor(['USER', 'ADMIN'], 'adminUsers').map((i) => i.route)).toEqual(['AdminMetrics', 'AdminUsers', 'AdminDevices', 'AdminTips']);
+  it('the administration has its own menu: summary, users, meters, tips and messages', () => {
+    expect(navItemsFor(['USER', 'ADMIN'], 'adminUsers').map((i) => i.route)).toEqual(['AdminMetrics', 'AdminUsers', 'AdminDevices', 'AdminTips', 'AdminMessages']);
   });
 
   it('a normal user never gets the administration menu, whatever the section', () => {

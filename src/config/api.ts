@@ -122,6 +122,13 @@ export const CONSUMPTION_ENDPOINTS = {
   PLACE_GOAL: (placeId: string) => `/api/places/${placeId}/goals/current`,
 };
 
+/** ms-notification: the WhatsApp / SMS texts (administrator) and the ones the app fills in itself (guest link). */
+export const MESSAGE_TEMPLATE_ENDPOINTS = {
+  ADMIN: '/api/admin/message-templates',
+  ADMIN_ONE: (key: string) => `/api/admin/message-templates/${key}`,
+  SHARED: (key: string) => `/api/message-templates/${key}`,
+};
+
 /** ms-valve (HU-019..022). */
 export const VALVE_ENDPOINTS = {
   VALVE: (placeId: string) => `/api/places/${placeId}/valve`,
