@@ -51,6 +51,8 @@ describe('side menu', () => {
     expect(sectionOf('NotificationPreferences')).toBe('notifications');
     expect(sectionOf('AdminUsers')).toBe('adminUsers');
     expect(sectionOf('PlaceTariff')).toBe('places');
+    expect(sectionOf('PlaceSharing')).toBe('places');
+    expect(sectionOf('Invitations')).toBe('places');
     expect(sectionOf('Tips')).toBe('tips');
     expect(sectionOf('AdminTips')).toBe('adminTips');
     expect(sectionOf('Nope')).toBeNull();

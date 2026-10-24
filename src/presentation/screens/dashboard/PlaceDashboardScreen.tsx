@@ -20,7 +20,9 @@ import { GoalDialog } from '../../components/goals/GoalDialog';
 import { CostCard } from '../../components/tariffs/CostCard';
 import { CloseValveDialog } from '../../components/valve/CloseValveDialog';
 import { ValveCard } from '../../components/valve/ValveCard';
+import { SharedPlaceDashboard } from './SharedPlaceDashboard';
 import { useConsumption } from '../../hooks/useConsumption';
+import { usePlaceAccess } from '../../hooks/usePlaceAccess';
 import { usePlaceCost } from '../../hooks/usePlaceCost';
 import { usePlaceDevice } from '../../hooks/usePlaceDevice';
 import { usePlaceGoal } from '../../hooks/usePlaceGoal';
@@ -33,7 +35,39 @@ import { useTranslation } from 'react-i18next';
 
 type Props = NativeStackScreenProps<MainStackParamList, 'PlaceDashboard'>;
 
-export const PlaceDashboardScreen: React.FC<Props> = ({ navigation, route }) => {
+/**
+ * The panel of a place. Who opens it decides what it is: the owner gets the full panel; a collaborator (HU-044/045) gets
+ * only what their permissions allow. If ms-places cannot tell right now (it is down), the full panel is tried as before:
+ * the servers refuse whatever the person may not do.
+ */
+export const PlaceDashboardScreen: React.FC<Props> = (props) => {
+  const { t } = useTranslation();
+  const { access, loaded, error } = usePlaceAccess(props.route.params.placeId);
+
+  if (!loaded) {
+    return (
+      <View style={centeredStyle}>
+        <ActivityIndicator size="large" color={theme.colors.primary} />
+      </View>
+    );
+  }
+  if (access?.role === 'COLLABORATOR') return <SharedPlaceDashboard {...props} access={access} />;
+  if (error?.kind === 'not_found') {
+    return (
+      <PageContainer narrow>
+        <Card variant="outlined" style={emptyCardStyle}>
+          <Ionicons name="lock-closed-outline" size={44} color={theme.colors.textMuted} />
+          <Text style={emptyTitleStyle}>{t('sharing.dashboard.noAccessTitle')}</Text>
+          <Text style={mutedStyle}>{t('sharing.dashboard.noAccessText')}</Text>
+          <Button label={t('places.list.title')} onPress={() => props.navigation.navigate('Places')} style={{ alignSelf: 'stretch' }} />
+        </Card>
+      </PageContainer>
+    );
+  }
+  return <OwnerDashboard {...props} />;
+};
+
+const OwnerDashboard: React.FC<Props> = ({ navigation, route }) => {
   const { t } = useTranslation();
   const { placeId, placeName = t('dashboard.defaultPlaceName') } = route.params;
   const { isCompact } = useLayout();
@@ -144,6 +178,13 @@ export const PlaceDashboardScreen: React.FC<Props> = ({ navigation, route }) => 
                 <Text style={chipTextStyle}>{t('dashboard.meterChip', { status: DEVICE_STATUS_LABELS[status] })}</Text>
               </Pressable>
             )}
+            <Button
+              label={t('sharing.share')}
+              variant="ghost"
+              size="small"
+              onPress={() => navigation.navigate('PlaceSharing', { placeId, placeName })}
+              icon={<Ionicons name="share-social-outline" size={16} color={theme.colors.primary} />}
+            />
             {isWeb && (
               <Button
                 label={t('dashboard.refresh')}

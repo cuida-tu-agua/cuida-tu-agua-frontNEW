@@ -108,3 +108,8 @@ export const consumptionApiClient = createApiClient(CONSUMPTION_API_CONFIG); // 
 export const valveApiClient = createApiClient(VALVE_API_CONFIG); // ms-valve :3005
 
 export const notificationsApiClient = createApiClient(NOTIFICATIONS_API_CONFIG); // ms-notification :3006
+
+// HU-040: a guest has no session. These clients never read the stored token and never try to refresh one,
+// so a guest link works the same whether or not somebody is signed in on the device.
+export const guestPlacesClient = axios.create(PLACES_API_CONFIG); // ms-places :3002
+export const guestConsumptionClient = axios.create(CONSUMPTION_API_CONFIG); // ms-consumption :3004
