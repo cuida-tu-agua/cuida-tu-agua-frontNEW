@@ -1,6 +1,6 @@
 import { AxiosInstance } from 'axios';
 import { MESSAGE_TEMPLATE_ENDPOINTS } from '../../config/api';
-import { MessageTemplate, MessageTemplateKey } from '../../domain/messages/MessageTemplate';
+import { MessageTemplate, MessageTemplateKey, ShortMessageProviders, TestMessageResult } from '../../domain/messages/MessageTemplate';
 import { MessageTemplateRepository } from '../../domain/messages/MessageTemplateRepository';
 import { toAppError } from '../http/httpError';
 
@@ -33,6 +33,24 @@ export class HttpMessageTemplateRepository implements MessageTemplateRepository 
   async reset(key: MessageTemplateKey): Promise<MessageTemplate> {
     try {
       const { data } = await this.http.delete<MessageTemplate>(MESSAGE_TEMPLATE_ENDPOINTS.ADMIN_ONE(key));
+      return data;
+    } catch (error) {
+      throw toAppError(error);
+    }
+  }
+
+  async test(key: MessageTemplateKey): Promise<TestMessageResult> {
+    try {
+      const { data } = await this.http.post<TestMessageResult>(MESSAGE_TEMPLATE_ENDPOINTS.TEST(key));
+      return data;
+    } catch (error) {
+      throw toAppError(error);
+    }
+  }
+
+  async providers(): Promise<ShortMessageProviders> {
+    try {
+      const { data } = await this.http.get<ShortMessageProviders>(MESSAGE_TEMPLATE_ENDPOINTS.PROVIDERS);
       return data;
     } catch (error) {
       throw toAppError(error);

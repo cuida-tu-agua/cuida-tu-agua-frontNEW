@@ -23,6 +23,26 @@ export interface MessageTemplate {
   updatedAt: string | null;
 }
 
+/** What happened with a test message the administrator sent to their own phone. */
+export interface TestMessageResult {
+  sent: boolean;
+  channel: 'SMS' | 'WHATSAPP' | null;
+  maskedPhone: string | null;
+  providerMessageId: string | null;
+  /** sms_disabled · no_verified_phone · rejected · unavailable */
+  problem: 'sms_disabled' | 'no_verified_phone' | 'rejected' | 'unavailable' | null;
+  /** The reason the provider gave, e.g. "Meta 400 (131030): ...". */
+  detail: string | null;
+  body: string | null;
+}
+
+/** Which provider each mode uses: meta = real WhatsApp, mailpit = simulated (development), '' = off. */
+export interface ShortMessageProviders {
+  sms: string;
+  whatsApp: string;
+  whatsAppTemplate: boolean;
+}
+
 export const BRAND = 'Cuida Tu Agua';
 
 /** One SMS holds 160 characters (without accents); longer texts go in two. */

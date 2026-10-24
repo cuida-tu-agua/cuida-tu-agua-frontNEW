@@ -127,6 +127,8 @@ export const MESSAGE_TEMPLATE_ENDPOINTS = {
   ADMIN: '/api/admin/message-templates',
   ADMIN_ONE: (key: string) => `/api/admin/message-templates/${key}`,
   SHARED: (key: string) => `/api/message-templates/${key}`,
+  TEST: (key: string) => `/api/admin/message-templates/${key}/test`,
+  PROVIDERS: '/api/admin/message-templates/providers',
 };
 
 /** ms-valve (HU-019..022). */

@@ -1212,6 +1212,23 @@ export const en: Translations = {
     restoreText: 'The message will say again: “{{text}}”',
     saved: 'Text saved: the next message already goes out like this.',
     restored: 'The message is back to its original text.',
+    test: 'Send me a test',
+    testAfterSave: 'Save the text to send yourself a test.',
+    testSent: 'Test sent by {{channel}} to {{phone}}. Check your phone.',
+    testDetail: 'Detail: {{detail}}',
+    testProblem: {
+      sms_disabled: 'WhatsApp / SMS is off in this environment.',
+      no_verified_phone: 'First verify your phone in My profile: the test goes to your own number.',
+      rejected: 'The provider refused the message.',
+      unavailable: 'The provider did not answer or the token expired.',
+    },
+    providers: {
+      meta: 'WhatsApp goes by Meta: it reaches the real phone (only within 24 h after the person wrote to the number).',
+      metaTemplate: 'WhatsApp goes by Meta with an approved template: it reaches the phone at any time.',
+      simulated: '{{mode}} is simulated in Mailpit: it does not reach the phone.',
+      twilio: '{{mode}} goes by Twilio.',
+      off: '{{mode}} is off.',
+    },
     errors: {
       empty: 'Write the text of the message.',
       tooLong: 'The text can have up to {{max}} characters.',

@@ -1214,6 +1214,23 @@ export const es = {
     restoreText: 'El mensaje volverá a decir: «{{text}}»',
     saved: 'Guardamos el texto: el próximo mensaje ya sale así.',
     restored: 'El mensaje volvió a su texto original.',
+    test: 'Enviarme una prueba',
+    testAfterSave: 'Guarda el texto para enviarte una prueba.',
+    testSent: 'Prueba enviada por {{channel}} a {{phone}}. Revisa tu celular.',
+    testDetail: 'Detalle: {{detail}}',
+    testProblem: {
+      sms_disabled: 'WhatsApp / SMS está apagado en este entorno.',
+      no_verified_phone: 'Primero verifica tu celular en Mi perfil: la prueba llega a tu propio número.',
+      rejected: 'El proveedor rechazó el mensaje.',
+      unavailable: 'El proveedor no respondió o el token venció.',
+    },
+    providers: {
+      meta: 'WhatsApp sale por Meta: llega al celular de verdad (solo 24 h después de que la persona le escribió al número).',
+      metaTemplate: 'WhatsApp sale por Meta con plantilla aprobada: llega al celular a cualquier hora.',
+      simulated: '{{mode}} se simula en Mailpit: no llega al celular.',
+      twilio: '{{mode}} sale por Twilio.',
+      off: '{{mode}} está apagado.',
+    },
     errors: {
       empty: 'Escribe el texto del mensaje.',
       tooLong: 'El texto puede tener hasta {{max}} caracteres.',

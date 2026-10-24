@@ -10,11 +10,15 @@ jest.mock('../../../core/auth/AuthContext', () => ({ useAuth: () => ({ user: { r
 const mockList = jest.fn();
 const mockSave = jest.fn();
 const mockReset = jest.fn();
+const mockTest = jest.fn();
+const mockProviders = jest.fn();
 jest.mock('../../../core/di/container', () => ({
   messageTemplateRepository: {
     list: (...args: unknown[]) => mockList(...args),
     save: (...args: unknown[]) => mockSave(...args),
     reset: (...args: unknown[]) => mockReset(...args),
+    test: (...args: unknown[]) => mockTest(...args),
+    providers: (...args: unknown[]) => mockProviders(...args),
   },
 }));
 
@@ -64,6 +68,7 @@ describe('AdminMessagesScreen', () => {
     jest.clearAllMocks();
     mockRoles = ['ADMIN'];
     mockList.mockResolvedValue([alert]);
+    mockProviders.mockResolvedValue({ sms: 'mailpit', whatsApp: 'meta', whatsAppTemplate: false });
   });
 
   it('shows each text with a preview filled with example data', async () => {
@@ -98,6 +103,32 @@ describe('AdminMessagesScreen', () => {
 
     expect(field(tree).props.error).toMatch(/no es un dato de este mensaje/);
     expect(button(tree, 'Guardar texto').props.disabled).toBe(true);
+  });
+
+  it('says whether WhatsApp is real (Meta) or simulated', async () => {
+    const tree = await render();
+
+    expect(texts(tree)).toContain('WhatsApp sale por Meta');
+    expect(texts(tree)).toContain('SMS se simula en Mailpit');
+  });
+
+  it('sends a test to the phone of the administrator and shows the answer of the provider', async () => {
+    mockTest.mockResolvedValueOnce({ sent: true, channel: 'WHATSAPP', maskedPhone: '+57300***233', providerMessageId: 'wamid.1', problem: null, detail: null, body: 'x' });
+    const tree = await render();
+
+    await act(async () => {
+      button(tree, 'Enviarme una prueba').props.onPress();
+    });
+    await flush();
+    expect(mockTest).toHaveBeenCalledWith('ALERT_CRITICAL');
+    expect(texts(tree)).toContain('Prueba enviada por WhatsApp a +57300***233');
+
+    mockTest.mockResolvedValueOnce({ sent: false, channel: 'WHATSAPP', maskedPhone: '+57300***233', providerMessageId: null, problem: 'rejected', detail: 'Meta 400 (131030): Recipient phone number not in allowed list', body: 'x' });
+    await act(async () => {
+      button(tree, 'Enviarme una prueba').props.onPress();
+    });
+    await flush();
+    expect(texts(tree)).toContain('El proveedor rechazó el mensaje. Detalle: Meta 400 (131030)');
   });
 
   it('a person who is not an administrator does not see the texts', async () => {

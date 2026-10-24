@@ -1212,6 +1212,23 @@ export const fr: Translations = {
     restoreText: 'Le message dira de nouveau : « {{text}} »',
     saved: 'Texte enregistré : le prochain message partira ainsi.',
     restored: 'Le message a retrouvé son texte d’origine.',
+    test: 'M’envoyer un test',
+    testAfterSave: 'Enregistrez le texte pour vous envoyer un test.',
+    testSent: 'Test envoyé par {{channel}} au {{phone}}. Regardez votre téléphone.',
+    testDetail: 'Détail : {{detail}}',
+    testProblem: {
+      sms_disabled: 'WhatsApp / SMS est désactivé dans cet environnement.',
+      no_verified_phone: 'Vérifiez d’abord votre téléphone dans Mon profil : le test arrive sur votre propre numéro.',
+      rejected: 'Le fournisseur a refusé le message.',
+      unavailable: 'Le fournisseur n’a pas répondu ou le jeton a expiré.',
+    },
+    providers: {
+      meta: 'WhatsApp passe par Meta : il arrive sur le vrai téléphone (seulement 24 h après que la personne a écrit au numéro).',
+      metaTemplate: 'WhatsApp passe par Meta avec un modèle approuvé : il arrive sur le téléphone à toute heure.',
+      simulated: '{{mode}} est simulé dans Mailpit : il n’arrive pas sur le téléphone.',
+      twilio: '{{mode}} passe par Twilio.',
+      off: '{{mode}} est désactivé.',
+    },
     errors: {
       empty: 'Écrivez le texte du message.',
       tooLong: 'Le texte peut contenir jusqu’à {{max}} caractères.',

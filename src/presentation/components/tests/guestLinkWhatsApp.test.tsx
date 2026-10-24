@@ -19,7 +19,7 @@ const render = (shared: jest.Mock) => {
         deactivate={jest.fn()}
         placeName="Casa centro"
         ownerName="Ana Gómez"
-        messages={{ list: jest.fn(), save: jest.fn(), reset: jest.fn(), shared }}
+        messages={{ list: jest.fn(), save: jest.fn(), reset: jest.fn(), shared, test: jest.fn(), providers: jest.fn() }}
       />,
     );
   });

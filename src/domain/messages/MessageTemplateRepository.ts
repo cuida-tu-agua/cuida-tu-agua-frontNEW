@@ -1,4 +1,4 @@
-import { MessageTemplate, MessageTemplateKey } from './MessageTemplate';
+import { MessageTemplate, MessageTemplateKey, ShortMessageProviders, TestMessageResult } from './MessageTemplate';
 
 export interface MessageTemplateRepository {
   /** Administrator: every text, with its default one. */
@@ -9,4 +9,8 @@ export interface MessageTemplateRepository {
   reset(key: MessageTemplateKey): Promise<MessageTemplate>;
   /** Any user: a text the app fills in itself (the guest link shared by WhatsApp). */
   shared(key: MessageTemplateKey): Promise<MessageTemplate>;
+  /** Administrator: sends the text, with example data, to their own verified phone right now. */
+  test(key: MessageTemplateKey): Promise<TestMessageResult>;
+  /** Administrator: which provider SMS and WhatsApp use. */
+  providers(): Promise<ShortMessageProviders>;
 }

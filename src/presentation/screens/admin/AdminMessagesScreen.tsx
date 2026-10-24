@@ -5,6 +5,8 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import {
   MessageTemplate,
+  ShortMessageProviders,
+  TestMessageResult,
   messageDescription,
   messageTitle,
   placeholderLabel,
@@ -22,6 +24,7 @@ import { Input } from '../../components/common/Input';
 import { PageContainer } from '../../components/common/PageContainer';
 import { PageHeader } from '../../components/common/PageHeader';
 import { useAdminMessages } from '../../hooks/useAdminMessages';
+import i18n from '../../../i18n';
 import { MainStackParamList } from '../../navigation/types';
 import { theme } from '../../styles/theme';
 import { themed } from '../../styles/themeRuntime';
@@ -46,6 +49,7 @@ const Messages: React.FC = () => {
     <PageContainer gap={theme.spacing.md}>
       <PageHeader webOnly={false} title={t('messages.title')} subtitle={t('messages.subtitle')} />
       <Banner tone="info" message={t('messages.whatsAppNote')} />
+      {!!admin.providers && <Banner tone={admin.providers.whatsApp === 'meta' ? 'success' : 'warning'} message={providersText(admin.providers)} />}
       {!!admin.notice && <Banner tone="success" message={admin.notice} onClose={admin.dismissNotice} />}
       {!!admin.error && (
         <Banner tone="error" message={admin.error.message} action={{ label: t('adminCommon.retry'), onPress: () => void admin.reload() }} onClose={admin.dismissError} />
@@ -62,6 +66,9 @@ const Messages: React.FC = () => {
               busy={admin.busyKey === template.key}
               onSave={(body) => admin.save(template.key, body)}
               onReset={() => admin.reset(template.key)}
+              testing={admin.testingKey === template.key}
+              test={admin.tests[template.key]}
+              onTest={() => void admin.sendTest(template.key)}
             />
           ))}
         </View>
@@ -75,9 +82,12 @@ interface MessageCardProps {
   busy: boolean;
   onSave: (body: string) => Promise<boolean>;
   onReset: () => Promise<boolean>;
+  testing: boolean;
+  test?: TestMessageResult;
+  onTest: () => void;
 }
 
-const MessageCard: React.FC<MessageCardProps> = ({ template, busy, onSave, onReset }) => {
+const MessageCard: React.FC<MessageCardProps> = ({ template, busy, onSave, onReset, testing, test, onTest }) => {
   const { t } = useTranslation();
   const [draft, setDraft] = useState(template.body);
   const [confirmReset, setConfirmReset] = useState(false);
@@ -150,7 +160,19 @@ const MessageCard: React.FC<MessageCardProps> = ({ template, busy, onSave, onRes
         {template.isCustom && !changed && (
           <Button label={t('messages.restore')} size="small" variant="secondary" onPress={() => setConfirmReset(true)} disabled={busy} />
         )}
+        {!changed && (
+          <Button
+            label={t('messages.test')}
+            size="small"
+            variant="ghost"
+            onPress={onTest}
+            loading={testing}
+            icon={<Ionicons name="paper-plane-outline" size={16} color={theme.colors.primary} />}
+          />
+        )}
       </View>
+      {changed && <Text style={mutedStyle}>{t('messages.testAfterSave')}</Text>}
+      {!!test && <Banner tone={test.sent ? 'success' : 'error'} message={testText(test)} />}
 
       <ConfirmDialog
         visible={confirmReset}
@@ -163,6 +185,23 @@ const MessageCard: React.FC<MessageCardProps> = ({ template, busy, onSave, onRes
       />
     </Card>
   );
+};
+
+/** What the providers mean for the administrator: real WhatsApp (Meta) or simulated in Mailpit. */
+const providerLine = (mode: string, provider: string, template = false): string => {
+  if (provider === 'meta') return i18n.t(template ? 'messages.providers.metaTemplate' : 'messages.providers.meta');
+  if (provider === 'mailpit') return i18n.t('messages.providers.simulated', { mode });
+  if (provider === 'twilio') return i18n.t('messages.providers.twilio', { mode });
+  return i18n.t('messages.providers.off', { mode });
+};
+
+const providersText = (p: ShortMessageProviders): string =>
+  `${providerLine('WhatsApp', p.whatsApp, p.whatsAppTemplate)} ${providerLine('SMS', p.sms)}`;
+
+const testText = (r: TestMessageResult): string => {
+  if (r.sent) return i18n.t('messages.testSent', { channel: r.channel === 'WHATSAPP' ? 'WhatsApp' : 'SMS', phone: r.maskedPhone ?? '' });
+  const problem = i18n.t(`messages.testProblem.${r.problem ?? 'unavailable'}`);
+  return r.detail ? `${problem} ${i18n.t('messages.testDetail', { detail: r.detail })}` : problem;
 };
 
 const listStyle: ViewStyle = { gap: theme.spacing.lg };
