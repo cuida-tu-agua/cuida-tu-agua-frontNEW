@@ -92,6 +92,24 @@ export const PLACES_ENDPOINTS = {
   CITIES: (subdivisionId: string) => `/api/geography/subdivisions/${subdivisionId}/cities`,
 };
 
+/** ms-places: sharing a place (HU-039..HU-047). Guest calls need no token; the rest are the signed-in person's. */
+export const SHARING_ENDPOINTS = {
+  ACCESS: (placeId: string) => `/api/places/${placeId}/access`,
+  MEMBERSHIP: (placeId: string) => `/api/places/${placeId}/membership`,
+  GUEST_LINK: (placeId: string) => `/api/places/${placeId}/guest-link`,
+  INVITATIONS: (placeId: string) => `/api/places/${placeId}/invitations`,
+  INVITATION: (placeId: string, invitationId: string) => `/api/places/${placeId}/invitations/${invitationId}`,
+  MEMBERS: (placeId: string) => `/api/places/${placeId}/members`,
+  MEMBER: (placeId: string, memberId: string) => `/api/places/${placeId}/members/${memberId}`,
+  MEMBER_PERMISSIONS: (placeId: string, memberId: string) => `/api/places/${placeId}/members/${memberId}/permissions`,
+  SHARED_PLACES: '/api/shared-places',
+  INBOX: '/api/invitations',
+  ACCEPT: (invitationId: string) => `/api/invitations/${invitationId}/accept`,
+  REJECT: (invitationId: string) => `/api/invitations/${invitationId}/reject`,
+  GUEST_PLACE: (token: string) => `/api/guest/${encodeURIComponent(token)}`,
+  GUEST_CONSUMPTION: (token: string) => `/api/guest/${encodeURIComponent(token)}/consumption`,
+};
+
 /** ms-devices: a place has at most ONE device, so the resource is singular. */
 export const DEVICES_ENDPOINTS = {
   PLACE_DEVICE: (placeId: string) => `/api/places/${placeId}/device`,
