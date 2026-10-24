@@ -8,6 +8,8 @@ import { GeographyRepository } from '../../domain/geography/Geography';
 import { NotificationRepository } from '../../domain/notifications/NotificationRepository';
 import { PlaceRepository } from '../../domain/places/PlaceRepository';
 import { PushRepository } from '../../domain/push/Push';
+import { GuestRepository } from '../../domain/sharing/GuestRepository';
+import { SharingRepository } from '../../domain/sharing/SharingRepository';
 import { TariffRepository } from '../../domain/tariffs/TariffRepository';
 import { AdminTipRepository, TipRepository } from '../../domain/tips/TipRepository';
 import { ValveRepository } from '../../domain/valve/ValveRepository';
@@ -16,9 +18,11 @@ import { HttpAdminRepository } from '../../infrastructure/repositories/HttpAdmin
 import { HttpAuthService } from '../../infrastructure/repositories/HttpAuthService';
 import { HttpConsumptionRepository } from '../../infrastructure/repositories/HttpConsumptionRepository';
 import { HttpDeviceRepository } from '../../infrastructure/repositories/HttpDeviceRepository';
+import { HttpGuestRepository } from '../../infrastructure/repositories/HttpGuestRepository';
 import { HttpGoalRepository } from '../../infrastructure/repositories/HttpGoalRepository';
 import { HttpGeographyRepository } from '../../infrastructure/repositories/HttpGeographyRepository';
 import { HttpNotificationRepository } from '../../infrastructure/repositories/HttpNotificationRepository';
+import { HttpSharingRepository } from '../../infrastructure/repositories/HttpSharingRepository';
 import { HttpTariffRepository } from '../../infrastructure/repositories/HttpTariffRepository';
 import { HttpTipRepository } from '../../infrastructure/repositories/HttpTipRepository';
 import { HttpPushRepository } from '../../infrastructure/repositories/HttpPushRepository';
@@ -29,6 +33,8 @@ import {
   apiClient,
   consumptionApiClient,
   devicesApiClient,
+  guestConsumptionClient,
+  guestPlacesClient,
   notificationsApiClient,
   placesApiClient,
   valveApiClient,
@@ -54,3 +60,5 @@ export const tariffRepository: TariffRepository = new HttpTariffRepository(place
 const tips = new HttpTipRepository(placesApiClient);
 export const tipRepository: TipRepository = tips;
 export const adminTipRepository: AdminTipRepository = tips;
+export const sharingRepository: SharingRepository = new HttpSharingRepository(placesApiClient);
+export const guestRepository: GuestRepository = new HttpGuestRepository(guestPlacesClient, guestConsumptionClient);

@@ -18,8 +18,8 @@ interface CostCardProps {
   cost: CostEstimate | null;
   loading: boolean;
   error: AppError | null;
-  /** Opens the screen where the tariff is chosen or typed. */
-  onConfigure: () => void;
+  /** Opens the screen where the tariff is chosen or typed. Left out for a collaborator, who can only look (HU-044). */
+  onConfigure?: () => void;
 }
 
 /**
@@ -51,11 +51,13 @@ export const CostCard: React.FC<CostCardProps> = ({ period, cost, loading, error
         <View style={inviteStyle}>
           <Text style={inviteTitleStyle}>{t('cost.noTariffTitle')}</Text>
           <Text style={mutedStyle}>
-            {shown.catalogAvailable
-              ? t('cost.inviteCatalog')
-              : t('cost.inviteManual')}
+            {!onConfigure
+              ? t('cost.noTariffShared')
+              : shown.catalogAvailable
+                ? t('cost.inviteCatalog')
+                : t('cost.inviteManual')}
           </Text>
-          <Button label={t('cost.configure')} onPress={onConfigure} size="medium" />
+          {!!onConfigure && <Button label={t('cost.configure')} onPress={onConfigure} size="medium" />}
         </View>
       ) : (
         <>
@@ -95,7 +97,9 @@ export const CostCard: React.FC<CostCardProps> = ({ period, cost, loading, error
             </View>
           )}
           <Text style={disclaimerStyle}>{shown.disclaimer}</Text>
-          <Button label={t('cost.change')} onPress={onConfigure} variant="secondary" size="small" style={{ alignSelf: 'flex-start' }} />
+          {!!onConfigure && (
+            <Button label={t('cost.change')} onPress={onConfigure} variant="secondary" size="small" style={{ alignSelf: 'flex-start' }} />
+          )}
         </>
       )}
     </Card>

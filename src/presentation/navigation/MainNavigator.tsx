@@ -7,6 +7,9 @@ import { LinkDeviceScreen } from '../screens/devices/LinkDeviceScreen';
 import { PlaceDeviceScreen } from '../screens/devices/PlaceDeviceScreen';
 import { CreatePlaceScreen } from '../screens/places/CreatePlaceScreen';
 import { EditPlaceScreen } from '../screens/places/EditPlaceScreen';
+import { GuestScreen } from '../screens/guest/GuestScreen';
+import { InvitationsScreen } from '../screens/sharing/InvitationsScreen';
+import { PlaceSharingScreen } from '../screens/sharing/PlaceSharingScreen';
 import { NotificationPreferencesScreen } from '../screens/notifications/NotificationPreferencesScreen';
 import { NotificationsScreen } from '../screens/notifications/NotificationsScreen';
 import { PlacesScreen } from '../screens/places/PlacesScreen';
@@ -54,6 +57,9 @@ export const MainNavigator: React.FC = () => {
       <Stack.Screen name="PlaceDashboard" component={themeAware(PlaceDashboardScreen)} options={{ title: t('nav.titles.dashboard') }} />
       <Stack.Screen name="ValveHistory" component={themeAware(ValveHistoryScreen)} options={{ title: t('valve.history.title') }} />
       <Stack.Screen name="PlaceTariff" component={themeAware(PlaceTariffScreen)} options={{ title: t('tariff.screen.title') }} />
+      <Stack.Screen name="PlaceSharing" component={themeAware(PlaceSharingScreen)} options={{ title: t('sharing.title') }} />
+      <Stack.Screen name="Invitations" component={themeAware(InvitationsScreen)} options={{ title: t('sharing.inbox.title') }} />
+      <Stack.Screen name="Guest" component={themeAware(GuestScreen)} options={{ title: t('guest.caption') }} />
       <Stack.Screen name="Tips" component={themeAware(TipsScreen)} options={{ title: t('nav.titles.tipsScreen') }} />
       <Stack.Screen name="AdminTips" component={themeAware(AdminTipsScreen)} options={{ title: t('nav.adminTips') }} />
       <Stack.Screen name="AdminMetrics" component={themeAware(AdminMetricsScreen)} options={{ title: t('nav.adminSummary') }} />

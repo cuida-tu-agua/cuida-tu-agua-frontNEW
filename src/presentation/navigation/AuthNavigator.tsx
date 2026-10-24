@@ -1,6 +1,7 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { ForgotPasswordScreen } from '../screens/auth/ForgotPasswordScreen';
+import { GuestScreen } from '../screens/guest/GuestScreen';
 import { LoginScreen } from '../screens/auth/LoginScreen';
 import { RegisterScreen } from '../screens/auth/RegisterScreen';
 import { ResetPasswordScreen } from '../screens/auth/ResetPasswordScreen';
@@ -25,5 +26,6 @@ export const AuthNavigator: React.FC = () => (
     <Stack.Screen name="VerifyEmail" component={themeAware(VerifyEmailScreen)} />
     <Stack.Screen name="ForgotPassword" component={themeAware(ForgotPasswordScreen)} />
     <Stack.Screen name="ResetPassword" component={themeAware(ResetPasswordScreen)} />
+    <Stack.Screen name="Guest" component={themeAware(GuestScreen)} />
   </Stack.Navigator>
 );

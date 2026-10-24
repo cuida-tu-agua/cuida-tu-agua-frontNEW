@@ -27,6 +27,8 @@ import { NotificationBell } from '../../components/notifications/NotificationBel
 import { Button } from '../../components/common/Button';
 import { PageHeader } from '../../components/common/PageHeader';
 import { PlaceCard } from '../../components/places/PlaceCard';
+import { SharedPlaceCard } from '../../components/sharing/SharedPlaceCard';
+import { useSharedWithMe } from '../../hooks/useSharedWithMe';
 import { listContentStyle } from '../../components/common/PageContainer';
 import { useLayout } from '../../layout/breakpoints';
 import { MainStackParamList } from '../../navigation/types';
@@ -45,6 +47,7 @@ export const PlacesScreen: React.FC<Props> = ({ navigation, route }) => {
   const [loadError, setLoadError] = useState<AppError | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const notice = route.params?.notice;
+  const shared = useSharedWithMe(); // HU-043/045: invitations waiting and places other people shared
 
   useFocusEffect(
     useCallback(() => {
@@ -124,8 +127,31 @@ export const PlacesScreen: React.FC<Props> = ({ navigation, route }) => {
   const banners = (
     <>
       {!!notice && <Banner tone="success" message={notice} onClose={() => navigation.setParams({ notice: undefined })} />}
+      {shared.inbox.length > 0 && (
+        <Banner
+          tone="info"
+          message={t('sharing.banner.pending', { count: shared.inbox.length })}
+          action={{ label: t('sharing.banner.view'), onPress: () => navigation.navigate('Invitations') }}
+        />
+      )}
     </>
   );
+
+  // HU-045: the places of other people where the person collaborates, below their own
+  const sharedSection =
+    shared.sharedPlaces.length > 0 ? (
+      <View style={sharedSectionStyle}>
+        <Text style={isWeb ? webCountStyle : sectionTitleStyle}>{t('sharing.shared.title')}</Text>
+        {shared.sharedPlaces.map((item) => (
+          <SharedPlaceCard
+            key={item.memberId}
+            shared={item}
+            onOpen={() => navigation.navigate('PlaceDashboard', { placeId: item.place.id, placeName: item.place.name })}
+          />
+        ))}
+        <Button label={t('sharing.shared.manage')} variant="ghost" size="small" onPress={() => navigation.navigate('Invitations')} />
+      </View>
+    ) : null;
 
   if (places === null) {
     return (
@@ -176,11 +202,13 @@ export const PlacesScreen: React.FC<Props> = ({ navigation, route }) => {
             {webHeader}
             {banners}
             <View style={emptyCardStyle}>{emptyContent}</View>
+            {sharedSection}
           </View>
         ) : (
           <>
             <View style={contentStyle}>{banners}</View>
             <View style={centerStyle}>{emptyContent}</View>
+            {!!sharedSection && <View style={contentStyle}>{sharedSection}</View>}
           </>
         )}
       </View>
@@ -215,19 +243,23 @@ export const PlacesScreen: React.FC<Props> = ({ navigation, route }) => {
               place={item}
               onEdit={() => navigation.navigate('EditPlace', { placeId: item.id })}
               onOpenPanel={() => navigation.navigate('PlaceDashboard', { placeId: item.id, placeName: item.name })}
+              onShare={() => navigation.navigate('PlaceSharing', { placeId: item.id, placeName: item.name })}
             />
           </View>
         )}
         ListFooterComponent={
-          isWeb ? null : (
-          <Button
-            label={t('places.list.registerAnother')}
-            variant="secondary"
-            icon={<Ionicons name="add" size={20} color={theme.colors.textPrimary} />}
-            onPress={() => navigation.navigate('CreatePlace')}
-            style={{ marginTop: theme.spacing.sm }}
-          />
-          )
+          <>
+            {isWeb ? null : (
+              <Button
+                label={t('places.list.registerAnother')}
+                variant="secondary"
+                icon={<Ionicons name="add" size={20} color={theme.colors.textPrimary} />}
+                onPress={() => navigation.navigate('CreatePlace')}
+                style={{ marginTop: theme.spacing.sm }}
+              />
+            )}
+            {sharedSection}
+          </>
         }
       />
     </View>
@@ -250,6 +282,8 @@ const headerStyle: ViewStyle = themed(() => ({
 const headerTextStyle: ViewStyle = { flex: 1 };
 
 const gridRowStyle: ViewStyle = { gap: theme.spacing.lg };
+
+const sharedSectionStyle: ViewStyle = { gap: theme.spacing.md, marginTop: theme.spacing.xl };
 
 const webCountStyle: TextStyle = themed(() => ({ ...theme.textStyles.h3, fontSize: 19, fontWeight: '800', color: theme.colors.textPrimary, marginBottom: theme.spacing.md }));
 // Web empty state: a card as wide as the page column (it starts on the same left edge as the title) with its content centered inside

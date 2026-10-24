@@ -15,6 +15,8 @@ export const linking: LinkingOptions<ReactNavigation.RootParamList> = {
       Register: 'register',
       ForgotPassword: 'forgot-password',
 
+      Guest: 'guest/:token',
+
       Places: 'places',
       CreatePlace: 'places/new',
       EditPlace: 'places/:placeId/edit',
@@ -24,6 +26,8 @@ export const linking: LinkingOptions<ReactNavigation.RootParamList> = {
       DeviceWifiSetup: 'places/:placeId/device/wifi',
       ValveHistory: 'places/:placeId/valve',
       PlaceTariff: 'places/:placeId/tariff',
+      PlaceSharing: 'places/:placeId/sharing',
+      Invitations: 'invitations',
       Tips: 'tips',
       Notifications: 'notifications',
       NotificationPreferences: 'notifications/preferences',
