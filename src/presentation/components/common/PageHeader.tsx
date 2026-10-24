@@ -35,8 +35,8 @@ export const PageHeader: React.FC<PageHeaderProps> = ({ title, caption, subtitle
           <Text style={backTextStyle}>{back.label}</Text>
         </TouchableOpacity>
       )}
-      <View style={rowStyle}>
-        <View style={textBlockStyle}>
+      <View style={web ? rowStyle : nativeColumnStyle}>
+        <View style={web ? textBlockStyle : nativeTextBlockStyle}>
           {web && !!caption && <Text style={captionStyle}>{caption}</Text>}
           <Text style={titleStyle} accessibilityRole="header">
             {title}
@@ -54,6 +54,10 @@ const backStyle: ViewStyle = { flexDirection: 'row', alignItems: 'center', gap: 
 const backTextStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, fontWeight: '600', color: theme.colors.primary }));
 const rowStyle: ViewStyle = { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'flex-end', justifyContent: 'space-between', gap: theme.spacing.md };
 const textBlockStyle: ViewStyle = { flexGrow: 1, flexShrink: 1, flexBasis: 280, gap: 2 };
+// Phone apps: the title gets the whole width and the actions go on their own line under it (side by side, a long
+// name was squeezed into a narrow column, one syllable per line).
+const nativeColumnStyle: ViewStyle = { gap: theme.spacing.md };
+const nativeTextBlockStyle: ViewStyle = { gap: 2 };
 const rightStyle: ViewStyle = { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.sm, flexWrap: 'wrap' };
 const captionStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, fontWeight: '600', color: theme.colors.textMuted }));
 const titleStyle: TextStyle = themed(() => ({ ...theme.textStyles.h2, color: theme.colors.textPrimary }));
