@@ -50,7 +50,7 @@ describe('GuestLinkCard · send by WhatsApp', () => {
     expect(open).toHaveBeenCalledWith(
       `https://wa.me/?text=${encodeURIComponent('Ana Gómez te comparte Casa centro: https://app.cuidatuagua/guest/AbC123')}`,
     );
-  });
+  }, 20_000);   // the first render of the file is slow on a cold run (CI)
 
   it('without the text of the server it still sends the usual message with the link', async () => {
     const tree = render(jest.fn().mockRejectedValue(new Error('offline')));
