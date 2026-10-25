@@ -46,3 +46,5 @@ app-example
 coverage/
 
 .env
+
+*firebase-adminsdk*.json

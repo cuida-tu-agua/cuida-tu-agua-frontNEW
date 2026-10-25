@@ -7,9 +7,10 @@ import { deviceTimeZone } from '../../domain/consumption/consumptionFormat';
 import { CostEstimate } from '../../domain/tariffs/Tariff';
 import { TariffRepository } from '../../domain/tariffs/TariffRepository';
 import { toAppError } from '../../infrastructure/http/httpError';
+import { onForeground } from './onForeground';
 
 /** The cost follows the consumption: it is asked again at the same pace. */
-export const COST_POLL_MS = 60_000;
+export const COST_POLL_MS = 30_000;
 
 interface CostState {
   loading: boolean;
@@ -53,9 +54,11 @@ export const usePlaceCost = (
       setState((s) => ({ ...s, loading: true }));
       void run();
       const timer = setInterval(run, COST_POLL_MS);
+      const stopForeground = onForeground(() => void run());
       return () => {
         active = false;
         clearInterval(timer);
+        stopForeground();
       };
     }, [fetchCost]),
   );
