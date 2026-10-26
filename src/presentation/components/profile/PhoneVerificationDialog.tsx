@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Text, TextStyle } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { User } from '../../../domain/entities/User';
@@ -35,6 +35,8 @@ interface PhoneVerificationDialogProps {
   /** The phone is verified: the new profile (with phoneVerified and phoneChannel). */
   onDone: (user: User) => void;
   onCancel: () => void;
+  /** The modes that can really arrive here (ms-notification). Missing = both. */
+  channels?: PhoneChannel[];
 }
 
 const RESEND_SECONDS = 60;
@@ -51,11 +53,15 @@ export const PhoneVerificationDialog: React.FC<PhoneVerificationDialogProps> = (
   confirm,
   onDone,
   onCancel,
+  channels,
 }) => {
   const { t } = useTranslation();
   const [country, setCountry] = useState<PhoneCountry>(countryOf(user.phone));
   const [phone, setPhone] = useState(nationalPartOf(user.phone));
+  const offered = useMemo(() => (channels?.length ? PHONE_CHANNELS.filter((c) => channels.includes(c)) : PHONE_CHANNELS), [channels]);
   const [channel, setChannel] = useState<PhoneChannel>(user.phoneChannel ?? 'WHATSAPP');
+  // A mode that cannot arrive here (no SMS configured) is never the one used
+  const selected = offered.includes(channel) ? channel : offered[0];
   const [phoneError, setPhoneError] = useState<string | undefined>(undefined);
   const [sent, setSent] = useState<PhoneCodeSent | null>(null);
   const [code, setCode] = useState('');
@@ -91,7 +97,7 @@ export const PhoneVerificationDialog: React.FC<PhoneVerificationDialogProps> = (
     setError(null);
     setPhoneError(undefined);
     try {
-      setSent(await requestCode(country, nationalMobile(country, phone)!, channel));
+      setSent(await requestCode(country, nationalMobile(country, phone)!, selected));
       setCode('');
       resend.start(RESEND_SECONDS);
     } catch (e) {
@@ -168,12 +174,12 @@ export const PhoneVerificationDialog: React.FC<PhoneVerificationDialogProps> = (
         />
         <SegmentedControl
           label={t('phone.channelLabel')}
-          options={PHONE_CHANNELS.map((c) => ({ value: c, label: PHONE_CHANNEL_LABELS[c] }))}
-          value={channel}
+          options={offered.map((c) => ({ value: c, label: PHONE_CHANNEL_LABELS[c] }))}
+          value={selected}
           onChange={setChannel}
           disabled={busy}
         />
-        <Banner tone="info" message={t('phone.channelNotice', { channel: PHONE_CHANNEL_LABELS[channel] })} />
+        <Banner tone="info" message={t('phone.channelNotice', { channel: PHONE_CHANNEL_LABELS[selected] })} />
         {!!error && <Banner tone="error" message={error} />}
         {resend.secondsLeft > 0 && (
           <Text style={hintStyle}>{t('phone.resendIn', { time: formatCountdown(resend.secondsLeft) })}</Text>

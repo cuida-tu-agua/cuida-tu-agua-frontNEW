@@ -103,4 +103,18 @@ describe('PhoneVerificationDialog (HU-028)', () => {
     expect(requestCode).toHaveBeenCalledWith('CO', '3001112233', 'WHATSAPP');   // WhatsApp is the default mode
     expect(phoneInput(tree).props.error).toMatch(/ese medio/);
   });
+
+  it('offers only the modes that can arrive here (no SMS configured = WhatsApp only)', async () => {
+    const requestCode = jest.fn().mockResolvedValue({ maskedPhone: '+57300***233', channel: 'WHATSAPP', expiresAt: '2026-10-24T15:05:00Z' });
+    const tree = render(
+      <PhoneVerificationDialog visible user={user({ phoneChannel: 'SMS' })} requestCode={requestCode} confirm={jest.fn()} onDone={noop} onCancel={noop} channels={['WHATSAPP']} />,
+    );
+
+    const mode = segments(tree)[1];
+    expect(mode.props.options.map((o: { value: string }) => o.value)).toEqual(['WHATSAPP']);
+    await act(async () => {
+      await dialog(tree).props.onConfirm();
+    });
+    expect(requestCode).toHaveBeenCalledWith('CO', '3001112233', 'WHATSAPP');   // the user had SMS: it moved to WhatsApp
+  });
 });

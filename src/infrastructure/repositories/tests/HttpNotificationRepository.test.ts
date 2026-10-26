@@ -83,4 +83,13 @@ describe('HttpNotificationRepository', () => {
     expect(error.kind).toBe('not_found');
     expect(error.message).toBe('Esa notificación ya no existe.');
   });
+
+  it('asks which modes (WhatsApp / SMS) can reach a phone', async () => {
+    const get = jest.fn().mockResolvedValue({ data: { channels: ['WHATSAPP'] } });
+
+    const channels = await new HttpNotificationRepository({ get } as unknown as AxiosInstance).shortMessageChannels();
+
+    expect(get).toHaveBeenCalledWith('/api/short-messages/channels');
+    expect(channels).toEqual(['WHATSAPP']);
+  });
 });

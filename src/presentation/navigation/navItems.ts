@@ -6,7 +6,16 @@ import { MainStackParamList } from './types';
 
 type IconName = ComponentProps<typeof Ionicons>['name'];
 
-export type NavSection = 'places' | 'tips' | 'notifications' | 'adminMetrics' | 'adminUsers' | 'adminDevices' | 'adminTips' | 'profile';
+export type NavSection =
+  | 'places'
+  | 'tips'
+  | 'notifications'
+  | 'adminMetrics'
+  | 'adminUsers'
+  | 'adminDevices'
+  | 'adminTips'
+  | 'adminMessages'
+  | 'profile';
 
 export interface NavItem {
   section: NavSection;
@@ -29,6 +38,7 @@ const ADMIN_ITEMS: NavItem[] = [
   { section: 'adminUsers', get label() { return i18n.t('nav.adminUsers'); }, icon: 'people-outline', route: 'AdminUsers' },
   { section: 'adminDevices', get label() { return i18n.t('nav.adminDevices'); }, icon: 'hardware-chip-outline', route: 'AdminDevices' },
   { section: 'adminTips', get label() { return i18n.t('nav.adminTips'); }, icon: 'bulb-outline', route: 'AdminTips' },
+  { section: 'adminMessages', get label() { return i18n.t('nav.adminMessages'); }, icon: 'chatbubbles-outline', route: 'AdminMessages' },
 ];
 
 /** `label` is a getter on every item, so the text follows the language active when it is read. */
@@ -67,6 +77,7 @@ const SECTION_OF_ROUTE: Partial<Record<keyof MainStackParamList, NavSection>> = 
   Invitations: 'places',
   Tips: 'tips',
   AdminTips: 'adminTips',
+  AdminMessages: 'adminMessages',
   ValveHistory: 'places',
   AdminMetrics: 'adminMetrics',
   AdminUsers: 'adminUsers',

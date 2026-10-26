@@ -27,6 +27,11 @@ export const NotificationsScreen: React.FC<Props> = ({ navigation }) => {
   const open = useCallback(
     async (item: AppNotification) => {
       void inbox.markRead(item.id);
+      // HU-043: an invitation is answered from the invitations screen (the place is not shared with the person yet)
+      if (item.type === 'COLLABORATOR_INVITATION') {
+        navigation.navigate('Invitations');
+        return;
+      }
       if (!item.placeId) return;
       // The panel shows the name of the place in its title: ask for it (a failure only loses the name)
       const place = await placeRepository.getById(item.placeId).catch(() => null);

@@ -8,7 +8,9 @@ export type NotificationType =
   | 'DEVICE_UNLINKED'
   | 'VALVE_CHANGED'
   | 'DEVICE_OFFLINE'
-  | 'SYSTEM_ANNOUNCEMENT';
+  | 'SYSTEM_ANNOUNCEMENT'
+  | 'COLLABORATOR_INVITATION'
+  | 'INVITATION_ANSWERED';
 
 export interface AppNotification {
   id: string;

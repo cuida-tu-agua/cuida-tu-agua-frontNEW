@@ -12,6 +12,8 @@ const TYPE_ICONS: Record<NotificationType, keyof typeof Ionicons.glyphMap> = {
   VALVE_CHANGED: 'water-outline',
   DEVICE_OFFLINE: 'cloud-offline-outline',
   SYSTEM_ANNOUNCEMENT: 'megaphone-outline',
+  COLLABORATOR_INVITATION: 'mail-unread-outline',
+  INVITATION_ANSWERED: 'people-outline',
 };
 
 const SEVERITY_COLORS: Record<NotificationSeverity, { fg: string; bg: string }> = themed(() => ({

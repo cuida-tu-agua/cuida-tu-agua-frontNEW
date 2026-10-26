@@ -36,8 +36,8 @@ describe('side menu', () => {
     expect(navItemsFor(['USER', 'ADMIN'], null, 'web').map((i) => i.route)).toEqual(['Places', 'Notifications', 'Tips', 'Profile', 'AdminMetrics']);
   });
 
-  it('the administration has its own menu: summary, users, meters and tips', () => {
-    expect(navItemsFor(['USER', 'ADMIN'], 'adminUsers', 'web').map((i) => i.route)).toEqual(['AdminMetrics', 'AdminUsers', 'AdminDevices', 'AdminTips']);
+  it('the administration has its own menu: summary, users, meters, tips and messages', () => {
+    expect(navItemsFor(['USER', 'ADMIN'], 'adminUsers', 'web').map((i) => i.route)).toEqual(['AdminMetrics', 'AdminUsers', 'AdminDevices', 'AdminTips', 'AdminMessages']);
   });
 
   it('on the phone apps an administrator gets the user menu: the administration is web only', () => {

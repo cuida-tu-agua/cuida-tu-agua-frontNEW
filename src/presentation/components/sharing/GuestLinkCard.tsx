@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
-import { Platform, Share, Text, TextStyle, View, ViewStyle } from 'react-native';
+import { Linking, Platform, Share, Text, TextStyle, View, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
+import { messageTemplateRepository } from '../../../core/di/container';
 import { AppError } from '../../../domain/common/AppError';
+import { renderMessage, whatsAppShareUrl } from '../../../domain/messages/MessageTemplate';
+import { MessageTemplateRepository } from '../../../domain/messages/MessageTemplateRepository';
 import { GuestLink } from '../../../domain/sharing/Sharing';
 import { toAppError } from '../../../infrastructure/http/httpError';
 import { theme } from '../../styles/theme';
@@ -18,6 +21,10 @@ interface GuestLinkCardProps {
   loading: boolean;
   create: (regenerate?: boolean) => Promise<unknown>;
   deactivate: () => Promise<void>;
+  /** For the WhatsApp text: the place and who shares it. */
+  placeName?: string;
+  ownerName?: string;
+  messages?: MessageTemplateRepository;
 }
 
 type Pending = 'regenerate' | 'deactivate' | null;
@@ -27,7 +34,15 @@ type Pending = 'regenerate' | 'deactivate' | null;
  * it (the old one stops working) or turns it off. Replacing and turning off ask first: they cut the access of whoever
  * has the link.
  */
-export const GuestLinkCard: React.FC<GuestLinkCardProps> = ({ link, loading, create, deactivate }) => {
+export const GuestLinkCard: React.FC<GuestLinkCardProps> = ({
+  link,
+  loading,
+  create,
+  deactivate,
+  placeName,
+  ownerName,
+  messages = messageTemplateRepository,
+}) => {
   const { t } = useTranslation();
   const [busy, setBusy] = useState(false);
   const [confirm, setConfirm] = useState<Pending>(null);
@@ -63,6 +78,20 @@ export const GuestLinkCard: React.FC<GuestLinkCardProps> = ({ link, loading, cre
     }
   };
 
+  // The owner sends the link from their own WhatsApp, with the text the administrator wrote (or the usual one)
+  const sendByWhatsApp = async () => {
+    if (!link) return;
+    const template = await messages.shared('GUEST_LINK_SHARE').catch(() => null);
+    const text = template
+      ? renderMessage(template.body, { place: placeName, owner: ownerName, link: link.url })
+      : t('sharing.guest.shareMessage', { url: link.url });
+    try {
+      await Linking.openURL(whatsAppShareUrl(text));
+    } catch {
+      setNotice(t('sharing.guest.whatsAppFailed'));
+    }
+  };
+
   return (
     <Card variant="outlined" style={cardStyle}>
       <View style={headerStyle}>
@@ -89,6 +118,13 @@ export const GuestLinkCard: React.FC<GuestLinkCardProps> = ({ link, loading, cre
             ) : (
               <Button label={t('sharing.guest.share')} size="small" onPress={share} icon={<Ionicons name="share-outline" size={16} color={theme.colors.textOnPrimary} />} />
             )}
+            <Button
+              label={t('sharing.guest.whatsApp')}
+              size="small"
+              variant="secondary"
+              onPress={() => void sendByWhatsApp()}
+              icon={<Ionicons name="logo-whatsapp" size={16} color={theme.colors.success} />}
+            />
             <Button label={t('sharing.guest.regenerate')} size="small" variant="secondary" disabled={busy} onPress={() => setConfirm('regenerate')} />
             <Button label={t('sharing.guest.deactivate')} size="small" variant="danger" disabled={busy} onPress={() => setConfirm('deactivate')} />
           </View>

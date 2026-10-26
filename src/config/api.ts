@@ -122,6 +122,15 @@ export const CONSUMPTION_ENDPOINTS = {
   PLACE_GOAL: (placeId: string) => `/api/places/${placeId}/goals/current`,
 };
 
+/** ms-notification: the WhatsApp / SMS texts (administrator) and the ones the app fills in itself (guest link). */
+export const MESSAGE_TEMPLATE_ENDPOINTS = {
+  ADMIN: '/api/admin/message-templates',
+  ADMIN_ONE: (key: string) => `/api/admin/message-templates/${key}`,
+  SHARED: (key: string) => `/api/message-templates/${key}`,
+  TEST: (key: string) => `/api/admin/message-templates/${key}/test`,
+  PROVIDERS: '/api/admin/message-templates/providers',
+};
+
 /** ms-valve (HU-019..022). */
 export const VALVE_ENDPOINTS = {
   VALVE: (placeId: string) => `/api/places/${placeId}/valve`,
@@ -174,6 +183,8 @@ export const NOTIFICATION_ENDPOINTS = {
   READ_ALL: '/api/notifications/read-all',
   PREFERENCES: '/api/notification-preferences',
   PREFERENCE: (severity: string) => `/api/notification-preferences/${severity}`,
+  /** HU-028: the modes (WHATSAPP / SMS) that can really reach a phone here. */
+  SHORT_MESSAGE_CHANNELS: '/api/short-messages/channels',
 };
 
 /** ms-notification (HU-026): the Expo push token of this phone. */

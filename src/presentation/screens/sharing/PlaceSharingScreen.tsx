@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Text, TextStyle, View, ViewStyle } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../../../core/auth/AuthContext';
+import { placeRepository } from '../../../core/di/container';
 import { isOwner } from '../../../domain/sharing/sharingRules';
 import { Banner } from '../../components/common/Banner';
 import { Button } from '../../components/common/Button';
@@ -22,9 +24,22 @@ type Props = NativeStackScreenProps<MainStackParamList, 'PlaceSharing'>;
 /** HU-039, HU-042, HU-043, HU-046: the owner shares the place: guest link, invitations and collaborators. */
 export const PlaceSharingScreen: React.FC<Props> = ({ navigation, route }) => {
   const { t } = useTranslation();
-  const { placeId, placeName } = route.params;
+  const { placeId, placeName: givenName } = route.params;
+  // Opened from its address (a bookmark, a reload) the name does not come with it: ask for it
+  const [loadedName, setLoadedName] = useState<string | null>(null);
+  useEffect(() => {
+    if (givenName) return;
+    let alive = true;
+    placeRepository.getById(placeId).then((p) => alive && setLoadedName(p.name)).catch(() => undefined);
+    return () => {
+      alive = false;
+    };
+  }, [placeId, givenName]);
+  const placeName = givenName || loadedName || t('dashboard.defaultPlaceName');
   const access = usePlaceAccess(placeId);
   const sharing = usePlaceSharing(placeId);
+  const { user } = useAuth();
+  const ownerName = user ? `${user.firstName} ${user.lastName ?? ''}`.trim() : undefined;
 
   const back = { label: placeName, onPress: () => navigation.navigate('PlaceDashboard', { placeId, placeName }) };
 
@@ -62,6 +77,8 @@ export const PlaceSharingScreen: React.FC<Props> = ({ navigation, route }) => {
             loading={false}
             create={sharing.createGuestLink}
             deactivate={sharing.deactivateGuestLink}
+            placeName={placeName}
+            ownerName={ownerName}
           />
           <InviteCard invite={sharing.invite} />
           <PendingInvitationsCard invitations={sharing.invitations} cancel={sharing.cancelInvitation} />
