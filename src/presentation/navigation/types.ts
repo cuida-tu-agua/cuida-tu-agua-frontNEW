@@ -3,10 +3,14 @@ export interface GuestParams {
   token: string;
 }
 
+/** The legal page: a document slug ("privacidad", "terminos"...) or nothing for the list. Public, like the guest page. */
+export type LegalParams = { doc?: string } | undefined;
+
 export type LoginNotice = 'verified' | 'password_reset';
 
 export type AuthStackParamList = {
   Guest: GuestParams;
+  Legal: LegalParams;
   Login: { email?: string; notice?: LoginNotice } | undefined;
   Register: undefined;
   VerifyEmail: {
@@ -22,6 +26,7 @@ export type AuthStackParamList = {
 
 export type MainStackParamList = {
   Guest: GuestParams;
+  Legal: LegalParams;
   Places: { notice?: string } | undefined;
   CreatePlace: undefined;
   EditPlace: { placeId: string };
