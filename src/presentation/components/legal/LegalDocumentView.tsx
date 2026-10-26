@@ -33,7 +33,7 @@ const Block: React.FC<{ block: LegalBlock }> = ({ block }) => {
     <View style={listStyle}>
       {block.items.map((item, index) => (
         <View key={index} style={itemStyle}>
-          <Text style={markerStyle}>{block.numbered ? `${index + 1}.` : '•'}</Text>
+          <Text style={markerStyle}>{'•'}</Text>
           <RichText style={itemTextStyle} text={item} />
         </View>
       ))}

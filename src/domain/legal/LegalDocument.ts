@@ -22,8 +22,8 @@ export const LEGAL_SLUGS: Record<LegalDocumentId, string> = {
 export const legalDocumentFromSlug = (slug: string | undefined): LegalDocumentId | null =>
   LEGAL_DOCUMENT_IDS.find((id) => LEGAL_SLUGS[id] === slug?.trim().toLowerCase()) ?? null;
 
-/** A paragraph, or a list (numbered for steps). **Words between double asterisks** are drawn in bold. */
-export type LegalBlock = string | { items: string[]; numbered?: boolean };
+/** A paragraph, or a list. **Words between double asterisks** are drawn in bold. */
+export type LegalBlock = string | { items: string[] };
 
 export interface LegalSection {
   title: string;

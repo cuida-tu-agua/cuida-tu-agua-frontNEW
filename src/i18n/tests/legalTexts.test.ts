@@ -3,7 +3,7 @@ import { LEGAL_TEXTS, legalDocument } from '../legal';
 import { LEGAL_RESPONSIBLES } from '../locales/legal/responsibles';
 
 const placeholders = (text: string) => (text.match(/{{\s*\w+\s*}}/g) ?? []).sort().join();
-const shape = (block: LegalBlock) => (typeof block === 'string' ? 'text' : `${block.numbered ? 'steps' : 'list'}:${block.items.length}`);
+const shape = (block: LegalBlock) => (typeof block === 'string' ? 'text' : `list:${block.items.length}`);
 const textsOf = (block: LegalBlock) => (typeof block === 'string' ? [block] : block.items);
 
 describe.each(['en', 'fr', 'pt'] as const)('legal texts: Spanish and %s say the same', (language) => {

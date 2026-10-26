@@ -10,7 +10,7 @@ export const legalFr: LegalTexts = {
       summary: 'Les règles pour utiliser l\'app et le compteur : ce que fait le service, ce qu\'il ne fait pas et de quoi chacun est responsable.',
       sections: [
         {
-          title: '1. Qui sommes-nous',
+          title: 'Qui sommes-nous',
           blocks: [
             'Cuida Tu Agua est un projet de {{responsible}}, domiciliés à {{city}}, e-mail {{email}} (« nous »). Ces Conditions régissent l\'utilisation de l\'app mobile, de l\'app web et du compteur Cuida Tu Agua (le « Service »).',
             'En créant votre compte et en cochant la case d\'acceptation, vous déclarez les avoir lues et les accepter. Si vous n\'êtes pas d\'accord, n\'utilisez pas le Service.',
@@ -19,7 +19,7 @@ export const legalFr: LegalTexts = {
           ],
         },
         {
-          title: '2. Ce que fait le Service',
+          title: 'Ce que fait le Service',
           blocks: [
             {
               items: [
@@ -33,7 +33,7 @@ export const legalFr: LegalTexts = {
           ],
         },
         {
-          title: '3. Ce que le Service N\'EST PAS',
+          title: 'Ce que le Service N\'EST PAS',
           blocks: [
             {
               items: [
@@ -45,7 +45,7 @@ export const legalFr: LegalTexts = {
           ],
         },
         {
-          title: '4. Votre compte',
+          title: 'Votre compte',
           blocks: [
             {
               items: [
@@ -59,7 +59,7 @@ export const legalFr: LegalTexts = {
           ],
         },
         {
-          title: '5. L\'appareil et son installation',
+          title: 'L\'appareil et son installation',
           blocks: [
             'En associant un appareil, vous déclarez que :',
             {
@@ -74,13 +74,13 @@ export const legalFr: LegalTexts = {
           ],
         },
         {
-          title: '6. La vanne à distance',
+          title: 'La vanne à distance',
           blocks: [
             'Fermer la vanne coupe l\'eau du lieu : avant de le faire, assurez-vous que personne ne l\'utilise. Les ordres que vous donnez, ou qu\'un collaborateur à qui vous avez donné cette autorisation donne, sont considérés comme les vôtres. Sans internet ni électricité, l\'ordre peut ne pas atteindre l\'appareil : ne l\'utilisez pas comme seule mesure en cas d\'urgence.',
           ],
         },
         {
-          title: '7. Partager votre lieu',
+          title: 'Partager votre lieu',
           blocks: [
             {
               items: [
@@ -92,7 +92,7 @@ export const legalFr: LegalTexts = {
           ],
         },
         {
-          title: '8. Utilisation acceptable',
+          title: 'Utilisation acceptable',
           blocks: [
             'Il est interdit de :',
             {
@@ -107,7 +107,7 @@ export const legalFr: LegalTexts = {
           ],
         },
         {
-          title: '9. Responsabilité',
+          title: 'Responsabilité',
           blocks: [
             'Nous sommes responsables, conformément à la loi, de la qualité du Service et de l\'appareil (garantie légale), des dommages causés par un défaut de l\'appareil et de la sécurité de vos données. **Nous n\'excluons pas ces responsabilités.**',
             'Nous ne sommes pas responsables des dommages dont la cause est, et est prouvée être :',
@@ -126,19 +126,19 @@ export const legalFr: LegalTexts = {
           ],
         },
         {
-          title: '10. Prix',
+          title: 'Prix',
           blocks: [
             'Aujourd\'hui, l\'utilisation de l\'app est gratuite. Si, à l\'avenir, nous vendons l\'appareil ou un abonnement, nous indiquerons le prix avant l\'achat, et pour les achats à distance vous aurez le droit de rétractation prévu par la loi. Les frais de votre opérateur pour les données ou les messages sont à votre charge.',
           ],
         },
         {
-          title: '11. Propriété intellectuelle',
+          title: 'Propriété intellectuelle',
           blocks: [
             'L\'app, le firmware, la marque et les contenus nous appartiennent ou font l\'objet d\'une licence. Nous vous accordons une autorisation personnelle et incessible de les utiliser tant que vous avez votre compte. **Vos données de consommation vous appartiennent.**',
           ],
         },
         {
-          title: '12. Modifications et contact',
+          title: 'Modifications et contact',
           blocks: [
             'Si nous modifions ces Conditions de manière importante, nous vous préviendrons à l\'avance dans l\'app ou par e-mail et vous demanderons de les accepter à nouveau lorsque la loi l\'exige.',
             'Pour toute demande, plainte ou réclamation, écrivez-nous à {{email}} : nous répondons sous 15 jours ouvrables au maximum. Si vous n\'êtes pas satisfait, vous pouvez vous adresser à la Surintendance de l\'industrie et du commerce (Colombie) ou au Défenseur du peuple (Équateur).',
@@ -153,14 +153,14 @@ export const legalFr: LegalTexts = {
       summary: 'Quelles données nous collectons, à quoi elles servent, avec qui nous les partageons, combien de temps nous les gardons et comment exercer vos droits.',
       sections: [
         {
-          title: '1. Responsable du traitement',
+          title: 'Responsable du traitement',
           blocks: [
             '{{responsible}}, membres du projet Cuida Tu Agua, domiciliés à {{city}}. E-mail pour les questions de données personnelles : {{email}}.',
             'Cette Politique respecte la loi 1581 de 2012 et le décret 1377 de 2013 (Colombie), ainsi que la loi organique de protection des données personnelles et son règlement (Équateur).',
           ],
         },
         {
-          title: '2. Quelles données nous collectons',
+          title: 'Quelles données nous collectons',
           blocks: [
             {
               items: [
@@ -179,10 +179,9 @@ export const legalFr: LegalTexts = {
           ],
         },
         {
-          title: '3. À quoi elles servent',
+          title: 'À quoi elles servent',
           blocks: [
             {
-              numbered: true,
               items: [
                 'Créer et gérer votre compte : inscription, connexion, récupération du mot de passe et vérifications.',
                 'Fournir le Service : consommation, coût estimé, vanne, objectifs et conseils.',
@@ -198,7 +197,7 @@ export const legalFr: LegalTexts = {
           ],
         },
         {
-          title: '4. Base légale',
+          title: 'Base légale',
           blocks: [
             {
               items: [
@@ -210,7 +209,7 @@ export const legalFr: LegalTexts = {
           ],
         },
         {
-          title: '5. Avec qui nous les partageons',
+          title: 'Avec qui nous les partageons',
           blocks: [
             {
               items: [
@@ -231,7 +230,7 @@ export const legalFr: LegalTexts = {
           ],
         },
         {
-          title: '6. Combien de temps nous les gardons',
+          title: 'Combien de temps nous les gardons',
           blocks: [
             {
               items: [
@@ -245,7 +244,7 @@ export const legalFr: LegalTexts = {
           ],
         },
         {
-          title: '7. Vos droits',
+          title: 'Vos droits',
           blocks: [
             {
               items: [
@@ -262,7 +261,7 @@ export const legalFr: LegalTexts = {
           ],
         },
         {
-          title: '8. Comment faire une demande ou une réclamation',
+          title: 'Comment faire une demande ou une réclamation',
           blocks: [
             'Écrivez-nous à {{email}} avec votre nom, l\'e-mail de votre compte et ce que vous demandez. Avant de communiquer ou de modifier des données, nous vérifions que vous êtes la personne concernée.',
             {
@@ -276,14 +275,14 @@ export const legalFr: LegalTexts = {
           ],
         },
         {
-          title: '9. Sécurité',
+          title: 'Sécurité',
           blocks: [
             'Nous utilisons une connexion chiffrée, des mots de passe chiffrés, des sessions qui expirent, une confirmation pour fermer la vanne, des autorisations par collaborateur et des journaux d\'activité.',
             'Aucun système n\'est sûr à 100 %. Si un incident met vos données en danger, nous le signalerons à l\'autorité dans les délais légaux (15 jours ouvrables en Colombie et 5 jours en Équateur) et vous préviendrons sans délai, avec ce que vous pouvez faire pour vous protéger.',
           ],
         },
         {
-          title: '10. Données d\'autres personnes',
+          title: 'Données d\'autres personnes',
           blocks: [
             {
               items: [
@@ -294,14 +293,14 @@ export const legalFr: LegalTexts = {
           ],
         },
         {
-          title: '11. Mineurs',
+          title: 'Mineurs',
           blocks: ['Le Service est réservé aux personnes de plus de 18 ans. Si nous détectons le compte d\'un mineur, nous le supprimerons.'],
         },
         {
-          title: '12. Modifications et validité',
+          title: 'Modifications et validité',
           blocks: [
             'Nous vous informerons des modifications importantes avant de les appliquer et vous demanderons une nouvelle autorisation lorsque la loi l\'exige.',
-            'Cette Politique est en vigueur depuis le {{date}}. Les bases de données resteront en vigueur tant que le Service est fourni et pendant les délais de la section 6.',
+            'Cette Politique est en vigueur depuis le {{date}}. Les bases de données resteront en vigueur tant que le Service est fourni et pendant les délais indiqués dans « Combien de temps nous les gardons ».',
           ],
         },
       ],
@@ -365,7 +364,6 @@ export const legalFr: LegalTexts = {
           title: 'Depuis l\'app',
           blocks: [
             {
-              numbered: true,
               items: ['Connectez-vous.', 'Allez dans Mon profil → Supprimer le compte.', 'Confirmez avec votre mot de passe ou avec votre compte Google.'],
             },
             'La suppression est immédiate.',

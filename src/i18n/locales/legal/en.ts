@@ -10,7 +10,7 @@ export const legalEn: LegalTexts = {
       summary: 'The rules for using the app and the meter: what the service does, what it does not do and what each party is responsible for.',
       sections: [
         {
-          title: '1. Who we are',
+          title: 'Who we are',
           blocks: [
             'Cuida Tu Agua is a project of {{responsible}}, domiciled in {{city}}, e-mail {{email}} ("we"). These Terms govern the use of the mobile app, the web app and the Cuida Tu Agua meter device (the "Service").',
             'By creating your account and ticking the acceptance box, you state that you have read and accept them. If you do not agree, do not use the Service.',
@@ -19,7 +19,7 @@ export const legalEn: LegalTexts = {
           ],
         },
         {
-          title: '2. What the Service does',
+          title: 'What the Service does',
           blocks: [
             {
               items: [
@@ -33,7 +33,7 @@ export const legalEn: LegalTexts = {
           ],
         },
         {
-          title: '3. What the Service is NOT',
+          title: 'What the Service is NOT',
           blocks: [
             {
               items: [
@@ -45,7 +45,7 @@ export const legalEn: LegalTexts = {
           ],
         },
         {
-          title: '4. Your account',
+          title: 'Your account',
           blocks: [
             {
               items: [
@@ -59,7 +59,7 @@ export const legalEn: LegalTexts = {
           ],
         },
         {
-          title: '5. The device and its installation',
+          title: 'The device and its installation',
           blocks: [
             'By linking a device you state that:',
             {
@@ -74,13 +74,13 @@ export const legalEn: LegalTexts = {
           ],
         },
         {
-          title: '6. The remote valve',
+          title: 'The remote valve',
           blocks: [
             'Closing the valve cuts off the water of the place: before doing it, make sure nobody is using it. Orders given by you, or by a collaborator you gave that permission to, are considered yours. Without internet or power the order may not reach the device: do not use it as the only measure in an emergency.',
           ],
         },
         {
-          title: '7. Sharing your place',
+          title: 'Sharing your place',
           blocks: [
             {
               items: [
@@ -92,7 +92,7 @@ export const legalEn: LegalTexts = {
           ],
         },
         {
-          title: '8. Acceptable use',
+          title: 'Acceptable use',
           blocks: [
             'It is not allowed to:',
             {
@@ -107,7 +107,7 @@ export const legalEn: LegalTexts = {
           ],
         },
         {
-          title: '9. Liability',
+          title: 'Liability',
           blocks: [
             'We are liable under the law for the quality of the Service and the device (legal warranty), for damage caused by a defect of the device and for the security of your data. **We do not exclude these responsibilities.**',
             'We are not liable for damage whose cause is, and is proven to be:',
@@ -126,19 +126,19 @@ export const legalEn: LegalTexts = {
           ],
         },
         {
-          title: '10. Price',
+          title: 'Price',
           blocks: [
             'Using the app is free today. If in the future we sell the device or a plan, we will state the price before the purchase, and for distance purchases you will have the right of withdrawal the law gives you. Your operator\'s charges for data or messages are your own.',
           ],
         },
         {
-          title: '11. Intellectual property',
+          title: 'Intellectual property',
           blocks: [
             'The app, the firmware, the brand and the content are ours or licensed to us. We give you a personal, non-transferable permission to use them while you have your account. **Your consumption data is yours.**',
           ],
         },
         {
-          title: '12. Changes and contact',
+          title: 'Changes and contact',
           blocks: [
             'If we change these Terms in an important way, we will let you know beforehand in the app or by e-mail and ask you to accept them again when the law requires it.',
             'For requests, complaints or claims write to {{email}}: we answer within 15 business days at most. If you are not satisfied, you can go to the Superintendence of Industry and Commerce (Colombia) or the Ombudsman\'s Office (Ecuador).',
@@ -153,14 +153,14 @@ export const legalEn: LegalTexts = {
       summary: 'What data we collect, what we use it for, who we share it with, how long we keep it and how you exercise your rights.',
       sections: [
         {
-          title: '1. Data controller',
+          title: 'Data controller',
           blocks: [
             '{{responsible}}, members of the Cuida Tu Agua project, domiciled in {{city}}. E-mail for personal data matters: {{email}}.',
             'This Policy complies with Law 1581 of 2012 and Decree 1377 of 2013 (Colombia), and with the Organic Law on Personal Data Protection and its Regulation (Ecuador).',
           ],
         },
         {
-          title: '2. What data we collect',
+          title: 'What data we collect',
           blocks: [
             {
               items: [
@@ -179,10 +179,9 @@ export const legalEn: LegalTexts = {
           ],
         },
         {
-          title: '3. What we use it for',
+          title: 'What we use it for',
           blocks: [
             {
-              numbered: true,
               items: [
                 'Creating and managing your account: sign-up, sign-in, password recovery and verifications.',
                 'Providing the Service: consumption, estimated cost, valve, goals and tips.',
@@ -198,7 +197,7 @@ export const legalEn: LegalTexts = {
           ],
         },
         {
-          title: '4. Legal basis',
+          title: 'Legal basis',
           blocks: [
             {
               items: [
@@ -210,7 +209,7 @@ export const legalEn: LegalTexts = {
           ],
         },
         {
-          title: '5. Who we share it with',
+          title: 'Who we share it with',
           blocks: [
             {
               items: [
@@ -231,7 +230,7 @@ export const legalEn: LegalTexts = {
           ],
         },
         {
-          title: '6. How long we keep it',
+          title: 'How long we keep it',
           blocks: [
             {
               items: [
@@ -245,7 +244,7 @@ export const legalEn: LegalTexts = {
           ],
         },
         {
-          title: '7. Your rights',
+          title: 'Your rights',
           blocks: [
             {
               items: [
@@ -262,7 +261,7 @@ export const legalEn: LegalTexts = {
           ],
         },
         {
-          title: '8. How to make an inquiry or a claim',
+          title: 'How to make an inquiry or a claim',
           blocks: [
             'Write to {{email}} with your name, your account e-mail and what you are asking for. Before handing over or changing data we check that you are the data subject.',
             {
@@ -276,14 +275,14 @@ export const legalEn: LegalTexts = {
           ],
         },
         {
-          title: '9. Security',
+          title: 'Security',
           blocks: [
             'We use encrypted connections, encrypted passwords, sessions that expire, confirmation to close the valve, permissions per collaborator and activity logs.',
             'No system is 100% secure. If an incident puts your data at risk, we will report it to the authority within the legal deadlines (15 business days in Colombia and 5 days in Ecuador) and let you know without delay, with what you can do to protect yourself.',
           ],
         },
         {
-          title: '10. Data of other people',
+          title: 'Data of other people',
           blocks: [
             {
               items: [
@@ -294,14 +293,14 @@ export const legalEn: LegalTexts = {
           ],
         },
         {
-          title: '11. Minors',
+          title: 'Minors',
           blocks: ['The Service is only for people over 18. If we detect an account of a minor, we will delete it.'],
         },
         {
-          title: '12. Changes and validity',
+          title: 'Changes and validity',
           blocks: [
             'We will let you know about important changes before applying them and ask you for a new authorization when the law requires it.',
-            'This Policy is in force from {{date}}. The databases will remain in force while the Service is provided and for the periods in section 6.',
+            'This Policy is in force from {{date}}. The databases will remain in force while the Service is provided and for the periods given in "How long we keep it".',
           ],
         },
       ],
@@ -365,7 +364,6 @@ export const legalEn: LegalTexts = {
           title: 'From the app',
           blocks: [
             {
-              numbered: true,
               items: ['Sign in.', 'Go to My profile → Delete account.', 'Confirm with your password or with your Google account.'],
             },
             'The deletion is immediate.',
