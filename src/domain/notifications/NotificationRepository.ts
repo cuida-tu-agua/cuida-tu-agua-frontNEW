@@ -1,3 +1,4 @@
+import { PhoneChannel } from '../phone/PhoneVerification';
 import { AppNotification, LevelPreference, NotificationPage } from './Notification';
 
 export interface ListOptions {
@@ -15,4 +16,6 @@ export interface NotificationRepository {
   markAllRead(): Promise<number>;
   getPreferences(): Promise<LevelPreference[]>;
   updatePreference(preference: LevelPreference): Promise<LevelPreference>;
+  /** HU-028: the modes a user may pick for the phone (an environment without SMS offers WhatsApp only). */
+  shortMessageChannels(): Promise<PhoneChannel[]>;
 }

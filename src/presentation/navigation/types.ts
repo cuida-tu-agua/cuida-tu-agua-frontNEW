@@ -35,6 +35,7 @@ export type MainStackParamList = {
   Invitations: undefined;
   Tips: { placeId?: string } | undefined;
   AdminTips: undefined;
+  AdminMessages: undefined;
   AdminMetrics: undefined;
   AdminUsers: undefined;
   AdminDevices: undefined;

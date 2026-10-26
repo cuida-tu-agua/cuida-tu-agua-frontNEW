@@ -17,6 +17,7 @@ import { AdminDeviceCreateScreen } from '../screens/admin/AdminDeviceCreateScree
 import { AdminDeviceDetailScreen } from '../screens/admin/AdminDeviceDetailScreen';
 import { AdminDevicesScreen } from '../screens/admin/AdminDevicesScreen';
 import { AdminMetricsScreen } from '../screens/admin/AdminMetricsScreen';
+import { AdminMessagesScreen } from '../screens/admin/AdminMessagesScreen';
 import { AdminTipsScreen } from '../screens/admin/AdminTipsScreen';
 import { AdminUsersScreen } from '../screens/admin/AdminUsersScreen';
 import { ChangePasswordScreen } from '../screens/profile/ChangePasswordScreen';
@@ -62,6 +63,7 @@ export const MainNavigator: React.FC = () => {
       <Stack.Screen name="Guest" component={themeAware(GuestScreen)} options={{ title: t('guest.caption') }} />
       <Stack.Screen name="Tips" component={themeAware(TipsScreen)} options={{ title: t('nav.titles.tipsScreen') }} />
       <Stack.Screen name="AdminTips" component={themeAware(AdminTipsScreen)} options={{ title: t('nav.adminTips') }} />
+      <Stack.Screen name="AdminMessages" component={themeAware(AdminMessagesScreen)} options={{ title: t('nav.adminMessages') }} />
       <Stack.Screen name="AdminMetrics" component={themeAware(AdminMetricsScreen)} options={{ title: t('nav.adminSummary') }} />
       <Stack.Screen name="AdminUsers" component={themeAware(AdminUsersScreen)} options={{ title: t('nav.adminUsers') }} />
       <Stack.Screen name="AdminDevices" component={themeAware(AdminDevicesScreen)} options={{ title: t('nav.adminDevices') }} />

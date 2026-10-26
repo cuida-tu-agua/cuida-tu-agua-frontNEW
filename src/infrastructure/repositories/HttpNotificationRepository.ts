@@ -2,6 +2,7 @@ import { AxiosInstance } from 'axios';
 import { NOTIFICATION_ENDPOINTS } from '../../config/api';
 import { AppNotification, LevelPreference, NotificationPage, PAGE_SIZE } from '../../domain/notifications/Notification';
 import { ListOptions, NotificationRepository } from '../../domain/notifications/NotificationRepository';
+import { PhoneChannel } from '../../domain/phone/PhoneVerification';
 import { toAppError } from '../http/httpError';
 
 export class HttpNotificationRepository implements NotificationRepository {
@@ -46,6 +47,15 @@ export class HttpNotificationRepository implements NotificationRepository {
     try {
       const { data } = await this.http.post<{ marked: number }>(NOTIFICATION_ENDPOINTS.READ_ALL);
       return data.marked;
+    } catch (error) {
+      throw toAppError(error);
+    }
+  }
+
+  async shortMessageChannels(): Promise<PhoneChannel[]> {
+    try {
+      const { data } = await this.http.get<{ channels: PhoneChannel[] }>(NOTIFICATION_ENDPOINTS.SHORT_MESSAGE_CHANNELS);
+      return data.channels;
     } catch (error) {
       throw toAppError(error);
     }

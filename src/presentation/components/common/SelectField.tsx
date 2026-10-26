@@ -2,9 +2,11 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import {
   ActivityIndicator,
+  Dimensions,
   FlatList,
   Modal,
   Platform,
+  Pressable,
   Text,
   TextInput,
   TextStyle,
@@ -75,46 +77,6 @@ const errorTextStyle: TextStyle = themed(() => ({
   marginTop: theme.spacing.sm,
 }));
 
-const sheetStyle: ViewStyle = themed(() => ({
-  flex: 1,
-  backgroundColor: theme.colors.background,
-}));
-
-const sheetHeaderStyle: ViewStyle = themed(() => ({
-  flexDirection: 'row',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  paddingHorizontal: theme.spacing.lg,
-  paddingVertical: theme.spacing.md,
-  borderBottomWidth: 1,
-  borderBottomColor: theme.colors.border,
-  backgroundColor: theme.colors.surface,
-}));
-
-const sheetTitleStyle: TextStyle = themed(() => ({
-  ...theme.textStyles.h2,
-  fontSize: theme.typography.sizes.h3,
-  color: theme.colors.textPrimary,
-  flex: 1,
-}));
-
-const closeTextStyle: TextStyle = themed(() => ({
-  ...theme.textStyles.button,
-  color: theme.colors.primary,
-}));
-
-const searchStyle: TextStyle = themed(() => ({
-  ...theme.textStyles.body,
-  height: 48,
-  margin: theme.spacing.lg,
-  paddingHorizontal: theme.spacing.lg,
-  borderRadius: theme.borderRadius.small,
-  borderWidth: 1,
-  borderColor: theme.colors.border,
-  backgroundColor: theme.colors.surface,
-  color: theme.colors.textPrimary,
-}));
-
 const optionStyle: ViewStyle = themed(() => ({
   minHeight: 52,
   justifyContent: 'center',
@@ -149,6 +111,38 @@ const webListStyle: ViewStyle = themed(() => ({
   backgroundColor: theme.colors.surface,
   overflow: 'hidden',
   ...({ boxShadow: '0 8px 24px rgba(0,0,0,0.12)' } as unknown as ViewStyle),
+}));
+
+// Phone apps: the dropdown floats over the page; the rest of the screen is a clear backdrop that closes it.
+const DROPDOWN_MAX = 280;
+interface NativeAnchor {
+  left: number;
+  width: number;
+  top?: number;
+  bottom?: number;
+  maxHeight: number;
+}
+const backdropStyle: ViewStyle = { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 };
+const nativeListStyle: ViewStyle = themed(() => ({
+  position: 'absolute',
+  borderRadius: theme.borderRadius.small,
+  borderWidth: 1,
+  borderColor: theme.colors.border,
+  backgroundColor: theme.colors.surface,
+  overflow: 'hidden',
+  elevation: 8,
+  shadowColor: '#000',
+  shadowOpacity: 0.12,
+  shadowRadius: 12,
+  shadowOffset: { width: 0, height: 8 },
+}));
+const nativeSearchStyle: TextStyle = themed(() => ({
+  ...theme.textStyles.body,
+  height: 48,
+  paddingHorizontal: theme.spacing.lg,
+  borderBottomWidth: 1,
+  borderBottomColor: theme.colors.border,
+  color: theme.colors.textPrimary,
 }));
 
 const emptyTextStyle: TextStyle = themed(() => ({
@@ -198,6 +192,9 @@ export const SelectField: React.FC<SelectFieldProps> = ({
   const anchorRef = useRef<View>(null);
   const listRef = useRef<View>(null);
   const [anchor, setAnchor] = useState<{ top: number; left: number; width: number } | null>(null);
+  // Phone apps: where the field is on the screen, and the height of the overlay the dropdown is drawn in
+  const [nativeField, setNativeField] = useState<{ x: number; y: number; width: number; height: number } | null>(null);
+  const [overlayHeight, setOverlayHeight] = useState<number | null>(null);
   // Where the field is on the screen now (the list follows it when the page scrolls)
   const measureAnchor = () =>
     anchorRef.current?.measureInWindow((x, y, width, height) => setAnchor({ top: y + height + 4, left: x, width }));
@@ -303,85 +300,116 @@ export const SelectField: React.FC<SelectFieldProps> = ({
     );
   }
 
+  // Phone apps: the same dropdown as the web, drawn under the field (or above it when the field is low on the screen).
+  // The field is measured on the screen and the list is placed once the overlay knows its own height.
+  const openNative = () => {
+    setQuery('');
+    anchorRef.current?.measureInWindow((x, y, width, height) => {
+      setNativeField({ x, y, width, height });
+      setOpen(true);
+    });
+  };
+  const nativeAnchor = ((): NativeAnchor | null => {
+    if (!nativeField) return null;
+    const screenHeight = overlayHeight ?? Dimensions.get('window').height;
+    const { x, y, width, height } = nativeField;
+    const up = y + height / 2 > screenHeight / 2;
+    return up
+      ? { left: x, width, bottom: screenHeight - y + 4, maxHeight: Math.min(DROPDOWN_MAX, y - insets.top - 8) }
+      : { left: x, width, top: y + height + 4, maxHeight: Math.min(DROPDOWN_MAX, screenHeight - (y + height) - insets.bottom - 8) };
+  })();
+
   return (
     <View style={containerStyle}>
       <Text style={labelStyle}>{label}</Text>
 
-      <TouchableOpacity
-        style={[
-          fieldStyle,
-          !!error && { borderColor: theme.colors.error },
-          isDisabled && { backgroundColor: theme.colors.grayLight },
-        ]}
-        onPress={() => setOpen(true)}
-        disabled={isDisabled}
-        activeOpacity={0.7}
-        accessibilityRole="button"
-        accessibilityLabel={`${label}: ${selected?.label ?? placeholder}`}
-        accessibilityState={{ disabled: isDisabled }}
-      >
-        <Text
-          style={[valueTextStyle, !selected && { color: theme.colors.textMuted }]}
-          numberOfLines={1}
+      <View ref={anchorRef} collapsable={false}>
+        <TouchableOpacity
+          style={[
+            fieldStyle,
+            !!error && { borderColor: theme.colors.error },
+            isDisabled && { backgroundColor: theme.colors.grayLight },
+            open && { borderColor: theme.colors.primary },
+          ]}
+          onPress={openNative}
+          disabled={isDisabled}
+          activeOpacity={0.7}
+          accessibilityRole="button"
+          accessibilityLabel={`${label}: ${selected?.label ?? placeholder}`}
+          accessibilityState={{ disabled: isDisabled, expanded: open }}
         >
-          {selected?.label ?? placeholder}
-        </Text>
-        {loading ? (
-          <ActivityIndicator size="small" color={theme.colors.primary} />
-        ) : (
-          <Text style={chevronStyle}>▾</Text>
-        )}
-      </TouchableOpacity>
+          <Text
+            style={[valueTextStyle, !selected && { color: theme.colors.textMuted }]}
+            numberOfLines={1}
+          >
+            {selected?.label ?? placeholder}
+          </Text>
+          {loading ? (
+            <ActivityIndicator size="small" color={theme.colors.primary} />
+          ) : (
+            <Text style={chevronStyle}>{open ? '▴' : '▾'}</Text>
+          )}
+        </TouchableOpacity>
+      </View>
 
       {error && <Text style={errorTextStyle}>{error}</Text>}
 
-      <Modal visible={open} animationType="slide" onRequestClose={close}>
-        <View style={[sheetStyle, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
-          <View style={sheetHeaderStyle}>
-            <Text style={sheetTitleStyle} numberOfLines={1}>
-              {label}
-            </Text>
-            <TouchableOpacity onPress={close} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
-              <Text style={closeTextStyle}>{i18n.t('commonUi.close')}</Text>
-            </TouchableOpacity>
-          </View>
-
-          {searchable && (
-            <TextInput
-              style={searchStyle}
-              value={query}
-              onChangeText={setQuery}
-              placeholder={i18n.t('commonUi.search')}
-              placeholderTextColor={theme.colors.textMuted}
-              autoCorrect={false}
-              autoFocus
+      <Modal visible={open && !!nativeAnchor} transparent statusBarTranslucent animationType="fade" onRequestClose={close}>
+        {/* A tap outside the list closes it, like a click outside on the web */}
+        <Pressable
+          style={backdropStyle}
+          onPress={close}
+          onLayout={(event) => setOverlayHeight(event.nativeEvent.layout.height)}
+          accessibilityLabel={i18n.t('commonUi.close')}
+        />
+        {nativeAnchor && (
+          <View
+            style={[
+              nativeListStyle,
+              {
+                left: nativeAnchor.left,
+                width: nativeAnchor.width,
+                top: nativeAnchor.top,
+                bottom: nativeAnchor.bottom,
+                maxHeight: nativeAnchor.maxHeight,
+              },
+            ]}
+          >
+            {searchable && (
+              <TextInput
+                style={nativeSearchStyle}
+                value={query}
+                onChangeText={setQuery}
+                placeholder={i18n.t('commonUi.search')}
+                placeholderTextColor={theme.colors.textMuted}
+                autoCorrect={false}
+              />
+            )}
+            <FlatList
+              data={filtered}
+              keyExtractor={(item) => item.value}
+              keyboardShouldPersistTaps="handled"
+              initialNumToRender={20}
+              renderItem={({ item }) => {
+                const isSelected = item.value === value;
+                return (
+                  <TouchableOpacity
+                    style={[optionStyle, isSelected && { backgroundColor: theme.colors.infoBg }]}
+                    onPress={() => pick(item.value)}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected: isSelected }}
+                  >
+                    <Text style={[optionTextStyle, isSelected && { fontWeight: '600' }]}>
+                      {isSelected ? `✓ ${item.label}` : item.label}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              }}
+              ListEmptyComponent={<Text style={emptyTextStyle}>{i18n.t('commonUi.noResults')}</Text>}
             />
-          )}
-
-          <FlatList
-            data={filtered}
-            keyExtractor={(item) => item.value}
-            keyboardShouldPersistTaps="handled"
-            initialNumToRender={20}
-            renderItem={({ item }) => {
-              const isSelected = item.value === value;
-              return (
-                <TouchableOpacity
-                  style={[optionStyle, isSelected && { backgroundColor: theme.colors.infoBg }]}
-                  onPress={() => pick(item.value)}
-                  accessibilityRole="button"
-                  accessibilityState={{ selected: isSelected }}
-                >
-                  <Text style={[optionTextStyle, isSelected && { fontWeight: '600' }]}>
-                    {isSelected ? `✓ ${item.label}` : item.label}
-                  </Text>
-                </TouchableOpacity>
-              );
-            }}
-            ListEmptyComponent={<Text style={emptyTextStyle}>{i18n.t('commonUi.noResults')}</Text>}
-          />
-        </View>
+          </View>
+        )}
       </Modal>
     </View>
   );
-};
+};

@@ -3,19 +3,19 @@ import { Text, TextStyle, View, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../../core/auth/AuthContext';
-import { isAdmin } from '../../../domain/admin/Admin';
+import { canUseAdmin } from '../../utils/adminAccess';
 import { theme } from '../../styles/theme';
 import { themed } from '../../styles/themeRuntime';
 
 /**
  * The administration screens are only for the ADMIN role. The menu already hides them from everybody else, and the
  * servers refuse the calls anyway (403): this is for someone who reaches the address by hand, so they see a clear
- * message instead of an error.
+ * message instead of an error. On the phone apps the administration is not offered at all (web only).
  */
 export const RequireAdmin: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
   const { t } = useTranslation();
-  if (isAdmin(user?.roles)) return <>{children}</>;
+  if (canUseAdmin(user?.roles)) return <>{children}</>;
 
   return (
     <View style={centerStyle}>

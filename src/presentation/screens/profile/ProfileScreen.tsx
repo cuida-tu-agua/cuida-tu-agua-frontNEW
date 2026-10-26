@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -14,9 +14,9 @@ import { useFocusEffect } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
-import { isAdmin } from '../../../domain/admin/Admin';
+import { canUseAdmin } from '../../utils/adminAccess';
 import { useAuth } from '../../../core/auth/AuthContext';
-import { profileService } from '../../../core/di/container';
+import { notificationRepository, profileService } from '../../../core/di/container';
 import { avatarUri } from '../../../config/api';
 import { User } from '../../../domain/entities/User';
 import { toAppError } from '../../../infrastructure/http/httpError';
@@ -31,7 +31,7 @@ import { PageHeader } from '../../components/common/PageHeader';
 import { ConfirmDialog } from '../../components/common/ConfirmDialog';
 import { Input } from '../../components/common/Input';
 import { PhoneVerificationDialog } from '../../components/profile/PhoneVerificationDialog';
-import { PHONE_CHANNEL_LABELS, maskPhone } from '../../../domain/phone/PhoneVerification';
+import { PHONE_CHANNEL_LABELS, PhoneChannel, maskPhone } from '../../../domain/phone/PhoneVerification';
 import { useForm } from '../../hooks/useForm';
 import { MainStackParamList } from '../../navigation/types';
 import { theme } from '../../styles/theme';
@@ -68,6 +68,12 @@ export const ProfileScreen: React.FC<Props> = ({ navigation }) => {
   const [confirmingLogout, setConfirmingLogout] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
   const [verifyingPhone, setVerifyingPhone] = useState(false);
+  // HU-028: only the modes that can arrive here (without SMS configured, WhatsApp only). A failure offers both.
+  const [phoneChannels, setPhoneChannels] = useState<PhoneChannel[] | undefined>(undefined);
+  useEffect(() => {
+    if (!verifyingPhone) return;
+    notificationRepository.shortMessageChannels().then(setPhoneChannels).catch(() => setPhoneChannels(undefined));
+  }, [verifyingPhone]);
   const [banner, setBanner] = useState<{ tone: BannerTone; message: string } | null>(null);
 
   useFocusEffect(
@@ -264,7 +270,7 @@ export const ProfileScreen: React.FC<Props> = ({ navigation }) => {
         />
         <Button label={isDirty ? t('profile.saveChanges') : t('profile.noChanges')} onPress={save} loading={saving} disabled={!isDirty} />
 
-        {isAdmin(user.roles) && (
+        {canUseAdmin(user.roles) && (
           <>
             <Text style={[sectionStyle, { marginTop: theme.spacing.xxl }]}>{t('profile.adminSection')}</Text>
             <MenuRow icon="stats-chart-outline" label={t('profile.metrics')} onPress={() => navigation.navigate('AdminMetrics')} />
@@ -303,6 +309,7 @@ export const ProfileScreen: React.FC<Props> = ({ navigation }) => {
 
       <PhoneVerificationDialog
         visible={verifyingPhone}
+        channels={phoneChannels}
         user={user}
         requestCode={(country, phone, channel) => profileService.requestPhoneCode(country, phone, channel)}
         confirm={(code) => profileService.confirmPhone(code)}
