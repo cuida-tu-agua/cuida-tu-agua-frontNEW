@@ -1,7 +1,7 @@
 import type { ComponentProps } from 'react';
 import type { Ionicons } from '@expo/vector-icons';
 import i18n from '../../i18n';
-import { isAdmin } from '../../domain/admin/Admin';
+import { canUseAdmin } from '../utils/adminAccess';
 import { MainStackParamList } from './types';
 
 type IconName = ComponentProps<typeof Ionicons>['name'];
@@ -44,10 +44,14 @@ export const USER_DOOR: NavItem = { section: 'places', get label() { return i18n
 
 export const isAdminSection = (section: NavSection | null): boolean => !!section && section.startsWith('admin');
 
-/** What the side menu shows: the admin area has its own menu, everybody else the user menu (+ the door for admins). */
-export const navItemsFor = (roles: readonly string[] = [], section: NavSection | null = null): NavItem[] => {
-  if (isAdmin(roles) && isAdminSection(section)) return [...ADMIN_ITEMS];
-  return isAdmin(roles) ? [...BASE_ITEMS, ADMIN_DOOR] : [...BASE_ITEMS];
+/**
+ * What the side menu shows: the admin area has its own menu, everybody else the user menu (+ the door for admins).
+ * The administration is web only: on the phone apps an administrator gets the user menu.
+ */
+export const navItemsFor = (roles: readonly string[] = [], section: NavSection | null = null, os?: string): NavItem[] => {
+  const admin = canUseAdmin(roles, os);
+  if (admin && isAdminSection(section)) return [...ADMIN_ITEMS];
+  return admin ? [...BASE_ITEMS, ADMIN_DOOR] : [...BASE_ITEMS];
 };
 
 const SECTION_OF_ROUTE: Partial<Record<keyof MainStackParamList, NavSection>> = {

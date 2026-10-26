@@ -10,6 +10,7 @@ import { RAIL_WIDTH, SIDEBAR_WIDTH, shellModeFor, useLayout } from '../layout/br
 import { theme } from '../styles/theme';
 import { themed } from '../styles/themeRuntime';
 import { NavItem, NavSection, isAdminSection, navItemsFor, sectionOf, USER_DOOR } from './navItems';
+import { canUseAdmin } from '../utils/adminAccess';
 import { navigationRef } from './navigationRef';
 import { useTranslation } from 'react-i18next';
 
@@ -63,7 +64,7 @@ const useMenu = () => {
   const { user, logout } = useAuth();
   const section = useCurrentSection();
   const roles = user?.roles ?? [];
-  const adminArea = isAdmin(roles) && isAdminSection(section);
+  const adminArea = canUseAdmin(roles) && isAdminSection(section);
   const items = navItemsFor(roles, section);
   const { count: unread } = useUnreadCount();
 
