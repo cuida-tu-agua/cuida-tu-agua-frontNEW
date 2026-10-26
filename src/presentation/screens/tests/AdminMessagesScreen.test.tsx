@@ -6,6 +6,8 @@ jest.mock('@expo/vector-icons', () => ({ Ionicons: () => null }));
 
 let mockRoles: string[] = ['ADMIN'];
 jest.mock('../../../core/auth/AuthContext', () => ({ useAuth: () => ({ user: { roles: mockRoles } }) }));
+// The administration is web only (the tests run as a phone app): render it as the web app does
+jest.mock('../../utils/adminAccess', () => ({ canUseAdmin: (roles?: string[] | null) => !!roles?.includes('ADMIN') }));
 
 const mockList = jest.fn();
 const mockSave = jest.fn();
