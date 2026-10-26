@@ -7,8 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { LEGAL_CONTACT } from '../../../config/legal';
 import { useAuth } from '../../../core/auth/AuthContext';
 import { LEGAL_DOCUMENT_IDS, LegalDocumentId, legalDocumentFromSlug } from '../../../domain/legal/LegalDocument';
-import { LEGAL_TEXTS, legalDocument } from '../../../i18n/legal';
-import { resolveLanguage } from '../../../i18n/languages';
+import { legalDocument } from '../../../i18n/legal';
 import { Button } from '../../components/common/Button';
 import { Card } from '../../components/common/Card';
 import { PageContainer } from '../../components/common/PageContainer';
@@ -57,7 +56,6 @@ export const LegalScreen: React.FC<Props> = ({ route }) => {
     );
   }
 
-  const email = LEGAL_CONTACT.email ?? LEGAL_TEXTS[resolveLanguage(i18n.language)].emailPending;
   return (
     <PageContainer narrow gap={theme.spacing.sm}>
       <PageHeader
@@ -83,7 +81,7 @@ export const LegalScreen: React.FC<Props> = ({ route }) => {
 
       <Card variant="outlined" style={contactCardStyle}>
         <Text style={contactTitleStyle}>{t('legal.contactTitle')}</Text>
-        <Text style={rowSummaryStyle}>{t('legal.contactText', { email })}</Text>
+        <Text style={rowSummaryStyle}>{t('legal.contactText', { email: LEGAL_CONTACT.email })}</Text>
         {signedIn && (
           <Button label={t('legal.deleteAccount')} variant="ghost" size="small" onPress={() => navigation.navigate('DeleteAccount')} style={deleteStyle} />
         )}

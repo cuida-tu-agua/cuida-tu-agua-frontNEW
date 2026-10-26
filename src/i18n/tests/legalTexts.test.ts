@@ -31,14 +31,14 @@ describe('legal texts', () => {
     expect(all.filter((text) => text.trim() === '')).toEqual([]);
   });
 
-  it('fills in the people responsible, the date and the e-mail (pending while none is configured)', () => {
+  it('fills in the people responsible, the date and the e-mail of the project', () => {
     const policy = legalDocument('privacy', 'es');
     const all = policy.sections.flatMap((s) => s.blocks.flatMap(textsOf)).join('\n');
 
     expect(all).not.toMatch(/{{/);
     expect(all).toContain(`${LEGAL_RESPONSIBLES[0]}, ${LEGAL_RESPONSIBLES[1]} y ${LEGAL_RESPONSIBLES[2]}`);
     expect(all).toContain('26 de octubre de 2026');
-    expect(all).toContain('(correo pendiente de publicar)');
+    expect(all).toContain('sywater2026@gmail.com');
   });
 
   it('draws a document in the language asked for, and in Spanish for an unknown one', () => {

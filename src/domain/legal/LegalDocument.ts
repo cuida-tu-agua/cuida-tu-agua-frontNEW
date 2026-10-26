@@ -42,8 +42,6 @@ export interface LegalDocument {
 export interface LegalTexts {
   /** Joins the last two names: "A, B y C". */
   and: string;
-  /** Shown where the e-mail goes while the project has none. */
-  emailPending: string;
   /** Where the responsible people live when no city is configured. */
   country: string;
   documents: Record<LegalDocumentId, Omit<LegalDocument, 'id'>>;

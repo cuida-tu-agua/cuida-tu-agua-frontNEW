@@ -18,7 +18,6 @@ describe('legal documents', () => {
   it('puts the contact data in the titles, the paragraphs and the lists', () => {
     const texts = {
       and: 'y',
-      emailPending: '-',
       country: 'Colombia',
       documents: {
         terms: {

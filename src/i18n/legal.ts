@@ -22,7 +22,7 @@ export const legalDocument = (id: LegalDocumentId, language: string): LegalDocum
   return fillLegalDocument(id, texts, {
     responsible: joinNames(LEGAL_RESPONSIBLES, texts.and),
     city: LEGAL_CONTACT.city ?? texts.country,
-    email: LEGAL_CONTACT.email ?? texts.emailPending,
+    email: LEGAL_CONTACT.email,
     date: legalEffectiveDate(lang),
   });
 };

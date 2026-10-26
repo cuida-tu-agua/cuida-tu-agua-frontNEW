@@ -3,7 +3,6 @@ import { LegalTexts } from '../../../domain/legal/LegalDocument';
 /** Tradução de legal/es.ts (prevalece o texto em espanhol). */
 export const legalPt: LegalTexts = {
   and: 'e',
-  emailPending: '(e-mail a publicar)',
   country: 'Colômbia',
   documents: {
     terms: {
