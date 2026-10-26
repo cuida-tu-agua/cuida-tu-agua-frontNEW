@@ -3,11 +3,13 @@ import { Text, TextStyle, View, ViewStyle } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { authService } from '../../../core/di/container';
+import { LegalDocumentId } from '../../../domain/legal/LegalDocument';
 import { toAppError } from '../../../infrastructure/http/httpError';
 import { AuthFooterLink, AuthLayout, GoogleSignInButton, PasswordField, PasswordStrengthMeter, UIcon } from '../../components/auth';
 import { Banner, BannerTone } from '../../components/common/Banner';
 import { Button } from '../../components/common/Button';
 import { Checkbox } from '../../components/common/Checkbox';
+import { GoogleConsentNote, LegalDocumentModal, LegalLink } from '../../components/legal';
 import { Input } from '../../components/common/Input';
 import { useForm } from '../../hooks/useForm';
 import { AuthStackParamList } from '../../navigation/types';
@@ -49,6 +51,7 @@ export const RegisterScreen: React.FC<Props> = ({ navigation }) => {
   const { values, errors, setValue, blur } = form;
 
   const [submitting, setSubmitting] = useState(false);
+  const [legalOpen, setLegalOpen] = useState<LegalDocumentId | null>(null);
   const [banner, setBanner] = useState<{
     tone: BannerTone;
     message: string;
@@ -194,9 +197,9 @@ export const RegisterScreen: React.FC<Props> = ({ navigation }) => {
       >
         <Text style={termsTextStyle}>
           {t('auth.register.termsPrefix')}
-          <Text style={termsLinkStyle}>{t('auth.register.termsLink')}</Text>
+          <LegalLink label={t('auth.register.termsLink')} onOpen={() => setLegalOpen('terms')} />
           {t('auth.register.termsMiddle')}
-          <Text style={termsLinkStyle}>{t('auth.register.privacyLink')}</Text>
+          <LegalLink label={t('auth.register.privacyLink')} onOpen={() => setLegalOpen('privacy')} />
           {t('auth.register.termsSuffix')}
         </Text>
       </Checkbox>
@@ -204,6 +207,8 @@ export const RegisterScreen: React.FC<Props> = ({ navigation }) => {
       <Button label={t('auth.register.submit')} onPress={handleSubmit} loading={submitting} />
 
       <GoogleSignInButton onError={(message) => setBanner({ tone: 'error', message })} />
+      <GoogleConsentNote />
+      <LegalDocumentModal documentId={legalOpen} onClose={() => setLegalOpen(null)} />
     </AuthLayout>
   );
 };
@@ -214,4 +219,3 @@ const halfStyle: ViewStyle = { flex: 1 };
 
 const termsTextStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, color: theme.colors.textSecondary }));
 
-const termsLinkStyle: TextStyle = themed(() => ({ color: theme.colors.primary, textDecorationLine: 'underline' }));

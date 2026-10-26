@@ -10,6 +10,7 @@ import { AuthFooterLink, AuthLayout, GoogleSignInButton, PasswordField, UIcon } 
 import { Banner, BannerTone } from '../../components/common/Banner';
 import { Button } from '../../components/common/Button';
 import { Input } from '../../components/common/Input';
+import { GoogleConsentNote } from '../../components/legal';
 import { formatCountdown, useCountdown } from '../../hooks/useCountdown';
 import { AuthStackParamList } from '../../navigation/types';
 import { theme } from '../../styles/theme';
@@ -179,6 +180,7 @@ export const LoginScreen: React.FC<Props> = ({ navigation, route }) => {
       />
 
       <GoogleSignInButton onError={(message) => setBanner({ tone: 'error', message })} />
+      <GoogleConsentNote />
     </AuthLayout>
   );
 };

@@ -13,6 +13,7 @@ import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Logo } from '../common/Logo';
+import { LegalLinks } from '../legal';
 import { useLayout } from '../../layout/breakpoints';
 import { useAppTheme } from '../../theme/ThemeProvider';
 import { theme } from '../../styles/theme';
@@ -49,6 +50,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ title, subtitle, onBack,
             {!!subtitle && <Text style={splitSubtitleStyle}>{subtitle}</Text>}
             <View style={{ marginTop: theme.spacing.lg }}>{children}</View>
             <View style={{ marginTop: theme.spacing.md }}>{footer}</View>
+            <LegalLinks />
           </View>
         </ScrollView>
       </View>
@@ -90,6 +92,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ title, subtitle, onBack,
         <View style={cardStyle}>{children}</View>
 
         {footer}
+        <LegalLinks />
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
