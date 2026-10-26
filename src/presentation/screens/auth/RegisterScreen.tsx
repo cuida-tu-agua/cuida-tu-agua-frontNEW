@@ -9,7 +9,7 @@ import { AuthFooterLink, AuthLayout, GoogleSignInButton, PasswordField, Password
 import { Banner, BannerTone } from '../../components/common/Banner';
 import { Button } from '../../components/common/Button';
 import { Checkbox } from '../../components/common/Checkbox';
-import { GoogleConsentNote, LegalDocumentModal, LegalLink } from '../../components/legal';
+import { LegalDocumentModal, LegalLink } from '../../components/legal';
 import { Input } from '../../components/common/Input';
 import { useForm } from '../../hooks/useForm';
 import { AuthStackParamList } from '../../navigation/types';
@@ -207,7 +207,6 @@ export const RegisterScreen: React.FC<Props> = ({ navigation }) => {
       <Button label={t('auth.register.submit')} onPress={handleSubmit} loading={submitting} />
 
       <GoogleSignInButton onError={(message) => setBanner({ tone: 'error', message })} />
-      <GoogleConsentNote />
       <LegalDocumentModal documentId={legalOpen} onClose={() => setLegalOpen(null)} />
     </AuthLayout>
   );
