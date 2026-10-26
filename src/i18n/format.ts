@@ -3,7 +3,10 @@ import i18n from 'i18next';
 /** BCP 47 tag of each language for Intl and toLocale*String. Spanish is the Colombian one; Portuguese is the Brazilian one. */
 const LOCALE_TAGS: Record<string, string> = { es: 'es-CO', en: 'en-US', fr: 'fr-FR', pt: 'pt-BR' };
 
-export const localeTag = (): string => LOCALE_TAGS[i18n.language] ?? LOCALE_TAGS.es;
+/** The tag of a given language (the legal texts are drawn in a language that is not always the current one). */
+export const localeTagOf = (language: string): string => LOCALE_TAGS[language] ?? LOCALE_TAGS.es;
+
+export const localeTag = (): string => localeTagOf(i18n.language);
 
 /** The marks that separate thousands and decimals: "1.234,5" (es, pt), "1,234.5" (en), "1 234,5" (fr, with a no-break space). */
 export const numberMarks = (): { group: string; decimal: string } => {
