@@ -73,16 +73,22 @@ const looks: Record<ButtonVariant, Record<'normal' | 'hover' | 'pressed' | 'disa
   },
 }));
 
+// The label is ONE line: a long label wrapped inside a small button ("VER / PANEL") broke the look of the cards.
+// Sizes a little under the manual's 18 px so the usual labels fit in one line, on the web and on the phone.
 const labelStyle: TextStyle = themed(() => ({
   ...(theme.textStyles.button as TextStyle),
+  fontSize: 16,
+  lineHeight: 20,
+  letterSpacing: 0.5,
   textTransform: 'uppercase',
   textAlign: 'center',
+  flexShrink: 1,
 }));
 
-const smallLabelStyle: TextStyle = { fontSize: 14, letterSpacing: 0.7 };
+const smallLabelStyle: TextStyle = { fontSize: 13, lineHeight: 16, letterSpacing: 0.4 };
 
-/** Web only: the desktop label (18 px, extra bold) is too big for the buttons of a page; a 15 px semibold reads better. */
-const webLabelStyle: TextStyle = Platform.OS === 'web' ? { fontSize: 15, fontWeight: '700', letterSpacing: 0.6 } : {};
+/** Web only: the buttons of a page read better at 14 px semibold than with the desktop label (18 px, extra bold). */
+const webLabelStyle: TextStyle = Platform.OS === 'web' ? { fontSize: 14, lineHeight: 18, fontWeight: '700', letterSpacing: 0.4 } : {};
 
 export const Button: React.FC<ButtonProps> = ({
   label,
@@ -132,7 +138,9 @@ export const Button: React.FC<ButtonProps> = ({
               ) : (
                 <View style={styles.iconWrapper}>{icon}</View>
               ))}
-            <Text style={[labelStyle, webLabelStyle, size === 'small' && smallLabelStyle, { color }]}>{label}</Text>
+            <Text style={[labelStyle, webLabelStyle, size === 'small' && smallLabelStyle, { color }]} numberOfLines={1}>
+              {label}
+            </Text>
           </View>
         );
       }}

@@ -61,26 +61,29 @@ const WebCard: React.FC<PlaceCardProps> = ({ place, onEdit, onOpenPanel, onShare
             label={t('places.card.viewPanel')}
             size="small"
             onPress={onOpenPanel}
-            style={{ flex: 1 }}
             icon={<Ionicons name="stats-chart" size={16} color={theme.colors.textOnPrimary} />}
           />
         )}
-        <Button
-          label={t('places.card.edit')}
-          size="small"
-          variant="secondary"
-          onPress={onEdit}
-          icon={<Ionicons name="create-outline" size={16} color={theme.colors.primary} />}
-        />
-        {!!onShare && (
+        <View style={webSecondaryRowStyle}>
           <Button
-            label={t('sharing.share')}
+            label={t('places.card.edit')}
             size="small"
             variant="secondary"
-            onPress={onShare}
-            icon={<Ionicons name="share-social-outline" size={16} color={theme.colors.primary} />}
+            onPress={onEdit}
+            style={{ flex: 1 }}
+            icon={<Ionicons name="create-outline" size={16} color={theme.colors.primary} />}
           />
-        )}
+          {!!onShare && (
+            <Button
+              label={t('sharing.share')}
+              size="small"
+              variant="secondary"
+              onPress={onShare}
+              style={{ flex: 1 }}
+              icon={<Ionicons name="share-social-outline" size={16} color={theme.colors.primary} />}
+            />
+          )}
+        </View>
       </View>
     </Pressable>
   );
@@ -197,4 +200,6 @@ const webCardStyle: ViewStyle = themed(() => ({
 const webNameStyle: TextStyle = themed(() => ({ ...theme.textStyles.h3, fontSize: 19, lineHeight: 24, fontWeight: '800', color: theme.colors.textPrimary }));
 const webLocationStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, fontSize: 15, color: theme.colors.textSecondary }));
 const webTypeStyle: TextStyle = themed(() => ({ ...theme.textStyles.caption, fontSize: 14, color: theme.colors.textMuted }));
-const webButtonsStyle: ViewStyle = { flexDirection: 'row', gap: theme.spacing.sm, alignItems: 'center' };
+// The panel button on its own line, edit and share below it sharing the width: the same layout in every card
+const webButtonsStyle: ViewStyle = { gap: theme.spacing.sm };
+const webSecondaryRowStyle: ViewStyle = { flexDirection: 'row', gap: theme.spacing.sm };
