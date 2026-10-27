@@ -16,6 +16,7 @@ export const linking: LinkingOptions<ReactNavigation.RootParamList> = {
       ForgotPassword: 'forgot-password',
 
       Guest: 'guest/:token',
+      Legal: 'legal/:doc?',
 
       Places: 'places',
       CreatePlace: 'places/new',
