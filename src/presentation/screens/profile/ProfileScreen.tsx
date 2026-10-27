@@ -295,6 +295,9 @@ export const ProfileScreen: React.FC<Props> = ({ navigation }) => {
           onPress={() => navigation.navigate('NotificationPreferences')}
         />
 
+        <Text style={[sectionStyle, { marginTop: theme.spacing.xl }]}>{t('profile.legalSection')}</Text>
+        <MenuRow icon="shield-checkmark-outline" label={t('profile.legal')} onPress={() => navigation.navigate('Legal')} />
+
         <Text style={[sectionStyle, { marginTop: theme.spacing.xl }]}>{t('profile.securitySection')}</Text>
         <MenuRow icon="key-outline" label={t('profile.changePassword')} onPress={() => navigation.navigate('ChangePassword')} />
         <MenuRow icon="log-out-outline" label={t('profile.logout')} onPress={() => setConfirmingLogout(true)} />

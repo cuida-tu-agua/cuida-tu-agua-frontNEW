@@ -8,6 +8,7 @@ import { PlaceDeviceScreen } from '../screens/devices/PlaceDeviceScreen';
 import { CreatePlaceScreen } from '../screens/places/CreatePlaceScreen';
 import { EditPlaceScreen } from '../screens/places/EditPlaceScreen';
 import { GuestScreen } from '../screens/guest/GuestScreen';
+import { LegalScreen } from '../screens/legal/LegalScreen';
 import { InvitationsScreen } from '../screens/sharing/InvitationsScreen';
 import { PlaceSharingScreen } from '../screens/sharing/PlaceSharingScreen';
 import { NotificationPreferencesScreen } from '../screens/notifications/NotificationPreferencesScreen';
@@ -77,6 +78,7 @@ export const MainNavigator: React.FC = () => {
       />
       <Stack.Screen name="Profile" component={themeAware(ProfileScreen)} options={{ title: t('nav.profile') }} />
       <Stack.Screen name="ChangePassword" component={themeAware(ChangePasswordScreen)} options={{ title: t('changePassword.title') }} />
+      <Stack.Screen name="Legal" component={themeAware(LegalScreen)} options={{ title: t('legal.title') }} />
       <Stack.Screen name="DeleteAccount" component={themeAware(DeleteAccountScreen)} options={{ title: t('deleteAccount.title') }} />
     </Stack.Navigator>
   );
